@@ -4,7 +4,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "db:create": "sequelize-cli db:create",
+    "db:migrate": "npx Sequelize-cli db:migrate",
+    "db:migrate:undo": "npx sequelize-cli db:migrate:undo"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +17,7 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mysql2": "^3.22.3",
+    "otp-generator": "^4.0.1",
     "sequelize": "^6.37.8",
     "sequelize-cli": "^6.6.5"
   },
