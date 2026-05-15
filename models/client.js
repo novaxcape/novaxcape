@@ -18,13 +18,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      defaultValue: DataTypes.UUIDV4
+      autoIncrement: true
     },
     fullName: DataTypes.STRING,
     email: DataTypes.STRING,
-    phoneNumber: DataTypes.STRING,
+    phoneNumber: DataTypes.STRING, // Changed to STRING
     age: DataTypes.INTEGER,
     gender: DataTypes.ENUM('Male', 'Female'),
+    password: DataTypes.STRING, // Added password field
     otp: DataTypes.STRING,
     profilePicture: DataTypes.TEXT,
     role: DataTypes.STRING,

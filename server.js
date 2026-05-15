@@ -3,10 +3,15 @@ const express = require('express')
 const sequelize = require('./database/database')
 const PORT = process.env.PORT
 
+const clientRoutes = require('./route/client')
+
+
 
 const app = express()
 app.use(express.json())
 
+// Use routes
+app.use('/api/client', clientRoutes)
 
 const databaseConnection = async () => {
     try {
