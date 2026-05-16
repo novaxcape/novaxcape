@@ -5,8 +5,6 @@ const PORT = process.env.PORT
 
 const clientRoutes = require('./route/client')
 
-
-
 const app = express()
 app.use(express.json())
 
@@ -27,3 +25,4 @@ const databaseConnection = async () => {
 }
 
 databaseConnection()
+ 

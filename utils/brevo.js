@@ -2,9 +2,10 @@ require('dotenv').config();
 const { TransactionalEmailsApi, SendSmtpEmail } = require('@getbrevo/brevo');
 
 const brevoClient = new TransactionalEmailsApi();
-brevoClient.setApiKey('api-key', process.env.BREVO_API_KEY || process.env.BERVO_API_KEY);
 
-const brevo = async (userEmail, username, html) => {
+brevoClient.setApiKey('api-key', process.env.BREVO_API_KEY || process.env.BREVO_API_KEY);
+
+exports.sendEmail = async (payloads) => {
     const senderEmail = process.env.SMTP_EMAIL?.trim();
 
     if (!senderEmail) {
@@ -13,18 +14,16 @@ const brevo = async (userEmail, username, html) => {
 
     const sendSmtpEmail = new SendSmtpEmail();
     sendSmtpEmail.subject = "OTP Verification";
-    sendSmtpEmail.htmlContent = html;
+    sendSmtpEmail.htmlContent = payloads.html;
     sendSmtpEmail.sender = {
         email: senderEmail,
         name: "Novaxcape Support",
     };
     sendSmtpEmail.to = [{
-        email: userEmail,
-        name: username
+        email: payloads.email,
+        name: payloads.name
     }];
 
     await brevoClient.sendTransacEmail(sendSmtpEmail);
-    console.log('email sent successfully to', userEmail);
+    console.log('email sent successfully to', payloads.email);
 };
-
-module.exports = { brevo };
