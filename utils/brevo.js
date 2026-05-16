@@ -1,8 +1,8 @@
 require('dotenv').config();
-const { TransactionalEmailsApi, SendSmtpEmail } = require('@getbrevo/brevo');
+const Brevo = require('@getbrevo/brevo');
 
-const brevoClient = new TransactionalEmailsApi();
-brevoClient.setApiKey('api-key', process.env.BREVO_API_KEY || process.env.BERVO_API_KEY);
+const brevoClient = new Brevo.TransactionalEmailsApi();
+brevoClient.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY );
 
 const brevo = async (userEmail, username, html) => {
     const senderEmail = process.env.SMTP_EMAIL?.trim();
@@ -11,7 +11,7 @@ const brevo = async (userEmail, username, html) => {
         throw new Error('SMTP_EMAIL is required for Brevo sender email');
     }
 
-    const sendSmtpEmail = new SendSmtpEmail();
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
     sendSmtpEmail.subject = "OTP Verification";
     sendSmtpEmail.htmlContent = html;
     sendSmtpEmail.sender = {

@@ -3,22 +3,8 @@ const { autoCapitalizeFirstChar } = require('../helper/validateInput');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const otpGenerator = require('otp-generator');
-// const { brevo } = require('../utils/brevo');
+const { brevo } = require('../utils/brevo');
 
-const sendOTPEmail = async (email, otp) => {
-    const html = `
-        <html>
-            <head></head>
-            <body>
-                <p>Hello,</p>
-                <p>Your OTP for email verification is: <strong>${otp}</strong></p>
-                <p>This OTP will expire in 5 minutes.</p>
-                <p>If you didn't request this, please ignore this email.</p>
-            </body>
-        </html>
-    `;
-    await brevo(email, 'User', html);
-};
 
 exports.register = async (req, res) => {
     console.log(`Hello, I'm called`)
@@ -47,12 +33,6 @@ exports.register = async (req, res) => {
         const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
 
         
-        const otpExpire = new Date(Date.now() + 5 * 60 * 1000);
-
-        // const checkLength = await client.findAll()
-        // console.log(checkLength.length)
-
-        
         const Aclient = {
             // id: Number(checkLength) + 1,
             fullName: await autoCapitalizeFirstChar(fullName),
@@ -61,9 +41,7 @@ exports.register = async (req, res) => {
             phoneNumber,
             age,
             gender,
-            otp,
-            otpExpire,
-            isVerified: false
+            otp
         }
 
         console.log(client)
