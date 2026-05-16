@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING, // Added password field
     otp: DataTypes.STRING,
     profilePicture: DataTypes.TEXT,
-    role: DataTypes.ENUM('User', 'Admin'),
+    role: DataTypes.STRING,
     otpExpire: DataTypes.DATE,
     isVerified: DataTypes.BOOLEAN,
     userName: DataTypes.STRING

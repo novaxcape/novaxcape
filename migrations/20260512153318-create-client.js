@@ -37,7 +37,7 @@ module.exports = {
         type: Sequelize.TEXT,
       },
       role: {
-        type: Sequelize.ENUM('User', 'Admin'),
+        type: Sequelize.STRING,
         defaultValue: "User",
       },
       otpExpire: {
