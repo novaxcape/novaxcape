@@ -11,30 +11,42 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+        client.hasMany(models.Booking, { foreignKey: 'clientId', as: 'bookings'});
     }
   }
   client.init({
     id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      autoIncrement: true
+       allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
     },
-    fullName: DataTypes.STRING,
+    firstName: DataTypes.STRING,
+    lastName: DataTypes.STRING,
     email: DataTypes.STRING,
     phoneNumber: DataTypes.STRING, // Changed to STRING
-    age: DataTypes.INTEGER,
-    gender: DataTypes.ENUM('Male', 'Female'),
-    password: DataTypes.STRING, // Added password field
-    otp: DataTypes.STRING,
+    gender: {
+      type: DataTypes.ENUM('Male', 'Female'),
+      allowNull: true
+    },
+    password: DataTypes.STRING,
+    otp: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     profilePicture: DataTypes.TEXT,
     role: DataTypes.STRING,
-    otpExpire: DataTypes.DATE,
+    otpExpire: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     isVerified: DataTypes.BOOLEAN,
+    isLocked: DataTypes.BOOLEAN,
+    failedLoginAttempts: DataTypes.INTEGER,
     userName: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'client',
+    modelName: 'clients',
   });
   return client;
 };

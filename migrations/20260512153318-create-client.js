@@ -4,12 +4,15 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('clients', {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true
       },
-      fullName: {
+      firstName: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      lastName: {
         type: Sequelize.STRING,
         allowNull: false
       },
@@ -21,30 +24,39 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      age: {
-        type: Sequelize.INTEGER,
+      password: {
+        type: Sequelize.STRING,
         allowNull: false
       },
       gender: {
         type: Sequelize.ENUM('Male', 'Female'),
-        allowNull: false
+        allowNull: true
       },
       otp: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       profilePicture: {
         type: Sequelize.TEXT,
       },
       role: {
         type: Sequelize.STRING,
-        defaultValue: "User",
+        defaultValue: "Client",
       },
       otpExpire: {
         type: Sequelize.DATE,
+        allowNull: true,
         defaultValue: () => new Date(Date.now() + 1000 * 60 * 7)
       },
       isVerified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      failedLoginAttempts: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+      },
+      isLocked: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
       },

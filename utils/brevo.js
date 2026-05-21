@@ -5,6 +5,10 @@ const Brevo = require('@getbrevo/brevo');
 exports.sendSingleEmail = async (options) => {
   try {
     const apikey = process.env.BREVO_API_KEY;
+    if (!apikey) {
+      throw new Error("BREVO_API_KEY is not configured");
+    }
+
     const apiInstance = new Brevo.TransactionalEmailsApi();
     apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, apikey);
     const sendSmtpEmail = new Brevo.SendSmtpEmail();
@@ -15,6 +19,20 @@ exports.sendSingleEmail = async (options) => {
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
     console.log("Email sent to:", options.email);
   } catch (error) {
-    throw new Error("Email not sent to:", options.email)
+    const status = error?.response?.status;
+    const brevoMessage = error?.response?.data?.message || error.message;
+    const emailError = new Error(`Email not sent to ${options.email}: ${brevoMessage}`);
+
+    emailError.code = 'BREVO_EMAIL_FAILED';
+    emailError.status = status;
+    emailError.brevoMessage = brevoMessage;
+
+    console.error('Brevo email failed:', {
+      recipient: options.email,
+      status,
+      message: brevoMessage
+    });
+
+    throw emailError;
   }
 };
