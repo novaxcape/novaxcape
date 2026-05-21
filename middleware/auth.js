@@ -1,41 +1,22 @@
-const jwt = require('jsonwebtoken');
-const client = require('../models/client');
+const jwt = require('jsonwebtoken')
 
-// Middleware to authenticate JWT token
-const authenticateToken = async (req, res, next) => {
+const authenticateToken = async(req, res, next)=>{
     try {
-        const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-
-        if (!token) {
+        const token = req.headers.authorization?.split(" ")[1]
+        if(!token){
             return res.status(401).json({
-                message: 'Access token required'
-            });
+                message: 'Token not found'
+            })
         }
-
-        // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Get user from database
-        const user = await client.findByPk(decoded.id);
-        if (!user) {
-            return res.status(401).json({
-                message: 'Invalid token'
-            });
-        }
-
-        req.user = user;
-        next();
+        
+        const validToken = await jwt.verify(token, process.env.SECERT_KEY)
+        req.user = validToken
+        next()
     } catch (error) {
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                message: 'Token expired'
-            });
-        }
-        return res.status(403).json({
-            message: 'Invalid token'
-        });
+        next(error)
     }
-};
+}
 
-module.exports = { authenticateToken };
+module.exports ={
+     authenticateToken
+}
