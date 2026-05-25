@@ -24,12 +24,18 @@ module.exports = (sequelize, DataTypes) => {
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
     email: DataTypes.STRING,
-    phoneNumber: DataTypes.STRING, // Changed to STRING
+    phoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     gender: {
       type: DataTypes.ENUM('Male', 'Female'),
       allowNull: true
     },
-    password: DataTypes.STRING,
+    password: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     otp: {
       type: DataTypes.STRING,
       allowNull: true

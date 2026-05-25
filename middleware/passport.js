@@ -13,8 +13,11 @@ passport.use(new GoogleStrategy({
         let user = await userModel.findOne({email: profile._json.email})
 
         if (!user){
+            const [firstName, ...lastName] = (profile._json.name || '').split(' ')
+
             user = new userModel({
-                fullname: profile._json.name,
+                firstName: profile._json.given_name,
+                lastName: profile._json.family_name,
                 phoneNumber: `${Math.floor(Math.random() * 1E9)}`,
                 email: profile._json.email,
                 isVerified: profile._json.email_verified,
@@ -23,6 +26,7 @@ passport.use(new GoogleStrategy({
             })
             await user.save()
         }
+
         return cb(null, user)
     } catch (error) {
       console.log('Error signing up with google:', error.message);
@@ -36,11 +40,15 @@ passport.serializeUser((user, cb) => {
 });
 
 passport.deserializeUser(async (id, cb) => {
+  try {
   const user = await userModel.findById(id)
   if(!user){
     return cb(new Error('User not found'), null)
   }
   cb(null, user)
+} catch (error) {
+  cb(error, null)
+}
 });
 
 const profile = passport.authenticate('google', {scope: ['profile', 'email']});
