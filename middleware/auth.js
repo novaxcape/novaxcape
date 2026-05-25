@@ -17,6 +17,17 @@ const authenticateToken = async(req, res, next)=>{
     }
 }
 
+
+const adminAuth = async (req, res, next) => {
+    if(req.user.role !== 'admin'){
+        return res.status(403).json({
+            message: 'Access denied'
+        })
+    }
+    next()
+}
+
 module.exports ={
-     authenticateToken
+     authenticateToken,
+     adminAuth
 }

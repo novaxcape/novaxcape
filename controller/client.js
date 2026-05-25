@@ -3,7 +3,7 @@ const { autoCapitalizeFirstChar } = require('../helper/validateInput');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const otpGenerator = require('otp-generator');
-const { sendOTPEmail } = require('../helper/emailTemplate');
+const { sendOTPEmail, resetPasswordTemplate, resetPasswordSuccessfulTemplate } = require('../helper/emailTemplate');
 const { sendSingleEmail } = require('../utils/brevo')
 
 
@@ -297,7 +297,7 @@ exports.forgotPassword = async (req, res) => {
         await sendSingleEmail({
             email: client.email,
             name: `${client.firstName} ${client.lastName}`,
-            html: await sendOTPEmail(`${client.firstName} ${client.lastName}`, OTP),
+            html: await resetPasswordTemplate(`${client.firstName} ${client.lastName}`, OTP),
             subject: "RESET PASSWORD OTP"
         })
 
@@ -333,7 +333,13 @@ exports.resetPassword = async (req, res) => {
         user.password = hashedPassword
         user.otp = null
         user.otpExpire = null
-        
+
+        await sendSingleEmail({
+            email: client.email,
+            name: `${client.firstName} ${client.lastName}`,
+            html: await resetPasswordSuccessfulTemplate(`${client.firstName} ${client.lastName}`),
+            subject: "RESET PASSWORD SUCCESSFUL"
+        })
         await user.save()
 
          res.status(200).json({

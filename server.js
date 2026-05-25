@@ -35,7 +35,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Use routes
-app.use('/api/client', clientRoutes)
+app.use('/api/v1/client', clientRoutes)
 
 app.use((err, req, res, next) => {
     if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
