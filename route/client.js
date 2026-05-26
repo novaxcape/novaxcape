@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const clientController = require('../controller/client');
-const {authenticateToken} = require('../middleware/auth')
+const clientValidate = require('../middleware/validation')
+const { authenticateToken } = require('../middleware/auth')
 const { profile, loginProfile } = require('../middleware/passport');
 const { upload } = require('../middleware/multer');
 
-router.post('/register', clientController.register);
-router.post('/verify-email', clientController.verifyEmail);
+router.post('/register', clientValidate.clientReg, clientController.register);
+router.post('/verify-email', clientValidate.otpReg, clientController.verifyEmail);
 router.post('/resend-otp', clientController.resendOTP);
 router.post('/login', clientController.login);
 router.put('/update-profile/:id', upload.single('profilePicture'), clientController.updateProfile);
