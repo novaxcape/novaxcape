@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const otpGenerator = require('otp-generator');
 const { sendOTPEmail, resetPasswordTemplate, resetPasswordSuccessfulTemplate } = require('../helper/emailTemplate');
 const { sendSingleEmail } = require('../utils/brevo')
+const fs = require('fs');
+const cloudinary = require('../middleware/cloudinary')
 
 
 exports.register = async (req, res) => {
@@ -119,7 +121,6 @@ exports.verifyEmail = async (req, res) => {
     }
 };
 
-// Resend OTP
 exports.resendOTP = async (req, res) => {
     try {
         const { email } = req.body;
@@ -164,7 +165,6 @@ exports.resendOTP = async (req, res) => {
     }
 };
 
-// Login client
 exports.login = async (req, res) => {
     try {
 
@@ -238,39 +238,42 @@ exports.login = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-        console.log("anything")
-        const files = req.file;
-        console.log(files)
-        const filePath = files['path']
+        const { userName } = req.body;
+        const { id } = req.params;
 
-        const uploadToCloudinary = await cloudinary.uploader.upload(filePath,(error, result) => {
-            if (error) {
-                console.log(error)
-            } else {
-                console.log(result)
-            };})
-       
-        const response = [{
-            secureUrl: uploadToCloudinary.secure_url,
-            publicId: uploadToCloudinary.public_id
-        }]
-        fs.unlinkSync(filePath)
+        const client = await Client.findByPk(id)
+        if (!client) {
+            return res.status(404).json({
+                message: "Client not found"
+            })
+        }
 
-        const {userName} = req.body;
-        const {id} = req.params;
+        const updateData = {}
 
-        const client = await Client.findById(id)
+        if (userName) {
+            updateData.userName = userName
+        }
 
-        const updatedClient = await Client.update({
-            userName,
-            profilePicture: response 
-        })
-        
+        if (req.file) {
+            const filePath = req.file.path
+            const uploadToCloudinary = await cloudinary.uploader.upload(filePath)
+
+            updateData.profilePicture = JSON.stringify({
+                secureUrl: uploadToCloudinary.secure_url,
+                publicId: uploadToCloudinary.public_id
+            })
+
+            fs.unlinkSync(filePath)
+        }
+
+        await client.update(updateData)
+
         res.status(200).json({
             message: "Profile updated successfully",
-            data: updatedClient
+            data: client
         })
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({
             message: error.message
         })
@@ -286,7 +289,7 @@ exports.forgotPassword = async (req, res) => {
                 message: 'Invalid credential'
             })
         }
-        const OTP = Math.round(Math.random() * 1e6).toString().padStart(6, "0")
+        const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, digits: true, lowerCaseAlphabets: false });
 
         client.otp = OTP
         console.log(OTP)
@@ -335,9 +338,9 @@ exports.resetPassword = async (req, res) => {
         user.otpExpire = null
 
         await sendSingleEmail({
-            email: client.email,
-            name: `${client.firstName} ${client.lastName}`,
-            html: await resetPasswordSuccessfulTemplate(`${client.firstName} ${client.lastName}`),
+            email: user.email,
+            name: `${user.firstName} ${user.lastName}`,
+            html: await resetPasswordSuccessfulTemplate(`${user.firstName} ${user.lastName}`),
             subject: "RESET PASSWORD SUCCESSFUL"
         })
         await user.save()
@@ -400,13 +403,13 @@ exports.changePassword = async (req, res) => {
 exports.loginWithGoogle = async (req, res) => {
     try {
         const token = await jwt.sign({
-            id: req.user._id,
+            id: req.user.id,
             role: req.user.role
         }, process.env.SECERT_KEY, {expiresIn: '1d'});
 
         res.status(200).json({
             message: 'Login successful',
-            data: req.user.fullname,
+            data: req.user,
             token
         })
     } catch (error) {

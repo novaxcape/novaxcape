@@ -7,6 +7,7 @@ const {passport} =require ('./middleware/passport')
 
 
 const clientRoutes = require('./route/client')
+const adminRoutes = require('./route/admin')
 
 const rateLimit = require('express-rate-limit')
 
@@ -27,15 +28,17 @@ app.use('/api/v1/login', limiter)
 
 app.use(express_session({
     secret: 'Oshio-Ella',
-    resave: true,
-    saveUninitialized: true
+    resave: false,
+    saveUninitialized: false
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Use routes
+
 app.use('/api/v1/client', clientRoutes)
+app.use('/api/v1/admin', adminRoutes)
+
 
 app.use((err, req, res, next) => {
     if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {

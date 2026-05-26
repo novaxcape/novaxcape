@@ -20,17 +20,9 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      phoneNumber: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
       role: {
         type: Sequelize.STRING,
         defaultValue: "Admin"
-      },
-      isVerified: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
       },
       createdAt: {
         allowNull: false,
