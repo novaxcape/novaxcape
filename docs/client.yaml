@@ -1,0 +1,367 @@
+openapi: 3.0.0
+
+info:
+  title: Novaxcape Client API
+  version: 1.0.0
+  description: Documentation for client endpoints
+
+paths:
+
+  /api/v1/client/register:
+    post:
+      summary: Register client
+      tags:
+        - Client
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+              required:
+                - firstName
+                - lastName
+                - email
+                - password
+                - phoneNumber
+                - gender
+
+              properties:
+                firstName:
+                  type: string
+                  example: John
+
+                lastName:
+                  type: string
+                  example: Doe
+
+                email:
+                  type: string
+                  example: johndoe@gmail.com
+
+                password:
+                  type: string
+                  example: Password123@
+
+                phoneNumber:
+                  type: string
+                  example: "09087654321"
+
+                gender:
+                  type: string
+                  example: male
+
+      responses:
+        "201":
+          description: User registered successfully
+
+        "400":
+          description: User with this email already exists
+
+        "500":
+          description: Something went wrong
+
+  /api/v1/client/verify-email:
+    post:
+      summary: Verify client email
+      tags:
+        - Client
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+              required:
+                - email
+                - otp
+
+              properties:
+                email:
+                  type: string
+                  example: johndoe@gmail.com
+
+                otp:
+                  type: string
+                  example: "123456"
+
+      responses:
+        "200":
+          description: Email verified successfully
+
+        "400":
+          description: Invalid OTP or OTP expired
+
+        "404":
+          description: User not found
+
+        "500":
+          description: Something went wrong
+
+  /api/v1/client/resend-otp:
+    post:
+      summary: Resend OTP
+      tags:
+        - Client
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+              required:
+                - email
+
+              properties:
+                email:
+                  type: string
+                  example: johndoe@gmail.com
+
+      responses:
+        "200":
+          description: OTP resent successfully
+
+        "404":
+          description: User not found
+
+        "502":
+          description: Resend OTP failed
+
+        "500":
+          description: Something went wrong
+
+  /api/v1/client/login:
+    post:
+      summary: Login client
+      tags:
+        - Client
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+              required:
+                - email
+                - password
+
+              properties:
+                email:
+                  type: string
+                  example: johndoe@gmail.com
+
+                password:
+                  type: string
+                  example: Password123@
+
+      responses:
+        "200":
+          description: Login successful
+
+        "400":
+          description: Invalid credentials or verify email first
+
+        "404":
+          description: Invalid credentials
+
+        "423":
+          description: Account locked
+
+        "429":
+          description: Too many failed login attempts
+
+        "500":
+          description: Something went wrong
+
+  /api/v1/client/update-profile:
+    put:
+      summary: Update client profile
+      tags:
+        - Client
+
+      requestBody:
+        required: true
+
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+
+              properties:
+                userName:
+                  type: string
+                  example: johndoe
+
+                profilePicture:
+                  type: string
+                  format: binary
+
+      responses:
+        "200":
+          description: Profile updated successfully
+
+        "500":
+          description: Something went wrong
+
+  /api/v1/client/forget-password:
+    post:
+      summary: Forgot password
+      tags:
+        - Client
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+              required:
+                - email
+
+              properties:
+                email:
+                  type: string
+                  example: johndoe@gmail.com
+
+      responses:
+        "200":
+          description: Forgot password successful
+
+        "404":
+          description: User not found
+
+        "502":
+          description: Reset password OTP failed
+
+        "500":
+          description: Something went wrong
+
+  /api/v1/client/reset-password:
+    post:
+      summary: Reset password
+      tags:
+        - Client
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+              required:
+                - email
+                - password
+
+              properties:
+                email:
+                  type: string
+                  example: johndoe@gmail.com
+
+                password:
+                  type: string
+                  example: NewPassword123@
+
+      responses:
+        "200":
+          description: Password reset successful
+
+        "400":
+          description: Invalid or expired OTP
+
+        "404":
+          description: Invalid credential
+
+        "500":
+          description: Something went wrong
+
+  /api/v1/client/change-password:
+    post:
+      summary: Change password
+      tags:
+        - Client
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+              required:
+                - oldPassword
+                - newPassword
+
+              properties:
+                oldPassword:
+                  type: string
+                  example: OldPassword123@
+
+                newPassword:
+                  type: string
+                  example: NewPassword123@
+
+      responses:
+        "200":
+          description: Password changed successfully
+
+        "400":
+          description: Old password is invalid
+
+        "404":
+          description: User not found
+
+        "500":
+          description: Something went wrong
+
+  /auth/google:
+    get:
+      summary: Login with Google
+      tags:
+        - Client
+
+      responses:
+        "200":
+          description: Login successful
+
+        "500":
+          description: Something went wrong
+
+  /auth/google/callback:
+    get:
+      summary: Google callback login
+      tags:
+        - Client
+
+      responses:
+        "200":
+          description: Login successful
+
+        "500":
+          description: Something went wrong
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

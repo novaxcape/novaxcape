@@ -3,6 +3,8 @@ const express = require('express')
 const sequelize = require('./database/database')
 const PORT = process.env.PORT
 const express_session = require('express-session')
+const swaggerUi = require('swagger-ui-express');
+const swagger= require('./swagger')
 const {passport} =require ('./middleware/passport')
 
 
@@ -22,6 +24,9 @@ const limiter = rateLimit({
 
 const app = express()
 app.use(express.json())
+
+app.use('/apisDocs', swaggerUi.serve, swaggerUi.setup(swagger))
+
 app.use('/api/v1/login', limiter)
 
 
