@@ -31,9 +31,10 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    email: DataTypes.STRING
+    amount: DataTypes.INTEGER,
+    reference: DataTypes.STRING,
+    status: DataTypes.ENUM('processing', 'success', 'failed', 'abandoned')
+    
   }, {
     sequelize,
     modelName: 'Payment',

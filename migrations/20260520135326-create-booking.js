@@ -28,17 +28,21 @@ module.exports = {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-      firstName: {
-        type: Sequelize.STRING,
+      visitDate: {
+        type: Sequelize.DATEONLY,
         allowNull: false
       },
-      lastName: {
-        type: Sequelize.STRING,
-        allowNull: false
+      adultQty: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false
+      childQty: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+      },
+      familyPackQty: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
       },
       createdAt: {
         allowNull: false,

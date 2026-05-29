@@ -418,3 +418,39 @@ exports.loginWithGoogle = async (req, res) => {
         })
     }
 }
+
+exports.getOneClient = async (req, res) => {
+    try {
+        const oneClient = await Client.findOne({ where: { id: req.params.id } })
+        if (!oneClient) {
+            return res.status(404).json({
+                message: "Client not found"
+            })
+        }
+        res.status(200).json({
+            message: "Client found",
+            data: oneClient
+        })
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).json({
+            message: "Something went wrong"
+        })
+    }
+}
+
+exports.getAllClients = async (req, res) => {
+    try {
+        const allClients = await Client.findAll().sort({ createdAt: -1 })
+        res.status(200).json({
+            message: "Clients found",
+            data: allClients,
+            count: allClients.length
+        })
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).json({
+            message: "Something went wrong"
+        })
+    }
+}

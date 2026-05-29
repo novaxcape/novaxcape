@@ -21,7 +21,7 @@ module.exports = {
         allowNull: false
       },
       role: {
-        type: Sequelize.STRING,
+        type: Sequelize.BOOLEAN,
         defaultValue: "Admin"
       },
       createdAt: {

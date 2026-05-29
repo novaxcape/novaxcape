@@ -40,7 +40,7 @@ module.exports = {
         type: Sequelize.TEXT,
       },
       role: {
-        type: Sequelize.STRING,
+        type: Sequelize.BOOLEAN,
         defaultValue: "Client",
       },
       otpExpire: {

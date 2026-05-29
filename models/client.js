@@ -41,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true
     },
     profilePicture: DataTypes.TEXT,
-    role: DataTypes.STRING,
+    role: DataTypes.BOOLEAN,
     otpExpire: {
       type: DataTypes.DATE,
       allowNull: true

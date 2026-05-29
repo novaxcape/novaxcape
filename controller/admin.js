@@ -1,6 +1,9 @@
 const { Admin: adminModel } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
+const otpGenerator = require('otp-generator')
+const { sendSingleEmail } = require('../utils/brevo')
+const { resetPasswordTemplate, resetPasswordSuccessfulTemplate } = require('../helper/emailTemplate')
 
 
 exports.registerAdmin = async (req, res) => {
@@ -94,19 +97,62 @@ exports.forgotPassword = async (req, res) => {
 
         const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, digits: true, lowerCaseAlphabets: false });
 
-        client.otp = OTP
-        client.otpExpire = new Date(Date.now() + (1000 * 60 * 5))
+        admin.otp = otp
+        admin.otpExpire = new Date(Date.now() + (1000 * 60 * 5))
 
         await sendSingleEmail({
-            email: client.email,
-            name: `${client.fullName}`,
-            html: await resetPasswordTemplate(`${client.fullName}`, OTP),
+            email: admin.email,
+            name: `${admin.fullName}`,
+            html: await resetPasswordTemplate(`${admin.fullName}`, otp),
             subject: "RESET PASSWORD OTP"
         })
 
         res.status(200).json({
             message: "Forgot password successful. Please check your email for OTP"
         })
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).json({
+            message: "Something went wrong"
+        })
+    }
+}
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const {email, otp, password} = req.body
+        const admin = await adminModel.findOne({ where: { email: email.toLowerCase() } })
+        if(admin == null){
+            return res.status(404).json({
+                message: 'Invalid credential'
+            })
+        }
+
+
+        if (!admin.otpExpire || Date.now() > admin.otpExpire.getTime() || otp !== admin.otp){
+                    return res.status(400).json({
+                        message: 'Invalid or expired OTP'
+                    })
+                }
+            const salt = await bcrypt.genSalt(10)
+            const hashedPassword = await bcrypt.hash(password, salt);
+        
+            admin.password = hashedPassword
+            admin.otp = null
+            admin.otpExpire = null
+
+            await sendSingleEmail({
+                email: admin.email,
+                name: `${admin.fullName}`,
+                html: await resetPasswordSuccessfulTemplate(`${admin.fullName}`),
+                subject: "RESET PASSWORD SUCCESSFUL"
+            })
+            await admin.save()
+            
+            res.status(200).json({
+                message: 'Password reset successful'
+            })
+        
     } catch (error) {
         console.log(error.message)
         res.status(500).json({
