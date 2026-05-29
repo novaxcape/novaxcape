@@ -1,13 +1,15 @@
-const joi = require('joi')
+const joi = require('joi');
+const { profile } = require('./passport');
+
 
 exports.clientReg = (req, res, next) => {
     const schema = joi.object({
-        firstName: joi.string().trim().pattern(/^[A-Za-z\s]{4,}$/).required().messages({
+        firstName: joi.string().trim().pattern(/^[A-Za-z\s]{3,}$/).required().messages({
             'any.required': 'Firstname is required',
             'string.empty': 'Firstname cannot be empty',
             'string.pattern.base': 'Firstname cannot contain numbers and must be at least 4 characters'
         }),
-        lastName: joi.string().trim().pattern(/^[A-Za-z\s]{4,}$/).required().messages({
+        lastName: joi.string().trim().pattern(/^[A-Za-z\s]{3,}$/).required().messages({
             'any.required': 'Lastname is required',
             'string.empty': 'Lastname cannot be empty',
             'string.pattern.base': 'Lastname cannot contain numbers and must be at least 4 characters'
@@ -35,6 +37,7 @@ exports.clientReg = (req, res, next) => {
 
     const { error } = schema.validate(req.body, { abortEarly: false });
     if (error) {
+        console.log(error.details[0])
         return res.status(400).json({
             message: error.details[0].message
         })
@@ -43,8 +46,8 @@ exports.clientReg = (req, res, next) => {
     next()
 }
 
-exports.otpReg = (req, res, next) => {
 
+exports.verifyOtp = (req, res, next) => {
     const schema = joi.object({
         email: joi.string().email().required().messages({
             'any.required': 'Email is required',
@@ -70,8 +73,7 @@ exports.otpReg = (req, res, next) => {
 }
 
 
-exports.otpValidator = (req, res, next) => {
-
+exports.resendOtp = (req, res, next) => {
     const schema = joi.object({
         email: joi.string().email().required().messages({
             'any.required': 'Email is required',
@@ -90,7 +92,8 @@ exports.otpValidator = (req, res, next) => {
     next()
 }
 
-exports.loginValidator = (req, res, next) => {
+
+exports.login = (req, res, next) => {
     const schema = joi.object({
         email: joi.string().email().required().messages({
             'any.required': 'Email is required',
@@ -113,6 +116,7 @@ exports.loginValidator = (req, res, next) => {
 
     next()
 }
+
 
 exports.resetPasswordValidator = (req, res, next) => {
     const schema = joi.object({
@@ -121,17 +125,54 @@ exports.resetPasswordValidator = (req, res, next) => {
             'string.empty': 'Email cannot be empty',
             'string.email': 'Email must be a valid email'
         }),
-        otp: joi.string().pattern(/^\d{6}$/).required().messages({
-            'any.required': 'OTP is required',
-            'string.empty': 'OTP cannot be empty',
-            'string.pattern.base': 'OTP must only contain numbers and must be 6 digits'
-        }),
         password: joi.string().pattern(/^(?=.*[A-Z]).{8,}$/).required().messages({
             'any.required': 'Password is required',
             'string.empty': 'Password cannot be empty',
             'string.pattern.base': 'Password must be at least 8 characters and must include 1 uppercase and 1 lowercase'
         })
     })
+    const { error } = schema.validate(req.body, { abortEarly: false });
+    // console.log(error.details[0])
+    if (error) {
+        return res.status(400).json({
+            message: error.details[0].message
+        })
+    }
+
+    next()
+}
+
+
+exports.forgotPasswordValidator = (req, res, next) => {
+    const schema = joi.object({
+        email: joi.string().email().required().messages({
+            'any.required': 'Email is required',
+            'string.empty': 'Email cannot be empty',
+            'string.email': 'Email must be a valid email'
+        })
+    })
+    const { error } = schema.validate(req.body, { abortEarly: false });
+    // console.log(error.details[0])
+    if (error) {
+        return res.status(400).json({
+            message: error.details[0].message
+        })
+    }
+
+    next()
+}
+
+
+exports.updateProfile = (req, res, next) => {
+    const schema = joi.object({
+        userName: joi.string().email().required().messages({
+            'any.required': 'Username is required',
+            'string.empty': 'Username cannot be empty',
+            'string.email': 'Username must be a valid email'
+        }),
+        profilePictue: joi.optional()
+    })
+
     const { error } = schema.validate(req.body, { abortEarly: false });
     // console.log(error.details[0])
     if (error) {
