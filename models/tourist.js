@@ -12,27 +12,73 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Tourist.hasOne(models.Kyc, { foreignKey: 'touristId', as: 'kyc' });
       Tourist.hasMany(models.Booking, { foreignKey: 'touristId', as: 'bookings' });
-  }
     }
+  }
 
     
   Tourist.init({
     id: {
-       allowNull: false,
-        primaryKey: true,
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4
     },
-    name: DataTypes.STRING,
-    location: DataTypes.STRING,
-    description: DataTypes.STRING,
-    city: DataTypes.STRING,
-    dailySlotCapacity: DataTypes.INTEGER,
-    pricingAndTickets: DataTypes.INTEGER,
-    streetAddress: DataTypes.STRING,
-    openingHours: DataTypes.STRING,
-    images: DataTypes.JSON,
-    facilitiesAndAmenities: DataTypes.JSON
+    centreName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    facilitiesAndAmenities: {
+      type: DataTypes.ENUM('free wifi', 'parking', 'restaurant', 'photography allowed', 'nature trails', 'water activities', 'hiking', 'guided tours'),
+      allowNull: false
+    },
+    dailySlotCapacity: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    adultTicket: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    childTicket: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    familyPack: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    installmentPayment: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
+    streetAddress: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    openingHours: {
+      type: DataTypes.JSON,
+      allowNull: false,
+    },
+    images: {
+      type: DataTypes.JSON,
+      allowNull: false
+    },
+    role: {
+      type: DataTypes.STRING,
+      defaultValue: "Tourist"
+    },
   }, {
     sequelize,
     modelName: 'Tourists',

@@ -19,7 +19,7 @@ const authenticateToken = async(req, res, next)=>{
 
 
 const adminAuth = async (req, res, next) => {
-    if(req.user.role !== 'admin'){
+    if(req.user.role !== 'Admin'){
         return res.status(403).json({
             message: 'Access denied'
         })

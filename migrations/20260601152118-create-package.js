@@ -2,27 +2,27 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Admins', {
+    await queryInterface.createTable('Packages', {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID
+        type: Sequelize.INTEGER
       },
-      fullName: {
+      packageName: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
-      email: {
+      packageType: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false
+      amount: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
-      role: {
+      numberOfPeople: {
         type: Sequelize.STRING,
-        defaultValue: "Admin"
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
@@ -35,6 +35,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Admins');
+    await queryInterface.dropTable('Packages');
   }
 };

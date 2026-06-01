@@ -2,17 +2,23 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Admins', {
+    await queryInterface.createTable('Vendors', {
       id: {
+        autoIncrement: true,
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID
+        type: Sequelize.INTEGER
       },
-      fullName: {
+      centerName: {
         type: Sequelize.STRING,
         allowNull: false
       },
       email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true
+      },
+      phoneNumber: {
         type: Sequelize.STRING,
         allowNull: false
       },
@@ -22,7 +28,20 @@ module.exports = {
       },
       role: {
         type: Sequelize.STRING,
-        defaultValue: "Admin"
+        defaultValue: 'Vendor'
+      },
+      isVerified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      otp: {
+      type: Sequelize.STRING,
+      allowNull: true
+      },
+      otpExpire: {
+        type: Sequelize.DATE,
+        allowNull: true,
+        defaultValue: () => new Date(Date.now() + 1000 * 60 * 5)
       },
       createdAt: {
         allowNull: false,
@@ -35,6 +54,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Admins');
+    await queryInterface.dropTable('Vendors');
   }
 };
