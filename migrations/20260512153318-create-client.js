@@ -40,13 +40,13 @@ module.exports = {
         type: Sequelize.TEXT,
       },
       role: {
-        type: Sequelize.BOOLEAN,
+        type: Sequelize.STRING,
         defaultValue: "Client",
       },
       otpExpire: {
         type: Sequelize.DATE,
         allowNull: true,
-        defaultValue: () => new Date(Date.now() + 1000 * 60 * 7)
+        defaultValue: () => new Date(Date.now() + 1000 * 60 * 5)
       },
       isVerified: {
         type: Sequelize.BOOLEAN,

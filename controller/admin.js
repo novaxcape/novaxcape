@@ -33,10 +33,7 @@ exports.registerAdmin = async (req, res) => {
             admin
         })
     } catch (error) {
-        console.log(error.message)
-        res.status(500).json({
-            message: "Something went wrong"
-        })
+        next(error);
     }
 }
 
@@ -78,10 +75,7 @@ exports.loginAdmin = async (req, res) => {
             admin
         })
     } catch (error) {
-         console.log(error.message)
-        res.status(500).json({
-            message: "Something went wrong"
-        })
+         next(error);
     }
 }
 
@@ -111,10 +105,7 @@ exports.forgotPassword = async (req, res) => {
             message: "Forgot password successful. Please check your email for OTP"
         })
     } catch (error) {
-        console.log(error.message)
-        res.status(500).json({
-            message: "Something went wrong"
-        })
+        next(error);
     }
 }
 
@@ -154,9 +145,6 @@ exports.resetPassword = async (req, res) => {
             })
         
     } catch (error) {
-        console.log(error.message)
-        res.status(500).json({
-            message: "Something went wrong"
-        })
+        next(error);
     }
 }

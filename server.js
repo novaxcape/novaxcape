@@ -10,6 +10,7 @@ const {passport} =require ('./middleware/passport')
 
 const clientRoutes = require('./route/client')
 const adminRoutes = require('./route/admin')
+const vendorRoutes = require('./route/vendor')
 
 const rateLimit = require('express-rate-limit')
 
@@ -28,7 +29,7 @@ app.use(express.json())
 
 app.use('/apisDocs', swaggerUi.serve, swaggerUi.setup(swagger))
 
-app.use('/api/v1/login', limiter)
+app.use('/api/v1/client/login', limiter)
 
 
 app.use(express_session({
@@ -43,6 +44,7 @@ app.use(passport.session());
 
 app.use('/api/v1/client', clientRoutes)
 app.use('/api/v1/admin', adminRoutes)
+app.use('/api/v1/vendor', vendorRoutes)
 
 
 app.use((err, req, res, next) => {
@@ -53,6 +55,45 @@ app.use((err, req, res, next) => {
     }
 
     next(err)
+})
+
+app.use((req, res) => {
+    res.status(404).json({
+        message: 'Route not found'
+    })
+})
+
+app.use((err, req, res, next) => {
+    if (res.headersSent) {
+        return next(err)
+    }
+
+    res.status(500).json({
+        message: err.message
+    })
+})
+
+app.use((err, req, res, next) => {
+    if (res.headersSent) {
+        return next(err)
+    }
+
+    if (err.name === 'TokenExpireError') {
+        return res.status(401).json({
+            message:"Session expired: Please login to continue"
+        })
+    }
+
+    if (err.name === 'MulterError') {
+        return res.status(400).json({
+            message: err.message
+        })
+    }
+
+    console.log(err.message)
+    res.status(500).json({
+        message: 'Something went wrong'
+    })
 })
 
 const databaseConnection = async () => {

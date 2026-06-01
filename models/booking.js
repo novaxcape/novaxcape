@@ -18,10 +18,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   Booking.init({
     id: {
-       allowNull: false,
-        primaryKey: true,
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4
     },
     clientId: {
       allowNull: false,
@@ -43,9 +43,22 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    email: DataTypes.STRING
+    visitDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: false
+    },
+    adultQty: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    childQty: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    familyPackQty: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    }
   }, {
     sequelize,
     modelName: 'Booking',

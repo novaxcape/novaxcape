@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Admin extends Model {
+  class Package extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,35 +11,33 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      
     }
   }
-  Admin.init({
+  Package.init({
     id: {
       allowNull: false,
       primaryKey: true,
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
+      type: DataTypes.INTEGER
     },
-    fullName: {
+    packageName: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    email: {
+    packageType: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false
+    amount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
-    role: {
+    numberOfPeople: {
       type: DataTypes.STRING,
-      defaultValue: "Admin"
-    }
+      allowNull: false,
+    },
   }, {
     sequelize,
-    modelName: 'Admin',
+    modelName: 'Package',
   });
-  return Admin;
+  return Package;
 };

@@ -16,10 +16,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   Payment.init({
     id: {
-       allowNull: false,
-        primaryKey: true,
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4
     },
     paymentPlanId: {
       allowNull: false,
@@ -31,10 +31,18 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-    amount: DataTypes.INTEGER,
-    reference: DataTypes.STRING,
-    status: DataTypes.ENUM('processing', 'success', 'failed', 'abandoned')
-    
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false
+    }
   }, {
     sequelize,
     modelName: 'Payment',

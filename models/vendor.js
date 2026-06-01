@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class client extends Model {
+  class Vendor extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,74 +11,52 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-        client.hasMany(models.Booking, { foreignKey: 'clientId', as: 'bookings'});
     }
   }
-  client.init({
+  Vendor.init({
     id: {
-      type: DataTypes.UUID,
+      autoIncrement: true,
       allowNull: false,
       primaryKey: true,
-      defaultValue: DataTypes.UUIDV4
+      type: DataTypes.INTEGER
     },
-    firstName: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    lastName: {
+    centerName: {
       type: DataTypes.STRING,
       allowNull: false
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      unique: true
     },
     phoneNumber: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    gender: {
-      type: DataTypes.ENUM('Male', 'Female'),
-      allowNull: true
-    },
     password: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    otp: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    profilePicture: {
-      type: DataTypes.TEXT
-    },
     role: {
       type: DataTypes.STRING,
-      defaultValue: "Client"
-    },
-    otpExpire: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: () => new Date(Date.now() + 1000 * 60 * 5)
+      defaultValue: 'Vendor'
     },
     isVerified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
-    failedLoginAttempts: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0
+    otp: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
-    isLocked: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
-    userName: {
-      type: DataTypes.STRING
+    otpExpire: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: () => new Date(Date.now() + 1000 * 60 * 5)
     }
   }, {
     sequelize,
-    modelName: 'clients',
+    modelName: 'Vendor',
   });
-  return client;
+  return Vendor;
 };

@@ -9,7 +9,7 @@ const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: 
 const otpExpire = new Date(Date.now() + 1000 * 60 * 5);
 
 
-exports.register = async (req, res) => {
+exports.register = async (req, res, next) => {
   try {
     const { firstName, lastName, email, password, phoneNumber, gender } = req.body;
     const normalizedFirstname = await autoCapitalizeFirstChar(firstName);
@@ -53,15 +53,12 @@ exports.register = async (req, res) => {
       }
     })()
   } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      message: 'Something went wrong'
-    });
+    next(error)
   }
 };
 
 
-exports.verifyEmail = async (req, res) => {
+exports.verifyEmail = async (req, res, next) => {
   try {
     const { email, otp } = req.body;
     const client = await Client.findOne({ where: { email: email.toLowerCase() } });
@@ -96,14 +93,11 @@ exports.verifyEmail = async (req, res) => {
       message: 'Email verified successfully'
     });
   } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      message: error.message
-    });
+    next(error);
   }
 };
 
-exports.resendOTP = async (req, res) => {
+exports.resendOTP = async (req, res, next) => {
   try {
     const { email } = req.body;
     const client = await Client.findOne({ where: { email: email.toLowerCase() } });
@@ -130,18 +124,15 @@ exports.resendOTP = async (req, res) => {
           subject: "RESEND: VERIFY OTP"
         })
       } catch (error) {
-        console.log(error.message)
+        next(error);
       }
     })()
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: error.message
-    });
+    next(error);
   }
 };
 
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await Client.findOne({ where: { email: email.toLowerCase() } })
@@ -198,22 +189,19 @@ exports.login = async (req, res) => {
       user
     })
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({
-      message: `Something went wrong`
-    })
+    next(error);
   }
 }
 
 
-exports.updateProfile = async (req, res) => {
+exports.updateProfile = async (req, res, next) => {
   try {
     const files = req.file;
     const filePath = files['path']
 
     const uploadToCloudinary = await cloudinary.uploader.upload(filePath, (error, result) => {
       if (error) {
-        console.log(error)
+        next(error);
       } else {
         console.log(result)
       };
@@ -241,13 +229,11 @@ exports.updateProfile = async (req, res) => {
       data: updatedClient
     })
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
+    next(error);
   }
 }
 
-exports.forgotPassword = async (req, res) => {
+exports.forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     const client = await Client.findOne({ where: { email: email.toLowerCase() } })
@@ -273,18 +259,15 @@ exports.forgotPassword = async (req, res) => {
           subject: "Reset password"
         })
       } catch (error) {
-        console.log(error.message)
+        next(error);
       }
     })()
   } catch (error) {
-    console.log(error)
-    res.status(500).json({
-      message: "Something went wrong"
-    })
+    next(error);
   }
 }
 
-exports.resetPassword = async (req, res) => {
+exports.resetPassword = async (req, res, next) => {
   try {
     const { password, email } = req.body
     const client = await Client.findOne({ where: { email: email.toLowerCase() } })
@@ -305,14 +288,11 @@ exports.resetPassword = async (req, res) => {
     })
 
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({
-      message: "Something went wrong"
-    })
+    next(error);
   }
 }
 
-exports.changePassword = async (req, res) => {
+exports.changePassword = async (req, res, next) => {
   try {
     const { oldPassword, newPassword } = req.body;
     const client = await Client.findByPk(req.user.id);
@@ -340,14 +320,11 @@ exports.changePassword = async (req, res) => {
       message: "Password changed successfully"
     })
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({
-      message: error.message
-    })
+    next(error);
   }
 }
 
-exports.loginWithGoogle = async (req, res) => {
+exports.loginWithGoogle = async (req, res, next) => {
   try {
     const token = await jwt.sign({
       id: req.user._id,
@@ -360,13 +337,11 @@ exports.loginWithGoogle = async (req, res) => {
       token
     })
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
+    next(error);
   }
 }
 
-exports.getOneClient = async (req, res) => {
+exports.getOneClient = async (req, res, next) => {
     try {
         const oneClient = await Client.findOne({ where: { id: req.params.id } })
         if (!oneClient) {
@@ -379,14 +354,11 @@ exports.getOneClient = async (req, res) => {
             data: oneClient
         })
     } catch (error) {
-        console.log(error.message)
-        res.status(500).json({
-            message: "Something went wrong"
-        })
+        next(error)
     }
 }
 
-exports.getAllClients = async (req, res) => {
+exports.getAllClients = async (req, res, next) => {
     try {
         const allClients = await Client.findAll().sort({ createdAt: -1 })
         res.status(200).json({
@@ -395,9 +367,6 @@ exports.getAllClients = async (req, res) => {
             count: allClients.length
         })
     } catch (error) {
-        console.log(error.message)
-        res.status(500).json({
-            message: "Something went wrong"
-        })
+        next(error)
     }
 }

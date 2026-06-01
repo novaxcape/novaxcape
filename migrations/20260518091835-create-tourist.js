@@ -60,6 +60,10 @@ module.exports = {
         type: Sequelize.JSON,
         allowNull: false
       },
+      role: {
+        type: Sequelize.STRING,
+        defaultValue: "Tourist"
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
