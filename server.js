@@ -11,6 +11,7 @@ const {passport} =require ('./middleware/passport')
 const clientRoutes = require('./route/client')
 const adminRoutes = require('./route/admin')
 const vendorRoutes = require('./route/vendor')
+const packageRoutes = require('./route/package')
 
 const rateLimit = require('express-rate-limit')
 
@@ -45,6 +46,7 @@ app.use(passport.session());
 app.use('/api/v1/client', clientRoutes)
 app.use('/api/v1/admin', adminRoutes)
 app.use('/api/v1/vendor', vendorRoutes)
+app.use('/api/v1/package', packageRoutes);
 
 
 app.use((err, req, res, next) => {
