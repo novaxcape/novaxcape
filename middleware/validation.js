@@ -214,4 +214,66 @@ exports.changePasswordValidator = (req, res, next) => {
     next()
 }
 
+    exports.createPackageValidation = (req, res, next) => {
+    
+        const schema = Joi.object({
+          packageName: Joi.string().trim().required().messages({
+              'string.empty': 'Package name is required',
+              'any.required': 'Package name is required'
+            }),
+          packageType: Joi.string().trim().required().messages({
+              'string.empty': 'Package type is required',
+              'any.required': 'Package type is required'
+            }),
+      
+          amount: Joi.number().integer().positive().required().messages({
+              'number.base': 'Amount must be a number',
+              'number.integer': 'Amount must be an integer',
+              'number.positive': 'Amount must be greater than 0',
+              'any.required': 'Amount is required'
+            }),
+      
+          numberOfPeople: Joi.string()  .trim() .required() .messages({
+              'string.empty': 'Number of people is required',
+              'any.required': 'Number of people is required'
+            })
+        });
+      
+        const { error } = schema.validate(req.body);
+      
+        if (error) {
+          return res.status(400).json({
+            success: false,
+            message: error.details[0].message
+          });
+        }
+      
+        next();
+      };
+  
+
+      exports.updatePackageValidation = (req, res, next) => {
+
+        const schema = Joi.object({
+          packageName: Joi.string().trim(),
+
+          packageType: Joi.string().trim(),
+
+          amount: Joi.number().integer().positive(),
+      
+          numberOfPeople: Joi.string().trim()
+        });
+      
+        const { error } = schema.validate(req.body);
+      
+        if (error) {
+          return res.status(400).json({
+            success: false,
+            message: error.details[0].message
+          });
+        }
+      
+        next();
+      };
+      
 
