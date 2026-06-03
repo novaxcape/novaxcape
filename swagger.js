@@ -9,6 +9,10 @@ const options = {
             description: "swagger documentation"
         },
         servers:[
+            {
+                url:"https://novaxcape.onrender.com",
+                description: "The hosted route"
+            },
         {
 
                 url:"http://localhost:9955",
