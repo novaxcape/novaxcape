@@ -40,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     facilitiesAndAmenities: {
-      type: DataTypes.JSON,
+      type: DataTypes.TEXT,
       allowNull: false
     },
     dailySlotCapacity: {

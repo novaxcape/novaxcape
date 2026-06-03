@@ -6,11 +6,13 @@ const express_session = require('express-session')
 const swaggerUi = require('swagger-ui-express');
 const swagger= require('./swagger')
 const {passport} =require ('./middleware/passport')
+const cors = require('cors')
 
 
 const clientRoutes = require('./route/client')
 const adminRoutes = require('./route/admin')
 const vendorRoutes = require('./route/vendor')
+const packageRoutes = require('./route/package')
 const touristRoutes = require('./route/tourist')
 const kycRoutes = require('./route/kyc')
 
@@ -28,6 +30,7 @@ const limiter = rateLimit({
 
 const app = express()
 app.use(express.json())
+app.use(cors())
 
 app.use('/apisDocs', swaggerUi.serve, swaggerUi.setup(swagger))
 
@@ -47,6 +50,7 @@ app.use(passport.session());
 app.use('/api/v1/client', clientRoutes)
 app.use('/api/v1/admin', adminRoutes)
 app.use('/api/v1/vendor', vendorRoutes)
+app.use('/api/v1/package', packageRoutes);
 app.use('/api/v1/tourist', touristRoutes)
 app.use('/api/v1/kyc', kycRoutes)
 

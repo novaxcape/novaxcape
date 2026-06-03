@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const otpGenerator = require('otp-generator');
 const { sendOTPEmail, resetPasswordTemplate, resetPasswordSuccessfulTemplate } = require('../helper/emailTemplate');
 const { sendSingleEmail } = require('../utils/brevo');
+const cloudinary = require('../middleware/cloudinary');
+const fs = require('fs');
 const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, digits: true, lowerCaseAlphabets: false });
 const otpExpire = new Date(Date.now() + 1000 * 60 * 5);
 
@@ -220,6 +222,12 @@ exports.updateProfile = async (req, res, next) => {
 
     const client = await Client.findByPk(id)
 
+    // if (!client) {
+    //   return res.status(404).json({
+    //     message: 'Client not found'
+    //   })
+    // }
+
     const updatedClient = await client.update({
       userName,
       profilePicture: response
@@ -230,6 +238,7 @@ exports.updateProfile = async (req, res, next) => {
       data: updatedClient
     })
   } catch (error) {
+    console.log(error.message)
     next(error);
   }
 }

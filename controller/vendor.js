@@ -259,7 +259,7 @@ exports.resetPassword = async (req, res, next) => {
 exports.changePassword = async (req, res, next) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    const vendor = await Client.findByPk(req.user.id);
+    const vendor = await Vendor.findByPk(req.user.id);
 
     if (!vendor) {
       return res.status(404).json({

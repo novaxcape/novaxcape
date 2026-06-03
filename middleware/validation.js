@@ -165,10 +165,10 @@ exports.forgotPasswordValidator = (req, res, next) => {
 
 exports.updateProfile = (req, res, next) => {
     const schema = joi.object({
-        userName: joi.string().email().required().messages({
-            'any.required': 'Username is required',
-            'string.empty': 'Username cannot be empty',
-            'string.email': 'Username must be a valid email'
+        userName: joi.string().pattern(/^[A-Za-z\s]{3,}$/).required().messages({
+            'any.required': 'username is required',
+            'string.empty': 'username cannot be empty',
+            'string.pattern.base': 'username cannot contain numbers and must be at least 4 characters'
         }),
         profilePictue: joi.optional()
     })
@@ -214,6 +214,68 @@ exports.changePasswordValidator = (req, res, next) => {
     next()
 }
 
+    exports.createPackageValidation = (req, res, next) => {
+    
+        const schema = Joi.object({
+          packageName: Joi.string().trim().required().messages({
+              'string.empty': 'Package name is required',
+              'any.required': 'Package name is required'
+            }),
+          packageType: Joi.string().trim().required().messages({
+              'string.empty': 'Package type is required',
+              'any.required': 'Package type is required'
+            }),
+      
+          amount: Joi.number().integer().positive().required().messages({
+              'number.base': 'Amount must be a number',
+              'number.integer': 'Amount must be an integer',
+              'number.positive': 'Amount must be greater than 0',
+              'any.required': 'Amount is required'
+            }),
+      
+          numberOfPeople: Joi.string()  .trim() .required() .messages({
+              'string.empty': 'Number of people is required',
+              'any.required': 'Number of people is required'
+            })
+        });
+      
+        const { error } = schema.validate(req.body);
+      
+        if (error) {
+          return res.status(400).json({
+            success: false,
+            message: error.details[0].message
+          });
+        }
+      
+        next();
+      };
+  
+
+      exports.updatePackageValidation = (req, res, next) => {
+
+        const schema = Joi.object({
+          packageName: Joi.string().trim(),
+
+          packageType: Joi.string().trim(),
+
+          amount: Joi.number().integer().positive(),
+      
+          numberOfPeople: Joi.string().trim()
+        });
+      
+        const { error } = schema.validate(req.body);
+      
+        if (error) {
+          return res.status(400).json({
+            success: false,
+            message: error.details[0].message
+          });
+        }
+      
+        next();
+      };
+      
 
 
 exports.vendorSignUpValidator = (req, res, next) => {
