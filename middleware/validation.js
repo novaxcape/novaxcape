@@ -165,10 +165,10 @@ exports.forgotPasswordValidator = (req, res, next) => {
 
 exports.updateProfile = (req, res, next) => {
     const schema = joi.object({
-        userName: joi.string().email().required().messages({
-            'any.required': 'Username is required',
-            'string.empty': 'Username cannot be empty',
-            'string.email': 'Username must be a valid email'
+        userName: joi.string().pattern(/^[A-Za-z\s]{3,}$/).required().messages({
+            'any.required': 'username is required',
+            'string.empty': 'username cannot be empty',
+            'string.pattern.base': 'username cannot contain numbers and must be at least 4 characters'
         }),
         profilePictue: joi.optional()
     })
@@ -204,7 +204,7 @@ exports.changePasswordValidator = (req, res, next) => {
     })
 
     const { error } = schema.validate(req.body, { abortEarly: false });
-    // console.log(error.details[0])
+    
     if (error) {
         return res.status(400).json({
             message: error.details[0].message
@@ -277,3 +277,36 @@ exports.changePasswordValidator = (req, res, next) => {
       };
       
 
+
+exports.vendorSignUpValidator = (req, res, next) => {
+    const schema = joi.object({
+        centerName: joi.string().pattern(/^[A-Za-z\s]{4,}$/).required().messages({
+            'any.required': "center name is required",
+         "string.empty": "center name cannot be empty",
+        'string.pattern.base': "center name must be at least 4 characters long and contain only letters and spaces"
+        }),
+        email: joi.string().email().required().messages({
+            'any.required': "email is required",
+            'string.empty': "email cannot be empty",
+            "string.email": "email must be a valid email"
+        }),
+        phoneNumber: joi.string().pattern(/^\d{11}$/).required().messages({
+            'any.required': "phone number is required",
+            "string.empty": "phone number cannot be empty",
+            'string.pattern.base': "phone number must be 11 digits long"
+        }),
+        password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z]).{8,}$/).required().messages({
+            'any.required': "password is required",
+            "string.empty": "password cannot be empty",
+            'string.pattern.base': "password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one digit, and one special character"
+        })
+    })
+
+    const { error } = schema.validate(req.body, { abortEarly: false })
+    if (error) {
+        return res.status(400).json({
+            message: error.details[0].message
+        })
+    }
+    next()
+}

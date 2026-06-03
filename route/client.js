@@ -10,7 +10,7 @@ router.post('/register', clientValidate.clientReg, clientController.register);
 router.post('/verify-email', clientValidate.verifyOtp, clientController.verifyEmail);
 router.post('/resend-otp', clientValidate.resendOtp, clientController.resendOTP);
 router.post('/login', clientValidate.login, clientController.login);
-router.put('/update-profile', clientValidate.updateProfile, clientController.updateProfile);
+router.put('/update-profile', authenticateToken, upload.single('profilePicture'), clientValidate.updateProfile, clientController.updateProfile);
 
 router.post('/forget-password', clientValidate.forgotPasswordValidator, clientController.forgotPassword);
 router.post('/reset-password', clientValidate.resetPasswordValidator, clientController.resetPassword);
