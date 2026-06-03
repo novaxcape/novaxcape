@@ -15,9 +15,16 @@ const options = {
                 description: 'hosted URL'
 
         }
-               
-           
-        ]
+        ],
+        components:{
+        securitySchemes:{
+            bearerAuth:{
+                type: "http",
+                scheme: "bearer",
+                bearerFormat: "JWT"
+            }
+        }
+    }
     },
     apis: [
       "./docs/client.yaml",

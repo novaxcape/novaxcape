@@ -25,22 +25,10 @@ module.exports = {
         allowNull: false
       },
       facilitiesAndAmenities: {
-        type: Sequelize.ENUM('free wifi', 'parking', 'restaurant', 'photography allowed', 'nature trails', 'water activities', 'hiking', 'guided tours'),
+        type: Sequelize.JSON,
         allowNull: false
       },
       dailySlotCapacity: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      adultTicket: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      childTicket: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      familyPack: {
         type: Sequelize.INTEGER,
         allowNull: false
       },
@@ -57,6 +45,14 @@ module.exports = {
         allowNull: false,
       },
       images: {
+        type: Sequelize.JSON,
+        allowNull: false
+      },
+      termsAndCondition: {
+        type: Sequelize.JSON,
+        allowNull: false
+      },
+      privacyPolicy: {
         type: Sequelize.JSON,
         allowNull: false
       },
