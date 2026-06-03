@@ -12,7 +12,7 @@ module.exports = {
       allowNull: false,
       type: Sequelize.UUID,
       references: {
-        model: 'bookings',
+        model: 'Bookings',
         key: 'id'
       },
       onUpdate: 'CASCADE',

@@ -25,7 +25,7 @@ module.exports = {
         allowNull: false
       },
       facilitiesAndAmenities: {
-        type: Sequelize.JSON,
+        type: Sequelize.TEXT,
         allowNull: false
       },
       dailySlotCapacity: {
@@ -41,19 +41,19 @@ module.exports = {
         allowNull: false
       },
       openingHours: {
-        type: Sequelize.JSON,
+        type: Sequelize.TEXT,
         allowNull: false,
       },
       images: {
-        type: Sequelize.JSON,
+        type: Sequelize.TEXT,
         allowNull: false
       },
       termsAndCondition: {
-        type: Sequelize.JSON,
+        type: Sequelize.TEXT,
         allowNull: false
       },
       privacyPolicy: {
-        type: Sequelize.JSON,
+        type: Sequelize.TEXT,
         allowNull: false
       },
       role: {

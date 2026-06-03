@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const booking = require('./booking');
 module.exports = (sequelize, DataTypes) => {
   class paymentPlan extends Model {
     /**
@@ -12,7 +13,6 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       paymentPlan.belongsTo(models.Booking, { foreignKey: 'bookingId', as: 'booking' });
-      paymentPlan.hasMany(models.Payment, { foreignKey: 'paymentPlanId', as: 'payments' });
     }
   }
   paymentPlan.init({
