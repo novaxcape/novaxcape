@@ -23,6 +23,7 @@ exports.createPackage = async (req, res) => {
             data: newPackage
         });
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: false,
             message: error.message
