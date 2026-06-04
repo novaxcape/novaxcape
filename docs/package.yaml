@@ -1,0 +1,161 @@
+openapi: 3.0.0
+
+info:
+  title: Novaxcape Package API
+  version: 1.0.0
+  description: Documentation for package endpoints
+
+paths:
+
+  /api/v1/package:
+    post:
+      summary: Create package
+      tags:
+        - Package
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+              required:
+                - packageName
+                - packageType
+                - amount
+                - numberOfPeople
+
+              properties:
+                packageName:
+                  type: string
+                  example: Family Package
+
+                packageType:
+                  type: string
+                  example: Premium
+
+                amount:
+                  type: integer
+                  example: 50000
+
+                numberOfPeople:
+                  type: string
+                  example: "5"
+
+      responses:
+        "201":
+          description: Package created successfully
+
+        "500":
+          description: Something went wrong
+
+  /api/v1/package/all:
+    get:
+      summary: Get all packages
+      tags:
+        - Package
+
+      responses:
+        "200":
+          description: Packages retrieved successfully
+
+        "500":
+          description: Something went wrong
+
+  /api/v1/package/{id}:
+    get:
+      summary: Get package by ID
+      tags:
+        - Package
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+
+      responses:
+        "200":
+          description: Package retrieved successfully
+
+        "404":
+          description: Package not found
+
+        "500":
+          description: Something went wrong
+
+    delete:
+      summary: Delete package
+      tags:
+        - Package
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+
+      responses:
+        "200":
+          description: Package deleted successfully
+
+        "404":
+          description: Package not found
+
+        "500":
+          description: Something went wrong
+
+  /api/v1/package/package/{id}:
+    put:
+      summary: Update package
+      tags:
+        - Package
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+              properties:
+                packageName:
+                  type: string
+                  example: Family Package
+
+                packageType:
+                  type: string
+                  example: Premium
+
+                amount:
+                  type: integer
+                  example: 75000
+
+                numberOfPeople:
+                  type: string
+                  example: "10"
+
+      responses:
+        "200":
+          description: Package updated successfully
+
+        "404":
+          description: Package not found
+
+        "500":
+          description: Something went wrong
