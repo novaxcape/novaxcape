@@ -1,4 +1,4 @@
-const { Tourists: Tourist } = require('../models')
+const { Tourist } = require('../models')
 const fs = require('fs')
 const cloudinary = require('../middleware/cloudinary')
 

@@ -306,3 +306,37 @@ exports.vendorSignUpValidator = (req, res, next) => {
     }
     next()
 }
+
+
+exports.kycValidator = (req, res, next) => {
+    const schema = joi.object({
+        centreName: joi.string().pattern(/^[A-Za-z\s]{4,}$/).required().messages({
+            'any.required': "center name is required",
+         "string.empty": "center name cannot be empty",
+        'string.pattern.base': "center name must be at least 4 characters long and contain only letters and spaces"
+        }),
+        lankmark: joi.string().pattern(/^[A-Za-z\s]{4,}$/).required().messages({
+            'any.required': "lankmark is required",
+         "string.empty": "lankmark cannot be empty",
+        'string.pattern.base': "lankmark must be at least 4 characters long and contain only letters and spaces"
+        }),
+        CAC: joi.string().pattern(/^[A-Za-z0-9\s]{4,}$/).required().messages({
+            'any.required': "CAC is required",
+         "string.empty": "CAC cannot be empty",
+        'string.pattern.base': "CAC must be at least 4 characters long and contain only letters, digits and spaces"
+        }),
+        yearEstalished: joi.integer().pattern(/^\d{4}$/).required().messages({
+            'any.required': "Year Established is required",
+            "string.empty": "Year Established cannot be empty",
+            'string.pattern.base': "Year Established must be 4 digits long"
+        }),
+        phoneNumber: joi.integer().pattern(/^\d{11}$/).required().messages({
+            'any.required': "phone number is required",
+            "string.empty": "phone number cannot be empty",
+            'string.pattern.base': "phone number must be 11 digits long"
+        }),
+        centreType: joi.string().pattern().required().messages({
+            
+        })
+    })
+}

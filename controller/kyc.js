@@ -27,7 +27,7 @@ exports.createKyc = async (req, res, next) => {
             accountNumber
         })
 
-        res.status(201).json({
+        res.status(200).json({
             message: "Kyc successfully created",
             data: newKyc
         })

@@ -1,4 +1,4 @@
-const { clients: Client } = require('../models');
+const { Client, Vendor } = require('../models');
 const { autoCapitalizeFirstChar } = require('../helper/validateInput');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -24,11 +24,17 @@ exports.register = async (req, res, next) => {
     const { firstName, lastName, email, password, phoneNumber, gender } = req.body;
     const normalizedFirstname = await autoCapitalizeFirstChar(firstName);
     const normalizedLastname = await autoCapitalizeFirstChar(lastName);
-    const existingClient = await Client.findOne({ where: { email: email.toLowerCase() } });
 
-    if (existingClient) {
+    const [existingClient, existingVendor] = await Promise.all([
+      Client.findOne({ where: { email: email.toLowerCase() } }),
+      Vendor.findOne({ where: { email: email.toLowerCase() } })
+    ]);
+
+    const existingUser = existingClient || existingVendor;
+
+    if (existingUser) {
       return res.status(400).json({
-        message: 'User with this email already exists'
+        message: 'User with this email already exists as a client or vendor'
       });
     }
 
@@ -64,6 +70,7 @@ exports.register = async (req, res, next) => {
       }
     })()
   } catch (error) {
+    console.log(error)
     next(error)
   }
 };
@@ -71,34 +78,34 @@ exports.register = async (req, res, next) => {
 
 exports.verifyEmail = async (req, res, next) => {
   try {
-    const { email, otp: submittedOtp } = req.body;
-    const client = await Client.findOne({ where: { email: email.toLowerCase() } });
+    const { email, otp } = req.body;
+    const clientUser = await Client.findOne({ where: { email: email.toLowerCase() } });
 
-    if (!client) {
+    if (!clientUser) {
       return res.status(404).json({
         message: 'User not found'
       });
     }
 
-    // if (client.isVerified) {
-    //   return res.status(400).json({
-    //     message: 'Email already verified'
-    //   });
-    // }
+    if (clientUser.isVerified) {
+      return res.status(400).json({
+        message: 'Email already verified'
+      });
+    }
 
-    if (Date.now() > client.otpExpire.getTime()) {
+    if (Date.now() > clientUser.otpExpire.getTime()) {
       return res.status(400).json({
         message: 'OTP has expired. Please request a new one.'
       });
     }
 
-    if (client.otp !== submittedOtp) {
+    if (clientUser.otp !== otp) {
       return res.status(400).json({
         message: 'Invalid OTP'
       });
     }
 
-    await client.update({ isVerified: true, otp: null, otpExpire: null });
+    await clientUser.update({ isVerified: true, otp: null, otpExpire: null });
 
     res.status(200).json({
       message: 'Email verified successfully'
@@ -111,17 +118,17 @@ exports.verifyEmail = async (req, res, next) => {
 exports.resendOTP = async (req, res, next) => {
   try {
     const { email } = req.body;
-    const client = await Client.findOne({ where: { email: email.toLowerCase() } });
+    const clientUser = await Client.findOne({ where: { email: email.toLowerCase() } });
 
-    if (!client) {
+    if (!clientUser) {
       return res.status(404).json({
         message: 'User not found'
       });
     }
 
+    // Update client with new OTP
     const { otp, otpExpire } = generateOTP();
-    
-    await client.update({ otp, otpExpire });
+    await clientUser.update({ otp, otpExpire });
 
     res.status(200).json({
       message: 'OTP resent successfully. Please check your email.'
@@ -131,8 +138,8 @@ exports.resendOTP = async (req, res, next) => {
       try {
         await sendSingleEmail({
           email: email.toLowerCase(),
-          name: `${client.dataValues.firstName} ${client.dataValues.lastName}`,
-          html: await sendOTPEmail(`${client.dataValues.firstName} ${client.dataValues.lastName}`, otp),
+          name: `${clientUser.dataValues.firstName} ${clientUser.dataValues.lastName}`,
+          html: await sendOTPEmail(`${clientUser.dataValues.firstName} ${clientUser.dataValues.lastName}`, otp),
           subject: "RESEND: VERIFY OTP"
         })
       } catch (error) {
@@ -212,7 +219,6 @@ exports.updateProfile = async (req, res, next) => {
     const files = req.file;
     const filePath = files?.path;
     const { userName } = req.body;
-    const { id } = req.params;
 
     const client = await Client.findByPk(req.user.id);
 
@@ -256,9 +262,9 @@ exports.updateProfile = async (req, res, next) => {
 exports.forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
-    const client = await Client.findOne({ where: { email: email.toLowerCase() } })
+    const clientData = await Client.findOne({ where: { email: email.toLowerCase() } })
 
-    if (!client) {
+    if (!clientData) {
       return res.status(404).json({
         message: 'User not found'
       })
@@ -266,7 +272,7 @@ exports.forgotPassword = async (req, res, next) => {
 
     const { otp, otpExpire } = generateOTP();
 
-    await client.update({ otp, otpExpire });
+    await clientData.update({ otp, otpExpire });
 
     res.status(200).json({
       message: 'Forgot password successful. Please check your email for OTP.'
@@ -276,8 +282,8 @@ exports.forgotPassword = async (req, res, next) => {
       try {
         await sendSingleEmail({
           email: email.toLowerCase(),
-          name: `${client.dataValues.firstName} ${client.dataValues.lastName}`,
-          html: await sendOTPEmail(`${client.dataValues.firstName} ${client.dataValues.lastName}`, otp),
+          name: `${clientData.dataValues.firstName} ${clientData.dataValues.lastName}`,
+          html: await sendOTPEmail(`${clientData.dataValues.firstName} ${clientData.dataValues.lastName}`, otp),
           subject: "Reset password"
         })
       } catch (error) {
@@ -292,9 +298,9 @@ exports.forgotPassword = async (req, res, next) => {
 exports.resetPassword = async (req, res, next) => {
   try {
     const { password, email } = req.body
-    const client = await Client.findOne({ where: { email: email.toLowerCase() } })
+    const clientData = await Client.findOne({ where: { email: email.toLowerCase() } })
 
-    if (!client) {
+    if (!clientData) {
       return res.status(404).json({
         message: 'Invalid credential'
       })
@@ -303,7 +309,7 @@ exports.resetPassword = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    await client.update({ password: hashedPassword });
+    await clientData.update({ password: hashedPassword });
 
     res.status(200).json({
       message: 'Password reset successful'
@@ -317,15 +323,15 @@ exports.resetPassword = async (req, res, next) => {
 exports.changePassword = async (req, res, next) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    const client = await Client.findByPk(req.user.id);
+    const clientData = await Client.findByPk(req.user.id);
 
-    if (!client) {
+    if (!clientData) {
       return res.status(404).json({
         message: "User not found"
       })
     }
 
-    const checkPassword = await bcrypt.compare(oldPassword, client.dataValues.password);
+    const checkPassword = await bcrypt.compare(oldPassword, clientData.dataValues.password);
 
     if (!checkPassword) {
       return res.status(400).json({
@@ -336,7 +342,7 @@ exports.changePassword = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    await client.update({ password: hashedPassword });
+    await clientData.update({ password: hashedPassword });
 
     res.status(200).json({
       message: "Password changed successfully"
@@ -364,31 +370,31 @@ exports.loginWithGoogle = async (req, res, next) => {
 }
 
 exports.getOneClient = async (req, res, next) => {
-    try {
-        const oneClient = await Client.findOne({ where: { id: req.params.id } })
-        if (!oneClient) {
-            return res.status(404).json({
-                message: "Client not found"
-            })
-        }
-        res.status(200).json({
-            message: "Client found",
-            data: oneClient
-        })
-    } catch (error) {
-        next(error)
+  try {
+    const oneClient = await Client.findOne({ where: { id: req.params.id } })
+    if (!oneClient) {
+      return res.status(404).json({
+        message: "client not found"
+      })
     }
+    res.status(200).json({
+      message: "client found",
+      data: oneClient
+    })
+  } catch (error) {
+    next(error)
+  }
 }
 
 exports.getAllClients = async (req, res, next) => {
-    try {
-        const allClients = await Client.findAll().sort({ createdAt: -1 })
-        res.status(200).json({
-            message: "Clients found",
-            data: allClients,
-            count: allClients.length
-        })
-    } catch (error) {
-        next(error)
-    }
+  try {
+    const allClients = await client.findAll().sort({ createdAt: -1 })
+    res.status(200).json({
+      message: "Clients found",
+      data: allClients,
+      count: allClients.length
+    })
+  } catch (error) {
+    next(error)
+  }
 }

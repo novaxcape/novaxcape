@@ -15,7 +15,7 @@ const options = {
             },
         {
 
-                url:"http://localhost:9955",
+                url:"http://localhost:9865",
                 description: 'hosted URL'
 
         }
@@ -31,7 +31,7 @@ const options = {
     }
     },
     apis: [
-      "./docs/client.yaml",
+      "./docs/client.yaml","./docs/package.yaml", "./docs/vendor.yaml"
     ]
 }
 
