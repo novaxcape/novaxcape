@@ -196,10 +196,6 @@ exports.changePasswordValidator = (req, res, next) => {
             'any.required': 'new password is required',
             'string.empty': 'new password cannot be empty',
             'string.pattern.base': 'new password must be at least 8 characters and must include 1 uppercase and 1 lowercase'
-        }),
-        confirmPassword: joi.string().required().valid(joi.ref('newPassword')).messages({
-            'any.only': 'confirm password must match New password',
-            'any.required': 'confirm password is required'
         })
     })
 

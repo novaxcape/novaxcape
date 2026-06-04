@@ -7,8 +7,16 @@ const { sendOTPEmail, resetPasswordTemplate, resetPasswordSuccessfulTemplate } =
 const { sendSingleEmail } = require('../utils/brevo');
 const cloudinary = require('../middleware/cloudinary');
 const fs = require('fs');
-const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, digits: true, lowerCaseAlphabets: false });
-const otpExpire = new Date(Date.now() + 1000 * 60 * 5);
+
+const generateOTP = () => ({
+  otp: otpGenerator.generate(6, {
+    upperCaseAlphabets: false,
+    specialChars: false,
+    digits: true,
+    lowerCaseAlphabets: false
+  }),
+  otpExpire: new Date(Date.now() + 1000 * 60 * 5)
+});
 
 
 exports.register = async (req, res, next) => {
@@ -26,6 +34,7 @@ exports.register = async (req, res, next) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    const { otp, otpExpire } = generateOTP();
 
     const newClient = await Client.create({
       firstName: normalizedFirstname,
@@ -62,7 +71,7 @@ exports.register = async (req, res, next) => {
 
 exports.verifyEmail = async (req, res, next) => {
   try {
-    const { email, otp } = req.body;
+    const { email, otp: submittedOtp } = req.body;
     const client = await Client.findOne({ where: { email: email.toLowerCase() } });
 
     if (!client) {
@@ -71,11 +80,11 @@ exports.verifyEmail = async (req, res, next) => {
       });
     }
 
-    if (client.isVerified) {
-      return res.status(400).json({
-        message: 'Email already verified'
-      });
-    }
+    // if (client.isVerified) {
+    //   return res.status(400).json({
+    //     message: 'Email already verified'
+    //   });
+    // }
 
     if (Date.now() > client.otpExpire.getTime()) {
       return res.status(400).json({
@@ -83,7 +92,7 @@ exports.verifyEmail = async (req, res, next) => {
       });
     }
 
-    if (client.otp !== otp) {
+    if (client.otp !== submittedOtp) {
       return res.status(400).json({
         message: 'Invalid OTP'
       });
@@ -110,7 +119,8 @@ exports.resendOTP = async (req, res, next) => {
       });
     }
 
-    // Update client with new OTP
+    const { otp, otpExpire } = generateOTP();
+    
     await client.update({ otp, otpExpire });
 
     res.status(200).json({
@@ -200,7 +210,23 @@ exports.login = async (req, res, next) => {
 exports.updateProfile = async (req, res, next) => {
   try {
     const files = req.file;
-    const filePath = files['path']
+    const filePath = files?.path;
+    const { userName } = req.body;
+    const { id } = req.params;
+
+    const client = await Client.findByPk(req.user.id);
+
+    if (!client) {
+      return res.status(404).json({
+        message: 'Client not found'
+      });
+    }
+
+    if (!filePath) {
+      return res.status(400).json({
+        message: 'Profile picture is required'
+      });
+    }
 
     const uploadToCloudinary = await cloudinary.uploader.upload(filePath, (error, result) => {
       if (error) {
@@ -210,27 +236,11 @@ exports.updateProfile = async (req, res, next) => {
       };
     })
 
-    const response = {
-      secureUrl: uploadToCloudinary.secure_url,
-      publicId: uploadToCloudinary.public_id
-    }
-
     fs.unlinkSync(filePath)
-
-    const { userName } = req.body;
-    const { id } = req.params;
-
-    const client = await Client.findByPk(id)
-
-    // if (!client) {
-    //   return res.status(404).json({
-    //     message: 'Client not found'
-    //   })
-    // }
 
     const updatedClient = await client.update({
       userName,
-      profilePicture: response
+      profilePicture: uploadToCloudinary.secure_url
     })
 
     res.status(200).json({
@@ -253,6 +263,8 @@ exports.forgotPassword = async (req, res, next) => {
         message: 'User not found'
       })
     }
+
+    const { otp, otpExpire } = generateOTP();
 
     await client.update({ otp, otpExpire });
 
