@@ -18,17 +18,61 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      firstName: {
+      lankmark: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      lastName: {
+      CAC: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      email: {
+      yearEstablished: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      phoneNumber: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      centreType: {
         type: Sequelize.STRING,
         allowNull: false
+      },
+      postal: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      state: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      directorFullName: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      directorEmail: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      directorPhoneNumber: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      bankName: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      accountNumber: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      accountName: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      bankCode: {
+        type: Sequelize.STRING,
+        allowNull: true
       },
       createdAt: {
         allowNull: false,

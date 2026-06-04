@@ -9,15 +9,26 @@ const options = {
             description: "swagger documentation"
         },
         servers:[
+            {
+                url:"https://novaxcape.onrender.com",
+                description: "The hosted route"
+            },
         {
 
-                url:"http://localhost:9865",
+                url:"http://localhost:9955",
                 description: 'hosted URL'
 
         }
-               
-           
-        ]
+        ],
+        components:{
+        securitySchemes:{
+            bearerAuth:{
+                type: "http",
+                scheme: "bearer",
+                bearerFormat: "JWT"
+            }
+        }
+    }
     },
     apis: [
       "./docs/client.yaml","./docs/package.yaml"

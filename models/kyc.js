@@ -30,17 +30,61 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-    firstName: {
+    lankmark: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    lastName: {
+    CAC: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    email: {
+    yearEstablished: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    phoneNumber: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    centreType: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    postal: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    state: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    directorFullName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    directorEmail: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    directorPhoneNumber: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    bankName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    accountNumber: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    accountName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    bankCode: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     sequelize,
