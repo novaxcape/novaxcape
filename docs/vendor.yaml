@@ -1,0 +1,173 @@
+tags:
+  - name: Vendor
+    description: Vendor Swagger Authentication 
+
+components:
+  schemas:
+    VendorRegister:
+      type: object
+      required:
+        - centerName
+        - email
+        - phoneNumber
+        - password
+      properties:
+        centerName:
+          type: string
+          example: Nova Escape Resort
+        email:
+          type: string
+          format: email
+          example: vendor@example.com
+        phoneNumber:
+          type: string
+          example: "08012345678"
+        password:
+          type: string
+          example: Password123
+
+    VerifyEmail:
+      type: object
+      required:
+        - email
+        - otp
+      properties:
+        email:
+          type: string
+          format: email
+          example: vendor@example.com
+        otp:
+          type: string
+          example: "123456"
+
+    ResendOTP:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: vendor@example.com
+
+paths:
+  /vendor/register:
+    post:
+      tags:
+        - Vendor
+      summary: Register a new vendor
+      description: Creates a vendor account and sends an OTP to the registered email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorRegister'
+      responses:
+        201:
+          description: Vendor registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Vendor registered successfully, Please check your email to verify OTP
+        400:
+          description: Vendor already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Vendor already exist
+
+  /vendor/verify-email:
+    post:
+      tags:
+        - Vendor
+      summary: Verify vendor email
+      description: Verifies vendor email using OTP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmail'
+      responses:
+        200:
+          description: Email verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email verified successfully
+
+        400:
+          description: Invalid OTP, OTP expired, or email already verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      invalidOtp:
+                        value: Invalid OTP
+                      expiredOtp:
+                        value: OTP has expired. Please request a new one.
+                      verified:
+                        value: Email already verified
+
+        404:
+          description: Vendor not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Vendor not found
+
+  /vendor/resend-otp:
+    post:
+      tags:
+        - Vendor
+      summary: Resend OTP
+      description: Generates and sends a new OTP to the vendor's email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendOTP'
+      responses:
+        200:
+          description: OTP resent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: OTP resent successfully. Please check your email.
+
+        404:
+          description: Vendor not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found

@@ -20,7 +20,7 @@ const options = {
         ]
     },
     apis: [
-      "./docs/client.yaml",
+      "./docs/client.yaml","./docs/package.yaml"
     ]
 }
 
