@@ -17,7 +17,6 @@ const options = {
 
                 url:"http://localhost:9955",
                 description: 'hosted URL'
-
         }
         ],
         components:{
