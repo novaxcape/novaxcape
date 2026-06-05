@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
         Kyc.belongsTo(models.Tourist, { foreignKey: 'touristId', as: 'tourist' });
+        Kyc.belongsTo(models.Vendor, { foreignKey: 'vendorId', as: 'vendor' });
     }
   }
   Kyc.init({

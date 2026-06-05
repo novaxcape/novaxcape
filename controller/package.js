@@ -11,6 +11,7 @@ exports.createPackage = async (req, res) => {
         } = req.body;
 
         const newPackage = await Package.create({
+            vendorId: req.user.id,
             packageName,
             packageType,
             amount,
@@ -23,6 +24,7 @@ exports.createPackage = async (req, res) => {
             data: newPackage
         });
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: false,
             message: error.message

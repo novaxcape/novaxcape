@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Package.belongsTo(models.Vendor, { foreignKey: 'vendorId' });
     }
   }
   Package.init({
@@ -19,6 +20,16 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
+    },
+    vendorId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'Vendors',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
     },
     packageName: {
       type: DataTypes.STRING,
