@@ -18,16 +18,11 @@ paths:
             schema:
               type: object
               required:
-                - touristId
                 - centerName
                 - email
                 - phoneNumber
                 - password
               properties:
-                touristId:
-                  type: string
-                  format: uuid
-                  example: "9b0e6b20-0c3c-4f57-a521-2a96084708f4"
                 centerName:
                   type: string
                   example: "Lekki Conservation Centre"

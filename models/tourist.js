@@ -59,17 +59,77 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    images: {
-      type: DataTypes.TEXT,
-      allowNull: false
-    },
+    images: [{
+      type: DataTypes.STRING,
+      allowNull: false,
+      get() {
+        const value = this.getDataValue('images');
+        return value ? JSON.parse(value): [];
+      },
+
+      set(val) {
+        this.setDataValue('images', JSON.stringify(val));
+      }
+    }],
+    imagesPublicUrl: [{
+      type: DataTypes.STRING,
+      allowNull: false,
+      get() {
+        const value = this.getDataValue('imagesPublicUrl');
+        return value ? JSON.parse(value): [];
+      },
+
+      set(val) {
+        this.setDataValue('imagesPublicUrl', JSON.stringify(val));
+      }
+    }],
     termsAndCondition: {
-      type: DataTypes.TEXT,
-      allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
+      get() {
+        const value = this.getDataValue('termsAndCondition');
+        return value ? JSON.parse(value): [];
+      },
+
+      set(val) {
+        this.setDataValue('termsAndCondition', JSON.stringify(val));
+      }
+    },
+    termsAndConditionPublicUrl: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      get() {
+        const value = this.getDataValue('termsAndConditionPublicUrl');
+        return value ? JSON.parse(value): [];
+      },
+
+      set(val) {
+        this.setDataValue('termsAndConditionPublicUrl', JSON.stringify(val));
+      }
     },
     privacyPolicy: {
-      type: DataTypes.TEXT,
-      allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
+      get() {
+        const value = this.getDataValue('privacyPolicy');
+        return value ? JSON.parse(value): [];
+      },
+
+      set(val) {
+        this.setDataValue('privacyPolicy', JSON.stringify(val));
+      }
+    },
+    privacyPolicyPublicUrl: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      get() {
+        const value = this.getDataValue('privacyPolicyPublicUrl');
+        return value ? JSON.parse(value): [];
+      },
+
+      set(val) {
+        this.setDataValue('privacyPolicyPublicUrl', JSON.stringify(val));
+      }
     },
     role: {
       type: DataTypes.STRING,

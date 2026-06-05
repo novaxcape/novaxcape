@@ -280,11 +280,6 @@ exports.changePasswordValidator = (req, res, next) => {
 
 exports.vendorSignUpValidator = (req, res, next) => {
     const schema = joi.object({
-        touristId: joi.string().guid().required().messages({
-            'any.required': "touristId is required",
-            "string.empty": "touristId cannot be empty",
-            'string.guid': "touristId must be a valid UUID"
-        }),
         centerName: joi.string().pattern(/^[A-Za-z\s]{4,}$/).required().messages({
             'any.required': "center name is required",
          "string.empty": "center name cannot be empty",

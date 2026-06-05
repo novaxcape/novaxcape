@@ -9,16 +9,16 @@ module.exports = {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4
       },
-      touristId: {
-      type: Sequelize.UUID,
-      allowNull: false,
-      references: {
-        model: 'Tourists',
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
-    },
+      // touristId: {
+      // type: Sequelize.UUID,
+      // allowNull: false,
+      // references: {
+      //   model: 'Tourists',
+      //   key: 'id'
+      // },
+      // onUpdate: 'CASCADE',
+      // onDelete: 'CASCADE'
+    // },
       centerName: {
         type: Sequelize.STRING,
         allowNull: false
