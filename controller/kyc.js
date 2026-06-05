@@ -1,4 +1,4 @@
-const { Kyc, Vendor } = require('../models')
+const { Kyc, Vendor, Tourist } = require('../models')
 const bcrypt = require('bcrypt')
 
 
