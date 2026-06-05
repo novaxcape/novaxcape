@@ -22,7 +22,7 @@ const uploadFile = async (file) => {
     const uploadToCloudinary = await cloudinary.uploader.upload(file.path)
     console.log(file.path)
     if (fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path)
+        fs.unlink(file.path)
     }
 
     return {

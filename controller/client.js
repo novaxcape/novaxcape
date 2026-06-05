@@ -246,7 +246,8 @@ exports.updateProfile = async (req, res, next) => {
 
     const updatedClient = await client.update({
       userName,
-      profilePicture: uploadToCloudinary.secure_url
+      profilePicture: uploadToCloudinary.secure_url,
+      profilePicturePublicUrl: uploadToCloudinary.public_id
     })
 
     res.status(200).json({
