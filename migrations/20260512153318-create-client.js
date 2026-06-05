@@ -38,7 +38,10 @@ module.exports = {
         allowNull: true
       },
       profilePicture: {
-        type: Sequelize.TEXT,
+        type: Sequelize.TEXT
+      },
+      profilePicturePublicUrl: {
+        type: Sequelize.TEXT
       },
       role: {
         type: Sequelize.STRING,
