@@ -44,23 +44,28 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false,
       },
-      imagesPrivateUrl: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
+      
       imagesPublicUrl: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false
       },
       images: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false
       },
       termsAndCondition: {
         type: Sequelize.TEXT,
         allowNull: false
       },
+      termsAndConditionPublicUrl: {
+        type: Sequelize.TEXT,
+        allowNull: false
+      },
       privacyPolicy: {
+        type: Sequelize.TEXT,
+        allowNull: false
+      },
+      privacyPolicyPublicUrl: {
         type: Sequelize.TEXT,
         allowNull: false
       },
