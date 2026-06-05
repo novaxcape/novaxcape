@@ -44,8 +44,16 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false,
       },
+      imagesPrivateUrl: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      imagesPublicUrl: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       images: {
-        type: Sequelize.TEXT,
+        type: Sequelize.STRING,
         allowNull: false
       },
       termsAndCondition: {

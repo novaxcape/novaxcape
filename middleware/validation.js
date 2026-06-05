@@ -216,24 +216,24 @@ exports.changePasswordValidator = (req, res, next) => {
 
     exports.createPackageValidation = (req, res, next) => {
     
-        const schema = Joi.object({
-          packageName: Joi.string().trim().required().messages({
+        const schema = joi.object({
+          packageName: joi.string().trim().required().messages({
               'string.empty': 'Package name is required',
               'any.required': 'Package name is required'
             }),
-          packageType: Joi.string().trim().required().messages({
+          packageType: joi.string().trim().required().messages({
               'string.empty': 'Package type is required',
               'any.required': 'Package type is required'
             }),
       
-          amount: Joi.number().integer().positive().required().messages({
+          amount: joi.number().integer().positive().required().messages({
               'number.base': 'Amount must be a number',
               'number.integer': 'Amount must be an integer',
               'number.positive': 'Amount must be greater than 0',
               'any.required': 'Amount is required'
             }),
       
-          numberOfPeople: Joi.string()  .trim() .required() .messages({
+          numberOfPeople: joi.string().trim().required().messages({
               'string.empty': 'Number of people is required',
               'any.required': 'Number of people is required'
             })
@@ -254,14 +254,14 @@ exports.changePasswordValidator = (req, res, next) => {
 
       exports.updatePackageValidation = (req, res, next) => {
 
-        const schema = Joi.object({
-          packageName: Joi.string().trim(),
+        const schema = joi.object({
+          packageName: joi.string().trim(),
 
-          packageType: Joi.string().trim(),
+          packageType: joi.string().trim(),
 
-          amount: Joi.number().integer().positive(),
+          amount: joi.number().integer().positive(),
       
-          numberOfPeople: Joi.string().trim()
+          numberOfPeople: joi.string().trim()
         });
       
         const { error } = schema.validate(req.body);
@@ -280,11 +280,6 @@ exports.changePasswordValidator = (req, res, next) => {
 
 exports.vendorSignUpValidator = (req, res, next) => {
     const schema = joi.object({
-        touristId: joi.string().guid().required().messages({
-            'any.required': "touristId is required",
-            "string.empty": "touristId cannot be empty",
-            'string.guid': "touristId must be a valid UUID"
-        }),
         centerName: joi.string().pattern(/^[A-Za-z\s]{4,}$/).required().messages({
             'any.required': "center name is required",
          "string.empty": "center name cannot be empty",
