@@ -11,14 +11,26 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Vendor.hasOne(models.Kyc, { foreignKey: 'vendorId', as: 'kyc' });
+      Vendor.hasMany(models.Package, { foreignKey: 'vendorId', as: 'packages' });
     }
   }
   Vendor.init({
     id: {
-      autoIncrement: true,
       allowNull: false,
       primaryKey: true,
-      type: DataTypes.INTEGER
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4
+    },
+    touristId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'Tourists',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
     },
     centerName: {
       type: DataTypes.STRING,

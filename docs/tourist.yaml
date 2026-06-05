@@ -1,0 +1,83 @@
+openapi: 3.0.0
+
+info:
+  title: Novaxcape Tourist API
+  version: 1.0.0
+  description: Documentation for tourist center endpoints
+
+paths:
+  /api/v1/tourist/register:
+    post:
+      summary: Register tourist center
+      tags:
+        - Tourist
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - centreName
+                - location
+                - description
+                - city
+                - facilitiesAndAmenities
+                - dailySlotCapacity
+                - installmentPayment
+                - streetAddress
+                - openingHours
+                - images
+                - termsAndCondition
+                - privacyPolicy
+              properties:
+                centreName:
+                  type: string
+                  example: Lekki Conservation Centre
+                location:
+                  type: string
+                  example: Lekki, Lagos
+                description:
+                  type: string
+                  example: Nature reserve and recreational tourist center
+                city:
+                  type: string
+                  example: Lagos
+                facilitiesAndAmenities:
+                  type: string
+                  description: JSON string or plain text list of facilities.
+                  example: '["Parking","Restaurant","Guided tours"]'
+                dailySlotCapacity:
+                  type: integer
+                  example: 250
+                installmentPayment:
+                  type: boolean
+                  example: true
+                streetAddress:
+                  type: string
+                  example: KM 19 Lekki-Epe Expressway
+                openingHours:
+                  type: string
+                  description: JSON string or plain text opening hours.
+                  example: '{"monday":"9:00 AM - 5:00 PM","saturday":"10:00 AM - 6:00 PM"}'
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Tourist center image files. The route accepts up to 10.
+                termsAndCondition:
+                  type: string
+                  format: binary
+                  description: Terms and condition document.
+                privacyPolicy:
+                  type: string
+                  format: binary
+                  description: Privacy policy document.
+      responses:
+        "201":
+          description: Tourist center registered successfully
+        "400":
+          description: Required files are missing
+        "500":
+          description: Something went wrong

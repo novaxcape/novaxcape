@@ -11,6 +11,7 @@ exports.createPackage = async (req, res) => {
         } = req.body;
 
         const newPackage = await Package.create({
+            vendorId: req.user.id,
             packageName,
             packageType,
             amount,

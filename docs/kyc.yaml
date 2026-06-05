@@ -1,0 +1,100 @@
+openapi: 3.0.0
+
+info:
+  title: Novaxcape KYC API
+  version: 1.0.0
+  description: Documentation for KYC endpoints
+
+paths:
+  /api/v1/kyc/{touristId}:
+    post:
+      summary: Create KYC for tourist center
+      tags:
+        - KYC
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: touristId
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - lankmark
+                - CAC
+                - yearEstablished
+                - phoneNumber
+                - centreType
+                - postal
+                - state
+                - directorFullName
+                - directorEmail
+                - directorPhoneNumber
+                - bankName
+                - accountNumber
+                - accountName
+              properties:
+                lankmark:
+                  type: string
+                  example: Near Lekki Phase 1 gate
+                CAC:
+                  type: string
+                  example: RC1234567
+                yearEstablished:
+                  type: integer
+                  example: 2018
+                phoneNumber:
+                  type: integer
+                  example: 9087654321
+                centreType:
+                  type: string
+                  example: Conservation center
+                postal:
+                  type: string
+                  example: "105102"
+                state:
+                  type: string
+                  example: Lagos
+                directorFullName:
+                  type: string
+                  example: Ada Johnson
+                directorEmail:
+                  type: string
+                  format: email
+                  example: director@example.com
+                directorPhoneNumber:
+                  type: integer
+                  example: 9081234567
+                bankName:
+                  type: string
+                  example: Access Bank
+                accountNumber:
+                  type: integer
+                  example: 1234567890
+                accountName:
+                  type: string
+                  example: Lekki Conservation Centre Ltd
+                bankCode:
+                  type: string
+                  example: "044"
+      responses:
+        "200":
+          description: KYC created successfully
+        "400":
+          description: KYC already exists for this tourist
+        "401":
+          description: Unauthorized
+        "403":
+          description: Vendor access required
+        "404":
+          description: Tourist not found
+        "500":
+          description: Something went wrong
