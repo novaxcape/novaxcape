@@ -147,52 +147,49 @@ paths:
           description: Something went wrong
 
   /api/v1/package/package/{id}:
-  put:
-    summary: Update package
-    tags:
-      - Package
+    put:
+      summary: Update package
+      tags:
+        - Package
+      security:
+        - bearerAuth: []
 
-    security:
-      - bearerAuth: []
-
-    parameters:
-      - in: path
-        name: id
-        required: true
-        description: Package ID
-        schema:
-          type: string
-          format: uuid
-        example: 550e8400-e29b-41d4-a716-446655440000
-
-    requestBody:
-      required: true
-
-      content:
-        application/json:
+      parameters:
+        - in: path
+          name: id
+          required: true
           schema:
-            type: object
+            type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
 
-            properties:
-              packageName:
-                type: string
-                example: Family Package
+      requestBody:
+        required: true
 
-              packageType:
-                type: string
-                example: Premium
+        content:
+          application/json:
+            schema:
+              type: object
 
-              amount:
-                type: number
-                example: 75000
+              properties:
+                packageName:
+                  type: string
+                  example: Family Package
 
-              numberOfPeople:
-                type: integer
-                example: 10
+                packageType:
+                  type: string
+                  example: Premium
 
-    responses:
-      "200":
-        description: Package updated successfully
+                amount:
+                  type: integer
+                  example: 75000
+
+                numberOfPeople:
+                  type: string
+                  example: "10"
+
+      responses:
+        "200":
+          description: Package updated successfully
 
         "400":
           description: Invalid request body
