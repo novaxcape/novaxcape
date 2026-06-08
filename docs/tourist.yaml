@@ -3,90 +3,88 @@ openapi: 3.0.0
 info:
   title: Novaxcape Tourist API
   version: 1.0.0
-  description: Documentation for tourist endpoints
+  description: Documentation for tourist center endpoints
 
 paths:
-
   /api/v1/tourist/register:
     post:
       summary: Register tourist center
       tags:
         - Tourist
-
       security:
         - bearerAuth: []
-
       requestBody:
         required: true
-        context:
+        content:
           multipart/form-data:
             schema:
               type: object
               required:
                 - centreName
-                - description
                 - location
-                - state
-                - openingHours
-                - images
+                - description
                 - city
-                - installmentPayment
-                - streetAddress
+                - state
                 - facilitiesAndAmenities
                 - dailySlotCapacity
+                - installmentPayment
+                - streetAddress
+                - openingHours
+                - images
+                - termsAndCondition
                 - privacyPolicy
               properties:
                 centreName:
                   type: string
-                  example: Lekki Conservation Center
-
-                description:
-                  type: string
-                  example: A nature reserve located in Lagos, Nigeria, known for its rich biodiversity and conservation efforts.
-
+                  example: Lekki Conservation Centre
                 location:
                   type: string
                   example: Lekki, Lagos
-                
-                state:
+                description:
                   type: string
-                  example: Lagos
-
-                openingHours:
-                  type: string
-                  example: 9:00 AM - 6:00 PM
-
-                images:
-                  type: string
-
+                  example: Nature reserve and recreational tourist center
                 city:
                   type: string
                   example: Lagos
-
+                state:
+                  type: string
+                  example: Lagos
+                facilitiesAndAmenities:
+                  type: string
+                  description: JSON string or plain text list of facilities.
+                  example: '["Parking","Restaurant","Guided tours"]'
+                dailySlotCapacity:
+                  type: integer
+                  example: 250
                 installmentPayment:
                   type: boolean
                   example: true
-
                 streetAddress:
                   type: string
-                  example: 123 Lekki Road, Lagos
-
-                facilitiesAndAmenities:
+                  example: KM 19 Lekki-Epe Expressway
+                openingHours:
                   type: string
-                  example: Picnic areas, boardwalks, birdwatching towers, and a canopy walkway
-
-                dailySlotCapacity:
-                  type: integer
-                  example: 100
-
+                  description: JSON string or plain text opening hours. The controller parses valid JSON strings before saving.
+                  example: '{"monday":{"isOpen":true,"openTime":"9:00 AM","closeTime":"5:00 PM"},"saturday":{"isOpen":true,"openTime":"10:00 AM","closeTime":"6:00 PM"}}'
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Tourist center image files. The route accepts up to 10.
+                termsAndCondition:
+                  type: string
+                  format: binary
+                  description: Terms and condition document.
                 privacyPolicy:
                   type: string
-                  
-
+                  format: binary
+                  description: Privacy policy document.
       responses:
         "201":
           description: Tourist center registered successfully
 
+          
   /api/v1/tourist/get-all-state/{state}:
     get:
       summary: Get tourist centers by state
