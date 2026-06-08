@@ -342,18 +342,18 @@ paths:
         "500":
           description: Something went wrong
 
-  /api/v1/client/auth/google:
-    get:
-      summary: Login with Google
-      tags:
-        - Client
+  # /api/v1/client/auth/google:
+  #   get:
+  #     summary: Login with Google
+  #     tags:
+  #       - Client
 
-      responses:
-        "200":
-          description: Login successful
+  #     responses:
+  #       "200":
+  #         description: Login successful
 
-        "500":
-          description: Something went wrong
+  #       "500":
+  #         description: Something went wrong
 
 #   /api/v1/client/auth/google/callback:
 #     get:
