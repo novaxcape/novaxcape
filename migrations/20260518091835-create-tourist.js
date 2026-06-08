@@ -53,7 +53,11 @@ module.exports = {
       state: {
         type: Sequelize.STRING,
         allowNull: false
-      },      
+      },
+      openingHours: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+      },
       imagesPublicUrl: {
         type: Sequelize.TEXT,
         allowNull: false
