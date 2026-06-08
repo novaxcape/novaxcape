@@ -55,7 +55,7 @@ module.exports = {
         allowNull: false
       },
       openingHours: {
-        type: Sequelize.TEXT,
+        type: Sequelize.STRING,
         allowNull: false,
       },
       imagesPublicUrl: {

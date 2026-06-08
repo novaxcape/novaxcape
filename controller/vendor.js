@@ -67,12 +67,6 @@ exports.verifyEmail = async (req, res, next) => {
       })
     }
 
-    if (vendor.isVerified) {
-      return res.status(400).json({
-        message: 'Email already verified'
-      })
-    }
-
     if (Date.now() > vendor.otpExpire.getTime()) {
       return res.status(400).json({
         message: 'OTP has expired. Please request a new one.'
@@ -253,7 +247,7 @@ exports.changePassword = async (req, res, next) => {
 
     if (!vendor) {
       return res.status(404).json({
-        message: "User not found"
+        message: "Vendor not found"
       })
     }
 

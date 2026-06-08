@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-
 const packageController = require('../controller/package');
 const {createPackageValidation,updatePackageValidation} = require('../middleware/validation');
 const {authenticateToken, adminAuth, vendorAuth} = require('../middleware/auth')

@@ -71,7 +71,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     openingHours: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     images: {
