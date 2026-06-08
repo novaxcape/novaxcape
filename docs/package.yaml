@@ -7,11 +7,13 @@ info:
 
 paths:
 
-  /api/v1/package/:
+  /api/v1/package:
     post:
       summary: Create package
       tags:
         - Package
+      security:
+        - bearerAuth: []
 
       requestBody:
         required: true
@@ -48,6 +50,15 @@ paths:
         "201":
           description: Package created successfully
 
+        "400":
+          description: Invalid request body
+
+        "401":
+          description: Unauthorized
+
+        "403":
+          description: Vendor access required
+
         "500":
           description: Something went wrong
 
@@ -56,10 +67,18 @@ paths:
       summary: Get all packages
       tags:
         - Package
+      security:
+        - bearerAuth: []
 
       responses:
         "200":
           description: Packages retrieved successfully
+
+        "401":
+          description: Unauthorized
+
+        "403":
+          description: Vendor access required
 
         "500":
           description: Something went wrong
@@ -69,6 +88,8 @@ paths:
       summary: Get package by ID
       tags:
         - Package
+      security:
+        - bearerAuth: []
 
       parameters:
         - in: path
@@ -82,6 +103,12 @@ paths:
         "200":
           description: Package retrieved successfully
 
+        "401":
+          description: Unauthorized
+
+        "403":
+          description: Vendor access required
+
         "404":
           description: Package not found
 
@@ -92,6 +119,8 @@ paths:
       summary: Delete package
       tags:
         - Package
+      security:
+        - bearerAuth: []
 
       parameters:
         - in: path
@@ -105,6 +134,12 @@ paths:
         "200":
           description: Package deleted successfully
 
+        "401":
+          description: Unauthorized
+
+        "403":
+          description: Vendor access required
+
         "404":
           description: Package not found
 
@@ -116,6 +151,8 @@ paths:
       summary: Update package
       tags:
         - Package
+      security:
+        - bearerAuth: []
 
       parameters:
         - in: path
@@ -153,6 +190,15 @@ paths:
       responses:
         "200":
           description: Package updated successfully
+
+        "400":
+          description: Invalid request body
+
+        "401":
+          description: Unauthorized
+
+        "403":
+          description: Vendor access required
 
         "404":
           description: Package not found

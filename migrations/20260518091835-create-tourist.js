@@ -8,6 +8,16 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID
       },
+      vendorId: {
+      type: Sequelize.UUID,
+      allowNull: false,
+      references: {
+        model: 'Vendors',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
       centreName: {
         type: Sequelize.STRING,
         allowNull: false
@@ -40,9 +50,17 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      state: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       openingHours: {
-        type: Sequelize.TEXT,
+        type: Sequelize.STRING,
         allowNull: false,
+      },
+      imagesPublicUrl: {
+        type: Sequelize.TEXT,
+        allowNull: false
       },
       images: {
         type: Sequelize.TEXT,
@@ -52,7 +70,15 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false
       },
+      termsAndConditionPublicUrl: {
+        type: Sequelize.TEXT,
+        allowNull: false
+      },
       privacyPolicy: {
+        type: Sequelize.TEXT,
+        allowNull: false
+      },
+      privacyPolicyPublicUrl: {
         type: Sequelize.TEXT,
         allowNull: false
       },

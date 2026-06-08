@@ -1,0 +1,109 @@
+openapi: 3.0.0
+
+info:
+  title: Novaxcape Tourist API
+  version: 1.0.0
+  description: Documentation for tourist center endpoints
+
+paths:
+  /api/v1/tourist/register:
+    post:
+      summary: Register tourist center
+      tags:
+        - Tourist
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - centreName
+                - location
+                - description
+                - city
+                - state
+                - facilitiesAndAmenities
+                - dailySlotCapacity
+                - installmentPayment
+                - streetAddress
+                - openingHours
+                - images
+                - termsAndCondition
+                - privacyPolicy
+              properties:
+                centreName:
+                  type: string
+                  example: Lekki Conservation Centre
+                location:
+                  type: string
+                  example: Lekki, Lagos
+                description:
+                  type: string
+                  example: Nature reserve and recreational tourist center
+                city:
+                  type: string
+                  example: Lagos
+                state:
+                  type: string
+                  example: Lagos
+                facilitiesAndAmenities:
+                  type: string
+                  description: JSON string or plain text list of facilities.
+                  example: '["Parking","Restaurant","Guided tours"]'
+                dailySlotCapacity:
+                  type: integer
+                  example: 250
+                installmentPayment:
+                  type: boolean
+                  example: true
+                streetAddress:
+                  type: string
+                  example: KM 19 Lekki-Epe Expressway
+                openingHours:
+                  type: string
+                  description: JSON string or plain text opening hours. The controller parses valid JSON strings before saving.
+                  example: '{"monday":{"isOpen":true,"openTime":"9:00 AM","closeTime":"5:00 PM"},"saturday":{"isOpen":true,"openTime":"10:00 AM","closeTime":"6:00 PM"}}'
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Tourist center image files. The route accepts up to 10.
+                termsAndCondition:
+                  type: string
+                  format: binary
+                  description: Terms and condition document.
+                privacyPolicy:
+                  type: string
+                  format: binary
+                  description: Privacy policy document.
+      responses:
+        "201":
+          description: Tourist center registered successfully
+
+          
+  /api/v1/tourist/get-all-state/{state}:
+    get:
+      summary: Get tourist centers by state
+      description: Returns all tourist centers registered in the requested state.
+      operationId: getAllTouristsByState
+      tags:
+        - Tourist
+      parameters:
+        - in: path
+          name: state
+          required: true
+          description: State to filter tourist centers by.
+          schema:
+            type: string
+          example: Lagos
+      responses:
+        "200":
+          description: Centers found
+        "404":
+          description: No centers found in the requested state
+        "500":
+          description: Something went wrong

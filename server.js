@@ -16,6 +16,7 @@ const packageRoutes = require('./route/package')
 const touristRoutes = require('./route/tourist')
 const kycRoutes = require('./route/kyc')
 
+
 const rateLimit = require('express-rate-limit')
 
 const limiter = rateLimit({
@@ -53,6 +54,7 @@ app.use('/api/v1/vendor', vendorRoutes)
 app.use('/api/v1/package', packageRoutes);
 app.use('/api/v1/tourist', touristRoutes)
 app.use('/api/v1/kyc', kycRoutes)
+
 
 
 app.use((err, req, res, next) => {

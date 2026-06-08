@@ -76,7 +76,7 @@ exports.sendOTPEmail = async (name, otp) => {
                                 </div>
 
                                 <p style="font-size:14px; color:#999999; margin-top:25px; line-height:1.5;">
-                                    This OTP is valid for <strong>60 seconds</strong>. <br>
+                                    This OTP is valid for <strong>5 minutes</strong>. <br>
                                     If you did not request this code, please ignore this email or contact support immediately.
                                 </p>
 

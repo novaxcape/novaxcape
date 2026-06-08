@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const kycController = require('../controller/kyc')
-const { createKycValidation } = require('../middleware/validation')
+const {authenticateToken,vendorAuth} = require('../middleware/auth')
 
-router.post('/', createKycValidation, kycController.createKyc)
+router.post('/:touristId', authenticateToken, vendorAuth, kycController.createKyc)
 
 module.exports = router;

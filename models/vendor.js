@@ -10,16 +10,28 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define associaation here
+      // define association here
+      Vendor.hasMany(models.Package, { foreignKey: 'vendorId', as: 'packages' });
+      Vendor.hasMany(models.Tourist, { foreignKey: 'vendorId', as: 'tourists' });
     }
   }
   Vendor.init({
     id: {
-      autoIncrement: true,
       allowNull: false,
       primaryKey: true,
-      type: DataTypes.INTEGER
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4
     },
+    // touristId: {
+    //   type: DataTypes.UUID,
+    //   allowNull: false,
+    //   references: {
+    //     model: 'Tourists',
+    //     key: 'id'
+    //   },
+    //   onUpdate: 'CASCADE',
+    //   onDelete: 'CASCADE'
+    // },
     centerName: {
       type: DataTypes.STRING,
       allowNull: false

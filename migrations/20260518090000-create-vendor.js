@@ -4,11 +4,21 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Vendors', {
       id: {
-        autoIncrement: true,
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4
       },
+      // touristId: {
+      // type: Sequelize.UUID,
+      // allowNull: false,
+      // references: {
+      //   model: 'Tourists',
+      //   key: 'id'
+      // },
+      // onUpdate: 'CASCADE',
+      // onDelete: 'CASCADE'
+    // },
       centerName: {
         type: Sequelize.STRING,
         allowNull: false

@@ -202,11 +202,15 @@ paths:
               required:
                 - oldPassword
                 - newPassword
+                - confirmPassword
               properties:
                 oldPassword:
                   type: string
                   example: "OldPassword123@"
                 newPassword:
+                  type: string
+                  example: "NewPassword123@"
+                confirmPassword:
                   type: string
                   example: "NewPassword123@"
       responses:

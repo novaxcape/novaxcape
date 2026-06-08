@@ -1,4 +1,4 @@
-const { Tourist } = require('../models')
+const { Tourist, Vendor } = require('../models')
 const fs = require('fs')
 const cloudinary = require('../middleware/cloudinary')
 
@@ -14,20 +14,34 @@ const parseJsonField = (value) => {
     }
 }
 
+const getUploadedFiles = (files = {}) => {
+    return Object.values(files).flat()
+}
+
+const deleteLocalFile = (file) => {
+    if (file?.path && fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path)
+    }
+}
+
+const deleteLocalFiles = (files = {}) => {
+    getUploadedFiles(files).forEach(deleteLocalFile)
+}
+
 const uploadFile = async (file) => {
     if (!file) {
         return null
     }
 
-    const uploadToCloudinary = await cloudinary.uploader.upload(file.path)
-    console.log(file.path)
-    if (fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path)
-    }
+    try {
+        const uploadToCloudinary = await cloudinary.uploader.upload(file.path)
 
-    return {
-        secureUrl: uploadToCloudinary.secure_url,
-        publicId: uploadToCloudinary.public_id
+        return {
+            secureUrl: uploadToCloudinary.secure_url,
+            publicId: uploadToCloudinary.public_id
+        }
+    } finally {
+        deleteLocalFile(file)
     }
 }
 
@@ -35,35 +49,74 @@ const uploadFile = async (file) => {
 exports.register = async (req, res, next) => {
     try {
 
-        const files = req.files;
-        const imageFile = files?.images?.[0]
+        const vendorId = req.user.id
+
+        const vendor = await Vendor.findOne({where: {id: vendorId}})
+
+        if(!vendor) {
+            return res.status(404).json({
+                message: "Vendor not found"
+            })
+        }
+
+        const files = req.files || {};
+        const imageFiles = files.images || []
         const termsFile = files?.termsAndCondition?.[0]
         const privacyFile = files?.privacyPolicy?.[0]
 
-        if (!imageFile || !termsFile || !privacyFile) {
+        if (!imageFiles.length || !termsFile || !privacyFile) {
+            deleteLocalFiles(files)
             return res.status(400).json({
                 message: "Images, terms and condition, and privacy policy files are required"
             })
         }
 
-        const imageResponse = await uploadFile(imageFile)
+        const imageResponses = await Promise.all(imageFiles.map(uploadFile))
         const termsResponse = await uploadFile(termsFile)
         const privacyResponse = await uploadFile(privacyFile)
 
 
 
-        const {centreName, description, city, streetAddress,facilitiesAndAmenities,dailySlotCapacity,installmentPayment,images,openingHours,termsAndCondition,privacyPolicy,location } = req.body
+        const {
+            centreName,description,city,state,streetAddress,facilitiesAndAmenities,dailySlotCapacity,installmentPayment,openingHours,location
+        } = req.body
 
-
-        const newTourist = await Tourist.create({
+        const requiredFields = {
             centreName,
             description,
             city,
+            state,
+            streetAddress,
+            facilitiesAndAmenities,
+            dailySlotCapacity,
+            installmentPayment,
+            openingHours,
+            location
+        }
+
+        const missingField = Object.entries(requiredFields).find(([, value]) => value === undefined || value === null || value === '')
+        if (missingField) {
+            deleteLocalFiles(files)
+            return res.status(400).json({
+                message: `${missingField[0]} is required`
+            })
+        }
+
+
+        const newTourist = await Tourist.create({
+            vendorId,
+            centreName,
+            description,
+            city,
+            state,
+            termsAndConditionPublicUrl: termsResponse.secureUrl,
+            privacyPolicyPublicUrl: privacyResponse.secureUrl,
+            imagesPublicUrl: imageResponses.map((image) => image.secureUrl),
             streetAddress,
             facilitiesAndAmenities: parseJsonField(facilitiesAndAmenities),
             dailySlotCapacity,
-            installmentPayment,
-            images: imageResponse,
+            installmentPayment: installmentPayment === true || installmentPayment === 'true',
+            images: imageResponses,
             termsAndCondition: termsResponse,
             privacyPolicy: privacyResponse,
             openingHours: parseJsonField(openingHours),
@@ -77,5 +130,33 @@ exports.register = async (req, res, next) => {
     } catch (error) {
         console.log(error.message);
         next(error);
+    }
+}
+
+
+exports.getAllTouristsByState = async (req, res, next) => {
+    try {
+        const {state} = req.params;
+
+        const centers = await Tourist.findAll({
+            where: {
+                state,
+            }
+        })
+
+        if (!centers.length) {
+            return res.status(404).json({
+                message: `No centers found in ${state}`
+            });
+        }
+
+        res.status(200).json({
+            message: "Centers found",
+            count: centers.length,
+            data: centers
+        })
+    } catch (error) {
+        console.log(error.message);
+        next(error)
     }
 }

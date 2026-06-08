@@ -11,6 +11,7 @@ exports.createPackage = async (req, res) => {
         } = req.body;
 
         const newPackage = await Package.create({
+            vendorId: req.user.id,
             packageName,
             packageType,
             amount,
@@ -34,10 +35,10 @@ exports.createPackage = async (req, res) => {
 exports.getAllPackages = async (req, res, next) => {
     try {
         const packages = await Package.findAll();
-        console.log('packages:', packages)
+        
+
         return res.status(200).json({
-            //   success: true,
-            //   count: packages.length,
+            count: packages.length,
             data: packages
         });
     } catch (error) {
@@ -55,13 +56,11 @@ exports.getPackageById = async (req, res, next) => {
 
         if (!packageData) {
             return res.status(404).json({
-                success: false,
                 message: 'Package not found'
             });
         }
 
         return res.status(200).json({
-            success: true,
             data: packageData
         });
     } catch (error) {
@@ -86,7 +85,6 @@ exports.updatePackage = async (req, res, next) => {
         await packageData.update(req.body);
 
         return res.status(200).json({
-            success: true,
             message: 'Package updated successfully',
             data: packageData
         });
@@ -111,8 +109,7 @@ exports.deletePackage = async (req, res, next) => {
 
         await packageData.destroy();
 
-        return res.status(200).json({
-            success: true,
+        return res.status(200).json({            
             message: 'Package deleted successfully'
         });
     } catch (error) {

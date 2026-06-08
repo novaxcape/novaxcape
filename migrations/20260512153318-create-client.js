@@ -7,6 +7,7 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
         primaryKey: true,
+        defaultValue: Sequelize.UUIDV4
       },
       firstName: {
         type: Sequelize.STRING,
@@ -37,7 +38,10 @@ module.exports = {
         allowNull: true
       },
       profilePicture: {
-        type: Sequelize.TEXT,
+        type: Sequelize.TEXT
+      },
+      profilePicturePublicUrl: {
+        type: Sequelize.TEXT
       },
       role: {
         type: Sequelize.STRING,
