@@ -1,10 +1,10 @@
-const { Kyc, Vendor, Tourist } = require('../models')
+const { Kyc, Tourist } = require('../models')
 const bcrypt = require('bcrypt')
 
 
 exports.createKyc = async (req, res, next) => {
     try {
-        const { centreName, lankmark, CAC, yearEstablished, phoneNumber, centreType, postal, state, directorFullName, directorEmail, directorPhoneNumber, bankName, accountNumber, accountName, bankCode } = req.body;
+        const { lankmark, CAC, yearEstablished, phoneNumber, centreType, postal, state, directorFullName, directorEmail, directorPhoneNumber, bankName, accountNumber, accountName, bankCode } = req.body;
 
         const {touristId} = req.params
 
@@ -22,17 +22,36 @@ exports.createKyc = async (req, res, next) => {
                 message: "Kyc already exists for this tourist"
             })
         }
+
+        const requiredFields = {
+            lankmark,
+            CAC,
+            yearEstablished,
+            phoneNumber,
+            centreType,
+            postal,
+            state,
+            directorFullName,
+            directorEmail,
+            directorPhoneNumber,
+            bankName,
+            accountNumber,
+            accountName
+        }
+
+        const missingField = Object.entries(requiredFields).find(([, value]) => value === undefined || value === null || value === '')
+        if (missingField) {
+            return res.status(400).json({
+                message: `${missingField[0]} is required`
+            })
+        }
+
         const salt = (await bcrypt.genSalt(10));
         const hashedCac = await bcrypt.hash(CAC, salt);
 
         const newKyc = await Kyc.create({
-            vendorId: req.user.id,
             touristId: tourist.id,
-            centreName: tourist.centreName,
-            centreEmail,
-            streetAddress: tourist.streetAddress,
-            city: tourist.city,
-            landmark,
+            lankmark,
             CAC: hashedCac,
             yearEstablished,
             phoneNumber,

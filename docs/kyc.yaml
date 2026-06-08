@@ -89,7 +89,7 @@ paths:
         "200":
           description: KYC created successfully
         "400":
-          description: KYC already exists for this tourist
+          description: Required field missing or KYC already exists for this tourist
         "401":
           description: Unauthorized
         "403":

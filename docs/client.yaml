@@ -314,6 +314,7 @@ paths:
               required:
                 - oldPassword
                 - newPassword
+                - confirmPassword
 
               properties:
                 oldPassword:
@@ -321,6 +322,10 @@ paths:
                   example: OldPassword123@
 
                 newPassword:
+                  type: string
+                  example: NewPassword123@
+
+                confirmPassword:
                   type: string
                   example: NewPassword123@
 
@@ -337,7 +342,7 @@ paths:
         "500":
           description: Something went wrong
 
-  /auth/google:
+  /api/v1/client/auth/google:
     get:
       summary: Login with Google
       tags:
@@ -350,7 +355,7 @@ paths:
         "500":
           description: Something went wrong
 
-  /auth/google/callback:
+  /api/v1/client/auth/google/callback:
     get:
       summary: Google callback login
       tags:

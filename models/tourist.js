@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Tourist.hasOne(models.Kyc, { foreignKey: 'touristId', as: 'kyc' });
       Tourist.hasMany(models.Booking, { foreignKey: 'touristId', as: 'bookings' });
+      Tourist.belongsTo(models.Vendor, { foreignKey: 'vendorId', as: 'vendor' });
     }
   }
 
@@ -22,6 +23,16 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
+    },
+    vendorId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'Vendors',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
     },
     centreName: {
       type: DataTypes.STRING,
@@ -55,12 +66,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
+    state: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     openingHours: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    images: [{
-      type: DataTypes.STRING,
+    images: {
+      type: DataTypes.TEXT,
       allowNull: false,
       get() {
         const value = this.getDataValue('images');
@@ -70,9 +85,9 @@ module.exports = (sequelize, DataTypes) => {
       set(val) {
         this.setDataValue('images', JSON.stringify(val));
       }
-    }],
-    imagesPublicUrl: [{
-      type: DataTypes.STRING,
+    },
+    imagesPublicUrl: {
+      type: DataTypes.TEXT,
       allowNull: false,
       get() {
         const value = this.getDataValue('imagesPublicUrl');
@@ -82,9 +97,9 @@ module.exports = (sequelize, DataTypes) => {
       set(val) {
         this.setDataValue('imagesPublicUrl', JSON.stringify(val));
       }
-    }],
+    },
     termsAndCondition: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
       get() {
         const value = this.getDataValue('termsAndCondition');
@@ -96,7 +111,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     termsAndConditionPublicUrl: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
       get() {
         const value = this.getDataValue('termsAndConditionPublicUrl');
@@ -108,7 +123,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     privacyPolicy: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
       get() {
         const value = this.getDataValue('privacyPolicy');
@@ -120,7 +135,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     privacyPolicyPublicUrl: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
       get() {
         const value = this.getDataValue('privacyPolicyPublicUrl');
