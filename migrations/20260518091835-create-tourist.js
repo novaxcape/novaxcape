@@ -8,6 +8,16 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID
       },
+      vendorId: {
+      type: Sequelize.UUID,
+      allowNull: false,
+      references: {
+        model: 'Vendors',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
       centreName: {
         type: Sequelize.STRING,
         allowNull: false
@@ -37,6 +47,10 @@ module.exports = {
         allowNull: false
       },
       streetAddress: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      state: {
         type: Sequelize.STRING,
         allowNull: false
       },
