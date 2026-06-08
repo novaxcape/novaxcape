@@ -75,7 +75,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     images: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false,
       get() {
         const value = this.getDataValue('images');
@@ -87,7 +87,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     imagesPublicUrl: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false,
       get() {
         const value = this.getDataValue('imagesPublicUrl');
@@ -99,7 +99,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     termsAndCondition: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false,
       get() {
         const value = this.getDataValue('termsAndCondition');
@@ -111,7 +111,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     termsAndConditionPublicUrl: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false,
       get() {
         const value = this.getDataValue('termsAndConditionPublicUrl');
@@ -123,7 +123,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     privacyPolicy: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false,
       get() {
         const value = this.getDataValue('privacyPolicy');
@@ -135,7 +135,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     privacyPolicyPublicUrl: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false,
       get() {
         const value = this.getDataValue('privacyPolicyPublicUrl');
