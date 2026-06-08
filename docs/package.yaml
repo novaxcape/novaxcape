@@ -147,49 +147,52 @@ paths:
           description: Something went wrong
 
   /api/v1/package/package/{id}:
-    put:
-      summary: Update package
-      tags:
-        - Package
-      security:
-        - bearerAuth: []
+  put:
+    summary: Update package
+    tags:
+      - Package
 
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          example: 550e8400-e29b-41d4-a716-446655440000
+    security:
+      - bearerAuth: []
 
-      requestBody:
+    parameters:
+      - in: path
+        name: id
         required: true
+        description: Package ID
+        schema:
+          type: string
+          format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
 
-        content:
-          application/json:
-            schema:
-              type: object
+    requestBody:
+      required: true
 
-              properties:
-                packageName:
-                  type: string
-                  example: Family Package
+      content:
+        application/json:
+          schema:
+            type: object
 
-                packageType:
-                  type: string
-                  example: Premium
+            properties:
+              packageName:
+                type: string
+                example: Family Package
 
-                amount:
-                  type: integer
-                  example: 75000
+              packageType:
+                type: string
+                example: Premium
 
-                numberOfPeople:
-                  type: string
-                  example: "10"
+              amount:
+                type: number
+                example: 75000
 
-      responses:
-        "200":
-          description: Package updated successfully
+              numberOfPeople:
+                type: integer
+                example: 10
+
+    responses:
+      "200":
+        description: Package updated successfully
 
         "400":
           description: Invalid request body
