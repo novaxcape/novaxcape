@@ -9,40 +9,38 @@ module.exports = {
         type: Sequelize.UUID
       },
       clientId: {
-      allowNull: false,
-      type: Sequelize.UUID,
-      references: {
-        model: 'clients',
-        key: 'id'
+        allowNull: false,
+        type: Sequelize.UUID,
+        references: {
+          model: 'clients',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
-    },
-    touristId: {
-      allowNull: false,
-      type: Sequelize.UUID,
-      references: {
-        model: 'Tourists',
-        key: 'id'
+      touristId: {
+        allowNull: false,
+        type: Sequelize.UUID,
+        references: {
+          model: 'Tourists',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
-    },
+      packageId: {
+        allowNull: false,
+        type: Sequelize.UUID,
+        references: {
+          model: 'Packages',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
       visitDate: {
         type: Sequelize.DATEONLY,
         allowNull: false
-      },
-      adultQty: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0
-      },
-      childQty: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0
-      },
-      familyPackQty: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0
       },
       createdAt: {
         allowNull: false,

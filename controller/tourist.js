@@ -40,7 +40,11 @@ const uploadFile = async (file) => {
             secureUrl: uploadToCloudinary.secure_url,
             publicId: uploadToCloudinary.public_id
         }
-    } finally {
+    } catch (error) {
+        console.log('Error uploading file to Cloudinary:', error)
+        throw new Error('Failed to upload file')
+    }
+    finally {
         deleteLocalFile(file)
     }
 }
@@ -51,9 +55,9 @@ exports.register = async (req, res, next) => {
 
         const vendorId = req.user.id
 
-        const vendor = await Vendor.findOne({where: {id: vendorId}})
+        const vendor = await Vendor.findOne({ where: { id: vendorId } })
 
-        if(!vendor) {
+        if (!vendor) {
             return res.status(404).json({
                 message: "Vendor not found"
             })
@@ -78,7 +82,7 @@ exports.register = async (req, res, next) => {
 
 
         const {
-            centreName,description,city,state,streetAddress,facilitiesAndAmenities,dailySlotCapacity,installmentPayment,openingHours,location
+            centreName, description, city, state, streetAddress, facilitiesAndAmenities, dailySlotCapacity, installmentPayment, openingHours, location
         } = req.body
 
         const requiredFields = {
@@ -128,7 +132,7 @@ exports.register = async (req, res, next) => {
             data: newTourist
         })
     } catch (error) {
-        console.log(error.message);
+        console.log("error:", error);
         next(error);
     }
 }
@@ -136,7 +140,7 @@ exports.register = async (req, res, next) => {
 
 exports.getAllTouristsByState = async (req, res, next) => {
     try {
-        const {state} = req.params;
+        const { state } = req.params;
 
         const centers = await Tourist.findAll({
             where: {

@@ -43,21 +43,19 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
+    packageId: {
+      allowNull: false,
+      type: DataTypes.UUID,
+      references: {
+        model: 'Packages',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
     visitDate: {
       type: DataTypes.DATEONLY,
       allowNull: false
-    },
-    adultQty: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0
-    },
-    childQty: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0
-    },
-    familyPackQty: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0
     }
   }, {
     sequelize,
