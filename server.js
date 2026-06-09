@@ -107,8 +107,8 @@ app.use((err, req, res, next) => {
 })
 
 const databaseConnection = async () => {
-    try {
-        await sequelize.authenticate()
+    try {      
+          await sequelize.authenticate()
         console.log('database connected successfully')
 
         app.listen(PORT, () => {

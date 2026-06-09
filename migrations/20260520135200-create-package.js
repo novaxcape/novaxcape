@@ -13,6 +13,10 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false
       },
+      touristId: {
+        type: Sequelize.UUID,
+        allowNull: false
+      },
       packageName: {
         type: Sequelize.STRING,
         allowNull: false,

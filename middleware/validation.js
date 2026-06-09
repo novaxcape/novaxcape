@@ -29,10 +29,11 @@ exports.clientReg = (req, res, next) => {
             'string.empty': 'Password cannot be empty',
             'string.pattern.base': 'Password must be atleast 8 characters and must include at least one uppercase, one lowercase, one digit and one special character'
         }),
-        gender: joi.string().max(6).min(4).pattern(/^[A-Za-z]/).required().messages({
+        gender: joi.string().trim().required().valid('male', 'female').messages({
             'any.required': 'Gender is required',
             'string.empty': 'Gender cannot be empty',
-        }),
+            'any.only': 'Gender must be either male or female'
+        })
     })
 
     const { error } = schema.validate(req.body, { abortEarly: false });
