@@ -5,7 +5,7 @@ const {createPackageValidation,updatePackageValidation} = require('../middleware
 const {authenticateToken, adminAuth, vendorAuth} = require('../middleware/auth')
 
 
-router.post('/', createPackageValidation, authenticateToken, vendorAuth, packageController.createPackage);
+router.post('/:touristId', createPackageValidation, authenticateToken, vendorAuth, packageController.createPackage);
 router.put('/package/:id',updatePackageValidation, authenticateToken, vendorAuth,packageController.updatePackage);
 router.get('/all', authenticateToken, vendorAuth, packageController.getAllPackages);
 router.get('/:id', authenticateToken, vendorAuth, packageController.getPackageById);

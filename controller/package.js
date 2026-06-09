@@ -4,6 +4,7 @@ const { Package, Vendor, Tourist } = require('../models');
 exports.createPackage = async (req, res) => {
     try {
         const vendorId = req.user.id;
+        const touristId = req.params.touristId;
         const { packageName, packageType, amount, numberOfPeople } = req.body;
         const vendor = await Vendor.findByPk(vendorId);
 
@@ -14,7 +15,7 @@ exports.createPackage = async (req, res) => {
             });
         };
 
-        const tourist = await Tourist.findByPk(vendor.dataValues.id);
+        const tourist = await Tourist.findByPk(touristId);
 
         if (!tourist) {
             return res.status(404).json({
