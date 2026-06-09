@@ -4,12 +4,12 @@ const bcrypt = require('bcrypt')
 
 exports.createKyc = async (req, res, next) => {
     try {
-        const { lankmark, CAC, yearEstablished, phoneNumber, centreType, postal, state, directorFullName, directorEmail, directorPhoneNumber, bankName, accountNumber, accountName, bankCode } = req.body;
+        const { centreName, centreEmail, city, centrePhoneNumber, streetAddress, lankmark, CAC, yearEstablished, phoneNumber, centreType, postal, state, directorFullName, directorEmail, directorPhoneNumber, bankName, accountNumber, accountName, bankCode } = req.body;
 
         const {touristId} = req.params
 
         const tourist = await Tourist.findOne({where: {vendorId: req.user.id, id: touristId}})
-
+        console.log("tourist:", tourist.dataValues)
         if (!tourist) {
             return res.status(404).json({
                 message: 'Tourist not found'
@@ -24,6 +24,12 @@ exports.createKyc = async (req, res, next) => {
         }
 
         const requiredFields = {
+            touristId: tourist.dataValues.id,
+            centreName: tourist.dataValues.centreName,
+            centreEmail,
+            city: tourist.dataValues.city,
+            centrePhoneNumber,
+            streetAddress: tourist.dataValues.streetAddress,
             lankmark,
             CAC,
             yearEstablished,
@@ -49,23 +55,7 @@ exports.createKyc = async (req, res, next) => {
         const salt = (await bcrypt.genSalt(10));
         const hashedCac = await bcrypt.hash(CAC, salt);
 
-        const newKyc = await Kyc.create({
-            touristId: tourist.id,
-            lankmark,
-            CAC: hashedCac,
-            yearEstablished,
-            phoneNumber,
-            centreType,
-            postal,
-            state,
-            directorFullName,
-            directorEmail,
-            directorPhoneNumber,
-            bankName,
-            bankCode,
-            accountName,
-            accountNumber
-        })
+        const newKyc = await Kyc.create(requiredFields)
 
         res.status(200).json({
             message: "Kyc successfully created",

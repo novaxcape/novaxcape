@@ -18,6 +18,26 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
+      centreName: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      centreEmail: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      city: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      centrePhoneNumber: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      streetAddress: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       lankmark: {
         type: Sequelize.STRING,
         allowNull: false

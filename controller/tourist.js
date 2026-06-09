@@ -78,11 +78,15 @@ exports.register = async (req, res, next) => {
 
 
         const {
-            centreName,description,city,state,streetAddress,facilitiesAndAmenities,dailySlotCapacity,installmentPayment,openingHours,location
+            centreName,description,packageName,packageType,amount,NumberOfPeople,city,state,streetAddress,facilitiesAndAmenities,dailySlotCapacity,installmentPayment,openingHours,location
         } = req.body
 
         const requiredFields = {
             centreName,
+            packageName,
+            packageType,
+            amount,
+            NumberOfPeople,
             description,
             city,
             state,
@@ -157,6 +161,28 @@ exports.getAllTouristsByState = async (req, res, next) => {
         })
     } catch (error) {
         console.log(error.message);
+        next(error)
+    }
+}
+
+
+exports.getOneTourist = async (req, res, next) => {
+    try {
+        const {id} = req.params;
+        const center = await Tourist.findByPk(id)
+
+        if(!center) {
+            return res.status(404).json({
+                message: "Tourist center not found"
+            })
+        }
+
+        res.status(200).json({
+            message: "Tourist center found",
+            data: center
+        })
+    } catch (error) {
+        console.log(error.message)
         next(error)
     }
 }

@@ -9,5 +9,6 @@ router.post('/register', authenticateToken, vendorAuth, upload.fields([
     { name: 'privacyPolicy', maxCount: 1 }
 ]), touristController.register)
 router.get('/get-all-state/:state', touristController.getAllTouristsByState)
+router.get('/get-one/:id', touristController.getOneTourist)
 
 module.exports = router
