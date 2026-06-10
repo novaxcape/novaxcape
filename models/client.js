@@ -33,14 +33,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    phoneNumber: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    gender: {
-      type: DataTypes.ENUM('Male', 'Female'),
-      allowNull: true
-    },
     password: {
       type: DataTypes.STRING,
       allowNull: false

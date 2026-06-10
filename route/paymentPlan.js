@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const paymentPlanController = require('../controller/paymentPlan')
-const {authenticateToken, clientAuth} = require('../middleware/auth')
+const {authenticateToken, vendorAuth} = require('../middleware/auth')
 
-router.post('/create-plan/:packageId', authenticateToken, clientAuth, paymentPlanController.createPaymentPlan)
+router.post('/create-plan/:packageId', authenticateToken, vendorAuth, paymentPlanController.createPaymentPlan)
 
 module.exports = router

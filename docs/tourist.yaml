@@ -6,7 +6,7 @@ info:
   description: Documentation for tourist center endpoints
 
 paths:
-  /api/v1/tourist/register:
+  /api/v1/tourist/register/{vendorId}:
     post:
       summary: Register tourist center
       tags:
