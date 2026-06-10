@@ -50,22 +50,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    packageName: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      packageType: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      amount: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-      },
-      NumberOfPeople: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-      },
     facilitiesAndAmenities: {
       type: DataTypes.TEXT,
       allowNull: false

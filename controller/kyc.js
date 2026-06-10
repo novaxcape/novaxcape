@@ -9,7 +9,6 @@ exports.createKyc = async (req, res, next) => {
         const {touristId} = req.params
 
         const tourist = await Tourist.findOne({where: {vendorId: req.user.id, id: touristId}})
-        console.log("tourist:", tourist.dataValues)
         if (!tourist) {
             return res.status(404).json({
                 message: 'Tourist not found'

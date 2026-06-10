@@ -26,22 +26,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      packageName: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      packageType: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      amount: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      NumberOfPeople: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
       description: {
         type: Sequelize.STRING,
         allowNull: false

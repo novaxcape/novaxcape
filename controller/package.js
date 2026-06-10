@@ -1,17 +1,46 @@
-const { Package } = require('../models');
+const { Package, Vendor, Tourist } = require('../models');
 
 
 exports.createPackage = async (req, res) => {
     try {
-        const {
-            packageName,
-            packageType,
-            amount,
-            numberOfPeople
-        } = req.body;
+        const vendorId = req.user.id;
+        const touristId = req.params.touristId;
+        const { packageName, packageType, amount, numberOfPeople } = req.body;
+        const vendor = await Vendor.findByPk(vendorId);
+
+        if (!vendor) {
+            return res.status(404).json({
+                success: false,
+                message: 'Vendor not found'
+            });
+        };
+
+        const tourist = await Tourist.findByPk(touristId);
+
+        if (!tourist) {
+            return res.status(404).json({
+                success: false,
+                message: 'Tourist not found'
+            });
+        };
+
+        const existingPackage = await Package.findOne({
+            where: {
+                packageName,
+                touristId: tourist.dataValues.id
+            }
+        });
+
+        if (existingPackage) {
+            return res.status(400).json({
+                success: false,
+                message: 'Package already exists for this tourist'
+            });
+        };
 
         const newPackage = await Package.create({
-            vendorId: req.user.id,
+            vendorId: vendor.dataValues.id,
+            touristId: tourist.dataValues.id,
             packageName,
             packageType,
             amount,
@@ -24,7 +53,6 @@ exports.createPackage = async (req, res) => {
             data: newPackage
         });
     } catch (error) {
-        console.log(error)
         return res.status(500).json({
             success: false,
             message: error.message
@@ -36,33 +64,31 @@ exports.createPackage = async (req, res) => {
 exports.getAllPackages = async (req, res, next) => {
     try {
         const packages = await Package.findAll();
-        
-
         return res.status(200).json({
-            count: packages.length,
+            message: 'Packages retrieved successfully',
             data: packages
         });
     } catch (error) {
         console.log('error:', error)
         next(error)
     };
-}
+};
 
 
 exports.getPackageById = async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const { packageId } = req.params;
+        const package = await Package.findByPk(packageId);
 
-        const packageData = await Package.findByPk(id);
-
-        if (!packageData) {
+        if (!package) {
             return res.status(404).json({
                 message: 'Package not found'
             });
-        }
+        };
 
         return res.status(200).json({
-            data: packageData
+            message: 'Package retrieved successfully',
+            data: package
         });
     } catch (error) {
         next(error)
@@ -72,22 +98,38 @@ exports.getPackageById = async (req, res, next) => {
 
 exports.updatePackage = async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const vendorId = req.user.id;
+        const { packageId } = req.params;
+        const { packageName, packageType, amount, numberOfPeople } = req.body;
+        const vendor = await Vendor.findByPk(vendorId);
+        const package = await Package.findByPk(packageId);
 
-        const packageData = await Package.findByPk(id);
+        if (!vendor) {
+            return res.status(404).json({
+                success: false,
+                message: 'Vendor not found'
+            });
+        };
 
-        if (!packageData) {
+        if (!package) {
             return res.status(404).json({
                 success: false,
                 message: 'Package not found'
             });
+        };
+
+        const data = {
+            packageName: packageName || package.packageName,
+            packageType: packageType || package.packageType,
+            amount: amount || package.amount,
+            numberOfPeople: numberOfPeople || package.numberOfPeople
         }
 
-        await packageData.update(req.body);
+        await package.update(data);
 
         return res.status(200).json({
             message: 'Package updated successfully',
-            data: packageData
+            data: package
         });
     } catch (error) {
         next(error)
@@ -110,7 +152,7 @@ exports.deletePackage = async (req, res, next) => {
 
         await packageData.destroy();
 
-        return res.status(200).json({            
+        return res.status(200).json({
             message: 'Package deleted successfully'
         });
     } catch (error) {

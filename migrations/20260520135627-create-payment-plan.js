@@ -9,11 +9,11 @@ module.exports = {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4
       },
-      bookingId: {
+      packageId: {
         allowNull: false,
         type: Sequelize.UUID,
         references: {
-          model: 'Bookings',
+          model: 'Packages',
           key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -33,12 +33,12 @@ module.exports = {
       },
       // Total amount to be paid across the whole plan
       totalAmount: {
-        type: Sequelize.DECIMAL(12, 2),
+        type: Sequelize.INTEGER,
         allowNull: false
       },
       // Amount charged per installment
       installmentAmount: {
-        type: Sequelize.DECIMAL(12, 2),
+        type: Sequelize.INTEGER,
         allowNull: false
       },
       // Total number of installments expected
@@ -90,8 +90,5 @@ module.exports = {
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('paymentPlans');
-    // Clean up ENUM types created by Postgres
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_paymentPlans_frequency";');
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_paymentPlans_status";');
   }
 };

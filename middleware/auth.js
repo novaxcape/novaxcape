@@ -37,8 +37,18 @@ const vendorAuth = async (req, res, next) => {
     next()
 }
 
+
+const clientAuth = async (req, res, next) => {
+    if(req.user.role !== 'Client'){
+        return res.status(403).json({
+            message: 'Access denied'
+        })
+    }
+    next()
+}
 module.exports ={
      authenticateToken,
      adminAuth,
-     vendorAuth
+     vendorAuth,
+     clientAuth
 }

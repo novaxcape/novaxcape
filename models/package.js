@@ -11,7 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Package.belongsTo(models.Vendor, { foreignKey: 'vendorId' });
+      Package.belongsTo(models.Tourist, { foreignKey: 'touristId' });
+      Package.hasMany(models.PaymentPlan, { foreignKey: 'packageId', as: 'paymentPlans' });
     }
   }
   Package.init({
@@ -26,6 +27,16 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       references: {
         model: 'Vendors',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
+    touristId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'Tourists',
         key: 'id'
       },
       onUpdate: 'CASCADE',
@@ -50,6 +61,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Package',
+    tableName: 'Packages',
   });
   return Package;
 };

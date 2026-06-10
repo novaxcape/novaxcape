@@ -13,7 +13,6 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
         Booking.belongsTo(models.Client, { foreignKey: 'clientId', as: 'client'});
         Booking.belongsTo(models.Tourist, { foreignKey: 'touristId', as: 'tourist'});
-        Booking.hasOne(models.PaymentPlan, { foreignKey: 'bookingId', as: 'paymentPlan' });
     }
   }
   Booking.init({
@@ -43,21 +42,19 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
+    packageId: {
+      allowNull: false,
+      type: DataTypes.UUID,
+      references: {
+        model: 'Packages',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
     visitDate: {
       type: DataTypes.DATEONLY,
       allowNull: false
-    },
-    adultQty: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0
-    },
-    childQty: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0
-    },
-    familyPackQty: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0
     }
   }, {
     sequelize,

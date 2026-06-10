@@ -25,16 +25,11 @@ exports.register = async (req, res, next) => {
     const normalizedFirstname = await autoCapitalizeFirstChar(firstName);
     const normalizedLastname = await autoCapitalizeFirstChar(lastName);
 
-    const [existingClient, existingVendor] = await Promise.all([
-      Client.findOne({ where: { email: email.toLowerCase() } }),
-      Vendor.findOne({ where: { email: email.toLowerCase() } })
-    ]);
+    const existingClient = await Client.findOne({ where: { email: email.toLowerCase() } });
 
-    const existingUser = existingClient || existingVendor;
-
-    if (existingUser) {
+    if (existingClient) {
       return res.status(400).json({
-        message: 'User with this email already exists as a client or vendor'
+        message: 'Client already exists'
       });
     }
 
@@ -54,7 +49,7 @@ exports.register = async (req, res, next) => {
     });
 
     res.status(201).json({
-      message: 'User registered successfully. Please check your email for OTP verification.'
+      message: 'Client registered successfully. Please check your email for OTP verification.'
     });
 
     (async () => {
@@ -212,7 +207,6 @@ exports.login = async (req, res, next) => {
     next(error);
   }
 }
-
 
 exports.updateProfile = async (req, res, next) => {
   try {

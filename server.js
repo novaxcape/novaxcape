@@ -15,6 +15,7 @@ const vendorRoutes = require('./route/vendor')
 const packageRoutes = require('./route/package')
 const touristRoutes = require('./route/tourist')
 const kycRoutes = require('./route/kyc')
+const paymentPlanRoutes = require('./route/paymentPlan')
 
 
 const rateLimit = require('express-rate-limit')
@@ -54,6 +55,7 @@ app.use('/api/v1/vendor', vendorRoutes)
 app.use('/api/v1/package', packageRoutes);
 app.use('/api/v1/tourist', touristRoutes)
 app.use('/api/v1/kyc', kycRoutes)
+app.use('/api/v1/plan', paymentPlanRoutes)
 
 
 
@@ -107,8 +109,8 @@ app.use((err, req, res, next) => {
 })
 
 const databaseConnection = async () => {
-    try {
-        await sequelize.authenticate()
+    try {      
+          await sequelize.authenticate()
         console.log('database connected successfully')
 
         app.listen(PORT, () => {
