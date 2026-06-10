@@ -72,35 +72,3 @@ exports.createPaymentPlan = async (req, res, next) => {
     }
 }
 
-exports.cancelPaymentPlan = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-
-        const paymentPlan = await PaymentPlan.findByPk(id);
-
-        if (!paymentPlan) {
-            return res.status(404).json({
-                success: false,
-                message: 'Payment plan not found'
-            });
-        }
-
-        if (paymentPlan.status === 'completed') {
-            return res.status(400).json({
-                success: false,
-                message: 'A completed payment plan cannot be cancelled'
-            });
-        }
-
-        await paymentPlan.update({ status: 'cancelled' });
-
-        return res.status(200).json({
-            success: true,
-            message: 'Payment plan cancelled successfully',
-            data: paymentPlan
-        });
-    } catch (error) {
-        console.log(error.message);
-        next(error);
-    }
-};
