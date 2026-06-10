@@ -21,7 +21,7 @@ const generateOTP = () => ({
 
 exports.register = async (req, res, next) => {
   try {
-    const { firstName, lastName, email, password, phoneNumber, gender } = req.body;
+    const { firstName, lastName, email, password  } = req.body;
     const normalizedFirstname = await autoCapitalizeFirstChar(firstName);
     const normalizedLastname = await autoCapitalizeFirstChar(lastName);
 
@@ -42,8 +42,6 @@ exports.register = async (req, res, next) => {
       lastName: normalizedLastname,
       email: email.toLowerCase(),
       password: hashedPassword,
-      phoneNumber,
-      gender,
       otp,
       otpExpire
     });
