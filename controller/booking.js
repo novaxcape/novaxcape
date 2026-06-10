@@ -1,4 +1,4 @@
-const { Client, Booking } = require('../models');
+const { Client, Booking, Package, Tourist } = require('../models');
 const dayjs = require('dayjs');
 const customParseFormat = require('dayjs/plugin/customParseFormat');
 dayjs.extend(customParseFormat);
