@@ -20,9 +20,7 @@ paths:
               required:
                 - firstName
                 - lastName
-                - email
                 - password
-                - phoneNumber
                 - gender
               properties:
                 firstName:
@@ -37,12 +35,6 @@ paths:
                 password:
                   type: string
                   example: Password123@
-                phoneNumber:
-                  type: string
-                  example: "09087654321"
-                gender:
-                  type: string
-                  example: male
       responses:
         "201":
           description: Client registered successfully

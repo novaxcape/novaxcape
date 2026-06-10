@@ -19,20 +19,10 @@ exports.clientReg = (req, res, next) => {
             'string.empty': 'Email cannot be empty',
             'string.email': 'Email must be a valid email'
         }),
-        phoneNumber: joi.string().pattern(/^\d{11}$/).required().messages({
-            'any.required': 'Phone number is required',
-            'string.empty': 'Phone number cannot be empty',
-            'string.pattern.base': 'Phone number must only contain numbers and must be 11 digits'
-        }),
         password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#^()_\-+=])[A-Za-z\d@$!%*?&.#^()_\-+=]{8,}$/).required().messages({
             'any.required': 'Password is required',
             'string.empty': 'Password cannot be empty',
             'string.pattern.base': 'Password must be atleast 8 characters and must include at least one uppercase, one lowercase, one digit and one special character'
-        }),
-        gender: joi.string().trim().required().valid('male', 'female').messages({
-            'any.required': 'Gender is required',
-            'string.empty': 'Gender cannot be empty',
-            'any.only': 'Gender must be either male or female'
         })
     })
 
