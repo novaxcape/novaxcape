@@ -35,6 +35,7 @@ const options = {
       "./docs/vendor.yaml",
       "./docs/tourist.yaml",
       "./docs/kyc.yaml",
+      "./docs/paymentPlan.yaml",
       "./docs/booking.yaml"
     ]
 }
