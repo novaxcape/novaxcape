@@ -6,61 +6,57 @@ info:
   description: Documentation for package endpoints
 
 paths:
-
-  /api/v1/package:
+  /api/v1/package/{touristId}:
     post:
-      summary: Create package
+      summary: Create a new package for a tourist center
       tags:
         - Package
       security:
         - bearerAuth: []
-
+      parameters:
+        - in: path
+          name: touristId
+          required: true
+          schema:
+            type: string
+          description: Tourist center ID
       requestBody:
         required: true
-
         content:
           application/json:
             schema:
               type: object
-
               required:
                 - packageName
                 - packageType
                 - amount
                 - numberOfPeople
-
               properties:
                 packageName:
                   type: string
                   example: Family Package
-
                 packageType:
                   type: string
                   example: Premium
-
                 amount:
-                  type: integer
+                  type: number
                   example: 50000
-
                 numberOfPeople:
                   type: string
                   example: "5"
-
       responses:
         "201":
           description: Package created successfully
-
         "400":
-          description: Invalid request body
-
+          description: Package already exists for this tourist or invalid request
         "401":
           description: Unauthorized
-
         "403":
           description: Vendor access required
-
+        "404":
+          description: Vendor or tourist not found
         "500":
-          description: Something went wrong
+          description: Internal server error
 
   /api/v1/package/all:
     get:
@@ -69,19 +65,15 @@ paths:
         - Package
       security:
         - bearerAuth: []
-
       responses:
         "200":
           description: Packages retrieved successfully
-
         "401":
           description: Unauthorized
-
         "403":
           description: Vendor access required
-
         "500":
-          description: Something went wrong
+          description: Internal server error
 
   /api/v1/package/{id}:
     get:
@@ -90,118 +82,100 @@ paths:
         - Package
       security:
         - bearerAuth: []
-
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          example: 550e8400-e29b-41d4-a716-446655440000
-
+          description: Package ID
       responses:
         "200":
           description: Package retrieved successfully
-
         "401":
           description: Unauthorized
-
         "403":
           description: Vendor access required
-
         "404":
           description: Package not found
-
         "500":
-          description: Something went wrong
+          description: Internal server error
 
     delete:
-      summary: Delete package
+      summary: Delete a package by ID
       tags:
         - Package
       security:
         - bearerAuth: []
-
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          example: 550e8400-e29b-41d4-a716-446655440000
-
+          description: Package ID
       responses:
         "200":
           description: Package deleted successfully
-
         "401":
           description: Unauthorized
-
         "403":
           description: Vendor access required
-
         "404":
           description: Package not found
-
         "500":
-          description: Something went wrong
+          description: Internal server error
 
   /api/v1/package/package/{id}:
     put:
-      summary: Update package
+      summary: Update a package by ID
       tags:
         - Package
       security:
         - bearerAuth: []
-
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          example: 550e8400-e29b-41d4-a716-446655440000
-
+          description: Package ID
       requestBody:
         required: true
-
         content:
           application/json:
             schema:
               type: object
-
               properties:
                 packageName:
                   type: string
                   example: Family Package
-
                 packageType:
                   type: string
                   example: Premium
-
                 amount:
-                  type: integer
+                  type: number
                   example: 75000
-
                 numberOfPeople:
                   type: string
                   example: "10"
-
       responses:
         "200":
           description: Package updated successfully
-
         "400":
           description: Invalid request body
-
         "401":
           description: Unauthorized
-
         "403":
           description: Vendor access required
-
         "404":
           description: Package not found
-
         "500":
-          description: Something went wrong
+          description: Internal server error
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

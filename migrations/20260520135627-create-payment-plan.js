@@ -6,29 +6,77 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4
       },
-      bookingId: {
-      allowNull: false,
-      type: Sequelize.UUID,
-      references: {
-        model: 'Bookings',
-        key: 'id'
+      packageId: {
+        allowNull: false,
+        type: Sequelize.UUID,
+        references: {
+          model: 'Packages',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
-    },
-      firstName: {
-        type: Sequelize.STRING,
+      // Number of months the payment is spread across (e.g. 1, 2, 3)
+      durationInMonths: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1
+      },
+      // How often the installment is charged
+      frequency: {
+        type: Sequelize.ENUM('weekly', 'monthly'),
+        allowNull: false,
+        defaultValue: 'monthly'
+      },
+      // Total amount to be paid across the whole plan
+      totalAmount: {
+        type: Sequelize.INTEGER,
         allowNull: false
       },
-      lastName: {
-        type: Sequelize.STRING,
+      // Amount charged per installment
+      installmentAmount: {
+        type: Sequelize.INTEGER,
         allowNull: false
       },
-      email: {
-        type: Sequelize.STRING,
+      // Total number of installments expected
+      numberOfInstallments: {
+        type: Sequelize.INTEGER,
         allowNull: false
+      },
+      // How many installments have been successfully paid
+      installmentsPaid: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
+      // Running total of what has been paid so far
+      amountPaid: {
+        type: Sequelize.DECIMAL(12, 2),
+        allowNull: false,
+        defaultValue: 0
+      },
+      currency: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'NGN'
+      },
+      status: {
+        type: Sequelize.ENUM('active', 'completed', 'cancelled', 'defaulted'),
+        allowNull: false,
+        defaultValue: 'active'
+      },
+      // When the first payment was made / due
+      startDate: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+      // When the next installment is due to be charged
+      nextPaymentDate: {
+        type: Sequelize.DATE,
+        allowNull: true
       },
       createdAt: {
         allowNull: false,
