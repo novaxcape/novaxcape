@@ -1,7 +1,7 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-const { clients: Client } = require('../models');
+const { Client } = require('../models');
 
 passport.use(
   new GoogleStrategy(
@@ -30,7 +30,6 @@ passport.use(
             firstName: profile.name.givenName,
             lastName: profile.name.familyName,
             email: profile._json.email,
-            phoneNumber: ' ',
             password: ' ',
             profilePicture: profile._json.picture,
             isVerified: profile._json.email_verified

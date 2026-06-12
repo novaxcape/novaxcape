@@ -355,13 +355,20 @@ exports.changePassword = async (req, res, next) => {
 exports.loginWithGoogle = async (req, res, next) => {
   try {
     const token = await jwt.sign({
-      id: req.user._id,
+      id: req.user.id,
       role: req.user.role
     }, process.env.SECERT_KEY, { expiresIn: '1d' });
 
     res.status(200).json({
       message: 'Login successful',
-      data: req.user.fullname,
+      data: {
+        id: req.user.id,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        email: req.user.email,
+        role: req.user.role,
+        profilePicture: req.user.profilePicture
+      },
       token
     })
   } catch (error) {

@@ -42,28 +42,28 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
-    profilePicture: [{
-      type: DataTypes.STRING,
+    profilePicture: {
+      type: DataTypes.TEXT,
       get() {
         const value = this.getDataValue('profilePicture');
-        return value ? JSON.parse(value): [];
+        return value ? value : null;
       },
 
       set(val) {
-        this.setDataValue('profilePicture', JSON.stringify(val));
+        this.setDataValue('profilePicture', val);
       }
-    }],
-    profilePicturePublicUrl: [{
-      type: DataTypes.STRING,
+    },
+    profilePicturePublicUrl: {
+      type: DataTypes.TEXT,
       get() {
         const value = this.getDataValue('profilePicturePublicUrl');
-        return value ? JSON.parse(value): [];
+        return value ? value : null;
       },
 
       set(val) {
-        this.setDataValue('profilePicturePublicUrl', JSON.stringify(val));
+        this.setDataValue('profilePicturePublicUrl', val);
       }
-    }],
+    },
     role: {
       type: DataTypes.STRING,
       defaultValue: "Client"
