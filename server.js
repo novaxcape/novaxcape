@@ -20,6 +20,7 @@ const paymentPlanRoutes = require('./route/paymentPlan')
 
 
 const rateLimit = require('express-rate-limit')
+const { updateBookingMiddleware } = require('./middleware/bookingAuth')
 
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
@@ -35,6 +36,7 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
+app.use(updateBookingMiddleware)
 app.use('/apisDocs', swaggerUi.serve, swaggerUi.setup(swagger))
 
 app.use('/api/v1/client/login', limiter)

@@ -11,7 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Payment.belongsTo(models.PaymentPlan, { foreignKey: 'paymentPlanId', as: 'paymentPlan' });
+      Payment.belongsTo(models.Client, { foreignKey: 'clientId', as: 'client' });
+      Payment.belongsTo(models.Booking, { foreignKey: 'bookingId', as: 'booking' });
     }
   }
   Payment.init({
@@ -21,27 +22,38 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
     },
-    paymentPlanId: {
+    clientId: {
       allowNull: false,
       type: DataTypes.UUID,
       references: {
-        model: 'paymentPlans',
+        model: 'clients',
         key: 'id'
       },
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-    firstName: {
+    bookingId: {
+      allowNull: false,
+      type: DataTypes.UUID,
+      references: {
+        model: 'Bookings',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
+    amount: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    references: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    lastName: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false
+    status: {
+      type: DataTypes.ENUM('processing', 'success', 'failed', 'abandoned'),
+      allowNull: false,
+      defaultValue: 'processing'
     }
   }, {
     sequelize,

@@ -15,9 +15,14 @@ exports.createPaymentPlan = async (req, res, next) => {
 
         const vendor = await Vendor.findByPk(req.user.id)
 
-        const tourist = await Tourist.findByPk(vendor.touristId)
-
-
+        const tourist = await Tourist.findByPk(package.touristId)
+        console.log("tourist:", tourist)
+ 
+        if(!tourist) {
+            return res.status(404).json({
+                message: 'Tourist not found'
+            })
+        }
         if (tourist.dataValues.installmentPayment !== true) {
             return res.status(404).json({
                 message: 'Installment plan does not exist for this center'

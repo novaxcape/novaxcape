@@ -8,24 +8,26 @@ info:
 paths:
   /api/v1/booking/create/{touristId}/{packageId}:
     post:
-      summary: Create a booking for a client
+      summary: Create a booking for a tourist package
       tags:
         - Booking
       security:
         - bearerAuth: []
       parameters:
-        - name: touristId
-          in: path
+        - in: path
+          name: touristId
           required: true
           schema:
             type: string
             format: uuid
-        - name: packageId
-          in: path
+          description: Tourist ID
+        - in: path
+          name: packageId
           required: true
           schema:
             type: string
             format: uuid
+          description: Package ID
       requestBody:
         required: true
         content:
@@ -47,13 +49,91 @@ paths:
               schema:
                 $ref: '#/components/schemas/BookingResponse'
         "400":
-          description: Bad request
+          description: Bad request; invalid visit date or installment not completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         "404":
-          description: Client, Tourist, or Package not found
+          description: Client, Tourist, Package or Payment plan not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         "500":
-          description: Something went wrong
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/booking/get-all/{touristId}/{packageId}:
+    get:
+      summary: Retrieve bookings for a tourist and package
+      tags:
+        - Booking
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: touristId
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Tourist ID
+        - in: path
+          name: packageId
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Package ID
+        - in: query
+          name: pageNumber
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Number of bookings per page
+      responses:
+        "200":
+          description: Bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingListResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Vendor access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   securitySchemes:
@@ -78,9 +158,26 @@ components:
         packageId:
           type: string
           format: uuid
+        bookingNumber:
+          type: string
+          example: "NOV-123456"
         visitDate:
           type: string
           format: date
+          example: "2026-06-15"
+        status:
+          type: string
+          enum:
+            - camcelled
+            - inProgress
+            - installment
+            - delivered
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     BookingResponse:
       type: object
@@ -89,3 +186,36 @@ components:
           type: string
         booking:
           $ref: '#/components/schemas/Booking'
+
+    BookingListResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        count:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Booking'
+        pagination:
+          type: object
+          properties:
+            pageNumber:
+              type: integer
+            pageSize:
+              type: integer
+            totalDocuments:
+              type: integer
+            totalPages:
+              type: integer
+            hasNextPage:
+              type: boolean
+            hasPreviousPage:
+              type: boolean
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string

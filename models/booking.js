@@ -13,6 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
         Booking.belongsTo(models.Client, { foreignKey: 'clientId', as: 'client'});
         Booking.belongsTo(models.Tourist, { foreignKey: 'touristId', as: 'tourist'});
+        Booking.belongsTo(models.Package, { foreignKey: 'packageId', as: 'package'});
+        Booking.hasMany(models.Payment, { foreignKey: 'bookingId', as: 'payments'});
     }
   }
   Booking.init({
@@ -52,10 +54,18 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
+    bookingNumber: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     visitDate: {
       type: DataTypes.DATEONLY,
       allowNull: false
-    }
+    },
+    status: {
+        type: DataTypes.ENUM('camcelled', 'inProgress', 'installment', 'delivered'),
+        defaultValue: 'inProgress'
+      },
   }, {
     sequelize,
     modelName: 'Booking',

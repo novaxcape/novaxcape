@@ -38,9 +38,17 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
+      bookingNumber: {
+        type: Sequelize.UUID,
+        allowNull: false
+      },
       visitDate: {
         type: Sequelize.DATEONLY,
         allowNull: false
+      },
+      status: {
+        type: Sequelize.ENUM('camcelled', 'inProgress', 'installment', 'delivered'),
+        defaultValue: 'inProgress'
       },
       createdAt: {
         allowNull: false,
