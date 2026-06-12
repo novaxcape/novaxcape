@@ -165,6 +165,11 @@ exports.login = async (req, res, next) => {
       process.env.SECERT_KEY,
       { expiresIn: '1d' }
     );
+    const data = {
+      id: vendor.dataValues.id,
+      centerName: vendor.dataValues.centerName,
+      email: vendor.dataValues.email
+    }
 
     res.status(200).json({
       message: 'Login successfull',

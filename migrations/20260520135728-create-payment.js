@@ -8,28 +8,39 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID
       },
-      paymentPlanId: {
+      clientId: {
       allowNull: false,
       type: Sequelize.UUID,
       references: {
-        model: 'paymentPlans',
+        model: 'clients',
         key: 'id'
       },
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-      firstName: {
+    bookingId: {
+      allowNull: false,
+      type: Sequelize.UUID,
+      references: {
+        model: 'Bookings',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
+      amount: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      references: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      lastName: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
+      status: {
+        type: Sequelize.ENUM('processing', 'success', 'failed', 'abandoned'),
+        allowNull: false,
+        defaultValue: 'processing'
+      }, 
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
