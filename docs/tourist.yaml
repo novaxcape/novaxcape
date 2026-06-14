@@ -135,7 +135,7 @@ paths:
       parameters:
         - in: path
           name: state
-          required: true
+          required: true 
           description: State to filter tourist centers by.
           schema:
             type: string
@@ -182,6 +182,39 @@ paths:
                 $ref: '#/components/schemas/TouristResponse'
         "404":
           description: Tourist center not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/tourist/get-all-opening-hours/{openingHours}:
+    get:
+      summary: Get tourist centers by opening hours
+      description: Returns all tourist centers with the requested opening hours string.
+      tags:
+        - Tourist
+      parameters:
+        - in: path
+          name: openingHours
+          required: true
+          description: Opening hours value to filter tourist centers by.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Centers found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TouristListResponse'
+        "404":
+          description: No centers found for the requested opening hours
           content:
             application/json:
               schema:

@@ -263,3 +263,172 @@ exports.resetPasswordSuccessfulTemplate = (name)=> {
 
     `
 }
+
+
+exports.confirmBooking = ({ location, visitDate, bookingId, passcode }) => {
+   return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f5f5f5;font-family:Arial,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f5f5f5;padding:20px;">
+    <tr>
+        <td align="center">
+
+            <table width="600" cellpadding="0" cellspacing="0" border="0"
+                style="background:#ffffff;border-radius:16px;padding:30px;max-width:600px;">
+
+                <!-- Success Icon -->
+                <tr>
+                    <td align="center" style="padding-bottom:20px;">
+                        <div style="
+                            width:80px;
+                            height:80px;
+                            line-height:80px;
+                            border-radius:50%;
+                            background:#d8f5d9;
+                            color:#34a853;
+                            font-size:40px;
+                            font-weight:bold;
+                            text-align:center;">
+                            ✓
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Heading -->
+                <tr>
+                    <td align="center">
+                        <h1 style="
+                            margin:0;
+                            font-size:36px;
+                            color:#222222;
+                            font-weight:700;">
+                            Booking Confirmed!
+                        </h1>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td align="center"
+                        style="padding-top:10px;padding-bottom:25px;color:#555555;font-size:16px;">
+                        Your booking has been successfully confirmed.
+                    </td>
+                </tr>
+
+                <!-- Ticket Sent Notice -->
+                <tr>
+                    <td>
+                        <table width="100%" cellpadding="0" cellspacing="0"
+                            style="
+                            border:1px solid #2d73c8;
+                            background:#eaf4ff;
+                            border-radius:12px;">
+                            <tr>
+                                <td style="
+                                    padding:15px;
+                                    color:#1f5fa8;
+                                    font-size:15px;">
+                                    📧 Your digital ticket has been sent to your email.
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td height="25"></td>
+                </tr>
+
+                <!-- Booking Details -->
+                <tr>
+                    <td style="
+                        background:#fafafa;
+                        border-radius:12px;
+                        padding:20px;">
+
+                        <h3 style="
+                            margin:0 0 20px;
+                            color:#333333;
+                            font-size:22px;">
+                            Booking Details
+                        </h3>
+
+                        <p style="margin:0 0 18px;">
+                            <span style="color:#888888;font-size:13px;">Location</span><br>
+                            <strong>${location}</strong>
+                        </p>
+
+                        <p style="margin:0 0 18px;">
+                            <span style="color:#888888;font-size:13px;">Visit Date</span><br>
+                            <strong>${visitDate}</strong>
+                        </p>
+
+                        <p style="margin:0;">
+                            <span style="color:#888888;font-size:13px;">Booking ID</span><br>
+                            <strong>${bookingId}</strong>
+                        </p>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td height="25"></td>
+                </tr>
+
+                <!-- Passcode Section -->
+                <tr>
+                    <td style="
+                        border:2px solid #ff6b35;
+                        background:#fff3ee;
+                        border-radius:16px;
+                        padding:25px;
+                        text-align:center;">
+
+                        <h3 style="
+                            margin:0;
+                            color:#333333;
+                            font-size:24px;">
+                            🛡️ Gate Verification Passcode
+                        </h3>
+
+                        <p style="
+                            margin:15px 0 25px;
+                            color:#666666;
+                            font-size:14px;">
+                            Show this code at the gate for entry verification
+                        </p>
+
+                        <div style="
+                            display:inline-block;
+                            background:#ffffff;
+                            border-radius:12px;
+                            padding:18px 40px;
+                            font-size:40px;
+                            font-weight:bold;
+                            letter-spacing:10px;
+                            color:#111111;">
+                            ${passcode}
+                        </div>
+
+                    </td>
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
+
+
+
+`
+}

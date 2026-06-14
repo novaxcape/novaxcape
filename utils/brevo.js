@@ -3,6 +3,7 @@ const Brevo = require('@getbrevo/brevo');
 
 
 exports.sendSingleEmail = async (payloads) => {
+  console.log("Sending email to:", payloads);
   try {
     const apikey = process.env.BREVO_API_KEY;
     if (!apikey) {
