@@ -1,13 +1,154 @@
-const { Client, Booking, Payment } = require('../models')
+const { Client, Booking, Payment, Package } = require('../models')
 const otpGenerator = require('otp-generator')
 const axios = require('axios')
+const crypto = require('crypto')
+
+
 
 exports.initiatePayment = async (req, res, next) => {
     try {
         const clientId = req.user.id;
-        const 
+        const { bookingId } = req.params
+        const client = await Client.findByPk(clientId)
+
+        if(!Client) {
+            return res.status(404).json({
+                message: "Client not found"
+            })
+        }
+
+        const booking = await Booking.findByPk(bookingId);
+
+        const package = await Package.findByPk(booking.dataValues.packageId);
+
+        if (!booking) {
+            return res.status(404).json({
+                message: "Booking not found"
+            })
+        }
+
+        const ref = otpGenerator.generate(12, {upperCaseAlphabets: false,
+            specialChars: false, lowerCaseAlphabets: false
+        });
+        const reference = `NOV-XCAPE-${ref}`
+
+        const paymentData = {
+            amount: package.dataValues.amount,
+            currency: 'NGN',
+            reference,
+            customer: {
+                email: client.dataValues.email,
+                name: `${client.dataValues.firstName} ${client.dataValues.lastName}`
+            },
+            redirect_url: 'https://www.google.com',
+            notification_url: 'webhook'
+        }
+        console.log("payment:", paymentData)
+
+        const {data} = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentData, {
+            headers: {
+                Authorization: `Bearer ${process.env.KORA_API_KEY}`
+            }
+        })
+
+        const payment = await Payment.create({
+            amount: paymentData.amount,
+            reference,
+            clientId,
+            bookingId: booking.dataValues.id
+        })
+
+        res.status(200).json({
+            message: "payment initialized successfully",
+            data
+        })
+        
     } catch (error) {
         console.log(error.message)
         next(error)
     }
 }
+
+
+exports.verifyPayment = async (req, res, next) => {
+    try {
+        const { reference } = req.query;
+
+        const { data } = await axios.get(`https://api.korapay.com/merchant/api/v1/charges/${reference}`,{
+            headers: {
+                Authorization: `Bearer ${process.env.KORA_API_KEY}`
+            }
+        })
+        console.log("data:", data)
+        const payment = await Payment.findOne({where: {reference}})
+        if(!payment) {
+            return res.status(404).json({
+                message: 'Payment not found'
+            })
+        }
+
+        if (data?.status === true && data?.data.status === 'success') {
+            payment.status = data?.data.status;
+            await payment.save()
+
+            return res.status(200).json({
+                message: "Payment verified successfully",
+                data: data?.data
+            }) 
+        } else {
+            payment.dataValues.status = data?.data.status
+            await payment.save()
+
+            return res.status(200).json({
+                message: "Payment verification failed",
+                data: payment
+            })
+        }
+
+
+    } catch (error) {
+        console.log(error.message);
+        next(error)
+        
+    }
+}
+
+
+
+exports.verifyWebhook = async (req, res, next) => {
+    try {
+  const { event, data } = req.body;
+  const hash = crypto.createHmac("sha256", secretKey).update(JSON.stringify(data)).digest("hex");
+  const signature = req.headers["x-korapay-signature"];
+  if (hash !== signature) return res.status(401).json({
+    message: "Invalid webhook signature"
+  });
+  const payment = await Payment.findOne({where:{reference}})
+  const order = await orderModel.findOne({ customerId: payment.customerId });
+  if (!payment || !order) return res.status(404).json({
+    message: "NO payment record found"
+  });
+
+  if (event === 'charge.success') {
+    payment.dataValues.status = success
+    await payment.save()
+} else if (event === 'charge.pending') {
+    payment.dataValues.status = pending
+    await payment.save()
+} else if (event === 'charge.failed') {
+    payment.dataValues.status = failed
+    await payment.save()
+};
+
+  await payment.save();
+  res.status(200).json({
+    success: true,
+    status: "successful",
+    message: 'Payment verified successfully'
+  })
+} catch (error) {
+    console.log(error.message)
+    next(error)
+}
+
+};

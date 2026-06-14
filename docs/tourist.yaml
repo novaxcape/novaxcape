@@ -8,7 +8,7 @@ info:
 paths:
   /api/v1/tourist/register/{vendorId}:
     post:
-      summary: Register tourist center
+      summary: Register a new tourist center
       tags:
         - Tourist
       security:
@@ -20,7 +20,7 @@ paths:
           schema:
             type: string
             format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
+          description: Vendor ID for the authenticated vendor
       requestBody:
         required: true
         content:
@@ -57,6 +57,9 @@ paths:
                 state:
                   type: string
                   example: Lagos
+                streetAddress:
+                  type: string
+                  example: KM 19 Lekki-Epe Expressway
                 facilitiesAndAmenities:
                   type: string
                   description: JSON string or plain text list of facilities.
@@ -67,9 +70,6 @@ paths:
                 installmentPayment:
                   type: boolean
                   example: true
-                streetAddress:
-                  type: string
-                  example: KM 19 Lekki-Epe Expressway
                 openingHours:
                   type: string
                   description: JSON string or plain text opening hours. The controller parses valid JSON strings before saving.
@@ -91,13 +91,45 @@ paths:
       responses:
         "201":
           description: Tourist center registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TouristResponse'
+        "400":
+          description: Bad request; missing required fields or files
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Vendor access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Vendor not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
-          
   /api/v1/tourist/get-all-state/{state}:
     get:
       summary: Get tourist centers by state
       description: Returns all tourist centers registered in the requested state.
-      operationId: getAllTouristsByState
       tags:
         - Tourist
       parameters:
@@ -111,7 +143,163 @@ paths:
       responses:
         "200":
           description: Centers found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TouristListResponse'
         "404":
           description: No centers found in the requested state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         "500":
-          description: Something went wrong
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/tourist/get-one/{id}:
+    get:
+      summary: Get a single tourist center by ID
+      tags:
+        - Tourist
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Tourist center ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Tourist center found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TouristResponse'
+        "404":
+          description: Tourist center not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Tourist:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        vendorId:
+          type: string
+          format: uuid
+        centreName:
+          type: string
+        description:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        location:
+          type: string
+        streetAddress:
+          type: string
+        facilitiesAndAmenities:
+          type: string
+        dailySlotCapacity:
+          type: integer
+        installmentPayment:
+          type: boolean
+        openingHours:
+          type: string
+        images:
+          type: array
+          items:
+            type: object
+            properties:
+              secureUrl:
+                type: string
+              publicId:
+                type: string
+        imagesPublicUrl:
+          type: array
+          items:
+            type: string
+          example:
+            - https://res.cloudinary.com/example/image1.jpg
+            - https://res.cloudinary.com/example/image2.jpg
+        termsAndCondition:
+          type: object
+          properties:
+            secureUrl:
+              type: string
+            publicId:
+              type: string
+        termsAndConditionPublicUrl:
+          type: array
+          items:
+            type: string
+        privacyPolicy:
+          type: object
+          properties:
+            secureUrl:
+              type: string
+            publicId:
+              type: string
+        privacyPolicyPublicUrl:
+          type: array
+          items:
+            type: string
+        role:
+          type: string
+          example: Tourist
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TouristResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/Tourist'
+
+    TouristListResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        count:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tourist'
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string

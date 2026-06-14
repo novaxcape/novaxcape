@@ -77,3 +77,25 @@ exports.createPaymentPlan = async (req, res, next) => {
     }
 }
 
+
+exports.getAllPaymentPlan = async (req, res, next) => {
+    try {
+        const { packageId } = req.params;
+
+        const paymentPlans = await PaymentPlan.findAll({
+            where: {
+                packageId
+            }
+        });
+
+        res.status(200).json({
+            message: "Payment plans retrieved successfully",
+            count: paymentPlans.length,
+            data: paymentPlans
+        });
+
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    }
+};
