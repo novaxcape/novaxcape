@@ -10,5 +10,6 @@ router.post('/register/:vendorId', authenticateToken, vendorAuth, upload.fields(
 ]), touristController.register)
 router.get('/get-all-state/:state', touristController.getAllTouristsByState)
 router.get('/get-one/:id', touristController.getOneTourist)
+router.get('/get-all-opening-hours/:openingHours', touristController.getAllTouristsByOpeningHours)
 
 module.exports = router

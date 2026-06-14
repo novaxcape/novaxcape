@@ -1,6 +1,8 @@
-const { Client, Booking, Payment, Package } = require('../models')
+const { Client, Booking, Payment, Package, Tourist } = require('../models')
 const otpGenerator = require('otp-generator')
 const axios = require('axios')
+const { confirmBooking } = require('../helper/emailTemplate')
+const { sendSingleEmail } = require('../utils/brevo')
 const crypto = require('crypto')
 
 
@@ -41,7 +43,7 @@ exports.initiatePayment = async (req, res, next) => {
                 name: `${client.dataValues.firstName} ${client.dataValues.lastName}`
             },
             redirect_url: 'https://www.google.com',
-            notification_url: 'webhook'
+            notification_url: 'https://novaxcape.onrender.com/verify-webhook'
         }
         console.log("payment:", paymentData)
 
@@ -74,37 +76,73 @@ exports.verifyPayment = async (req, res, next) => {
     try {
         const { reference } = req.query;
 
+        const payment = await Payment.findOne({
+            where: { reference },
+            include: [
+                {
+                    model: Booking,
+                    as: 'booking'
+                }
+            ]
+        });
+
+        if (!payment) {
+            return res.status(404).json({
+                message: 'Payment not found'
+            });
+        }
+
+        const client = await Client.findByPk(payment.booking.clientId);
+        const tourist = await Tourist.findByPk(payment.booking.touristId);
+        console.log("payment:", payment)
+        console.log("tourist:", tourist)
+
         const { data } = await axios.get(`https://api.korapay.com/merchant/api/v1/charges/${reference}`,{
             headers: {
                 Authorization: `Bearer ${process.env.KORA_API_KEY}`
             }
         })
-        console.log("data:", data)
-        const payment = await Payment.findOne({where: {reference}})
-        if(!payment) {
-            return res.status(404).json({
-                message: 'Payment not found'
-            })
-        }
+        // console.log("data:", data)
+  
 
         if (data?.status === true && data?.data.status === 'success') {
             payment.status = data?.data.status;
             await payment.save()
 
-            return res.status(200).json({
+         res.status(200).json({
                 message: "Payment verified successfully",
                 data: data?.data
-            }) 
+            });
+
+          (async () => {
+              try {
+                await sendSingleEmail({
+                    email: client.email.toLowerCase(),
+                    name: `${client.firstName} ${client.lastName}`,
+                    html: confirmBooking({
+                        location: tourist.centreName,
+                        visitDate: payment.booking.visitDate,
+                        bookingId: payment.booking.bookingNumber,
+                        passcode: payment.booking.passcode
+                    }),
+                    subject: 'BOOKING CONFIRMATION'
+                });
+              } catch (error) {
+                  console.log('Email send error:', error);
+              }
+          })()
+            
         } else {
             payment.dataValues.status = data?.data.status
             await payment.save()
 
-            return res.status(200).json({
+            return res.status(400).json({
                 message: "Payment verification failed",
                 data: payment
             })
         }
 
+      
 
     } catch (error) {
         console.log(error.message);

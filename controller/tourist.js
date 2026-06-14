@@ -186,3 +186,31 @@ exports.getOneTourist = async (req, res, next) => {
         next(error)
     }
 }
+
+
+exports.getAllTouristsByOpeningHours = async (req, res, next) => {
+    try {
+        const { openingHours } = req.params;
+
+        const centers = await Tourist.findAll({
+            where: {
+                openingHours
+            }
+        })
+
+        if (!centers.length) {
+            return res.status(404).json({
+                message: `No centers found in ${openingHours}`
+            })
+        }
+
+        res.status(200).json({
+            message: "Centers found",
+            count: centers.length,
+            data: centers
+        })
+    } catch (error) {
+        console.log(error.message)
+        next(error)
+    }
+}

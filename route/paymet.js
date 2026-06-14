@@ -6,4 +6,6 @@ router.post('/make-payment/:bookingId', authenticateToken, paymentController.ini
 
 router.get('/verify-payment', authenticateToken, paymentController.verifyPayment)
 
+router.post('/verify-webhook',  paymentController.verifyWebhook)
+
 module.exports = router

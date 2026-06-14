@@ -3,6 +3,7 @@ const dayjs = require('dayjs');
 const customParseFormat = require('dayjs/plugin/customParseFormat');
 
 dayjs.extend(customParseFormat);
+const otpGenerator = require('otp-generator');
 
 const generateOrderNumber = () => {
   const randomNumber = Math.floor(100000 + Math.random() * 900000);
@@ -37,7 +38,9 @@ exports.createBooking = async (req, res, next) => {
                 message: 'Package not found'
             });
         }
+        const passcode = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, digits: true, lowerCaseAlphabets: false });
 
+        // booking.passcode = passcode;
         const paymentPlan = await PaymentPlan.findOne({
             where: {
                 packageId: tourPackage.id
@@ -84,13 +87,15 @@ exports.createBooking = async (req, res, next) => {
             packageId: tourPackage.id,
             visitDate: visit.toDate(),
             bookingNumber: generateOrderNumber(),
-            status
+            status,
+            passcode
         });
 
         return res.status(201).json({
             message: 'Booking created successfully',
             booking
         });
+
 
     } catch (error) {
         console.log(error);

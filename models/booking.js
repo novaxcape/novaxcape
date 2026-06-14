@@ -66,6 +66,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM('camcelled', 'inProgress', 'installment', 'delivered'),
         defaultValue: 'inProgress'
       },
+      passcode: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
   }, {
     sequelize,
     modelName: 'Booking',

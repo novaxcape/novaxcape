@@ -50,6 +50,10 @@ module.exports = {
         type: Sequelize.ENUM('camcelled', 'inProgress', 'installment', 'delivered'),
         defaultValue: 'inProgress'
       },
+      passcode: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
