@@ -1,0 +1,187 @@
+openapi: 3.0.0
+
+info:
+  title: Novaxcape Payment API
+  version: 1.0.0
+  description: Documentation for payment endpoints
+
+paths:
+  /api/v1/payment/make-payment/{bookingId}:
+    post:
+      summary: Initialize a payment for a booking
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: bookingId
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Booking ID for which to create the payment charge
+      responses:
+        "200":
+          description: Payment initialized successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentInitResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Booking or client not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/payment/verify-payment:
+    get:
+      summary: Verify a payment using the reference code
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: reference
+          required: true
+          schema:
+            type: string
+          description: Payment reference returned by the payment initialization endpoint
+      responses:
+        "200":
+          description: Payment verified successfully or failed payment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentVerifyResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+          format: uuid
+        bookingId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        reference:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaymentInitResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+            reference:
+              type: string
+            amount:
+              type: number
+            currency:
+              type: string
+            customer:
+              type: object
+              properties:
+                email:
+                  type: string
+                name:
+                  type: string
+            redirect_url:
+              type: string
+            notification_url:
+              type: string
+            transaction:
+              type: object
+            response:
+              type: object
+
+    PaymentVerifyResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+            reference:
+              type: string
+            amount:
+              type: number
+            currency:
+              type: string
+            customer:
+              type: object
+              properties:
+                email:
+                  type: string
+                name:
+                  type: string
+            transaction:
+              type: object
+            error:
+              type: object
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
