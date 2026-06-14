@@ -4,4 +4,6 @@ const {authenticateToken, vendorAuth} = require('../middleware/auth')
 
 router.post('/create-plan/:packageId', authenticateToken, vendorAuth, paymentPlanController.createPaymentPlan)
 
+router.get('/get-all/:packageId', authenticateToken,  paymentPlanController.getAllPaymentPlan)
+
 module.exports = router

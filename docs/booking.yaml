@@ -3,7 +3,7 @@ openapi: 3.0.0
 info:
   title: Novaxcape Booking API
   version: 1.0.0
-  description: Documentation for booking endpoints
+  description: Booking endpoints for Novaxcape, including booking creation and retrieval.
 
 paths:
   /api/v1/booking/create/{touristId}/{packageId}:
@@ -73,9 +73,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/v1/booking/get-all:
+    get:
+      summary: Retrieve bookings for the authenticated client
+      tags:
+        - Booking
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: pageNumber
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Number of bookings per page
+      responses:
+        "200":
+          description: Bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingListResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/v1/booking/get-all/{touristId}/{packageId}:
     get:
-      summary: Retrieve bookings for a tourist and package
+      summary: Retrieve bookings for a specific tourist and package (vendor access)
       tags:
         - Booking
       security:
@@ -172,6 +214,27 @@ components:
             - inProgress
             - installment
             - delivered
+        tourist:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            centreName:
+              type: string
+              example: "Ocean View Tours"
+        package:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            amount:
+              type: number
+              example: 45000
+            packageName:
+              type: string
+              example: "Beach Escape"
         createdAt:
           type: string
           format: date-time

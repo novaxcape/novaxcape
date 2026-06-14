@@ -157,46 +157,83 @@ exports.getAllBooking = async (req, res, next) => {
 };
 
 
-const getBookingStats = async (req, res) => {
-    const todayStart = dayjs().startOf("day").toDate();
-    const todayEnd = dayjs().endOf("day").toDate();
+exports.getAll = async (req, res, next) => {
+    try {
+        const clientId = req.user.id;
 
-    const yesterdayStart = dayjs()
-        .subtract(1, "day")
-        .startOf("day")
-        .toDate();
+        const pageNumber = parseInt(req.query.pageNumber) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 10;
 
-    const yesterdayEnd = dayjs()
-        .subtract(1, "day")
-        .endOf("day")
-        .toDate();
+        const offset = (pageNumber - 1) * pageSize;
 
-    const todayBookings = await Booking.count({
-        where: {
-            createdAt: {
-                [Op.between]: [todayStart, todayEnd]
+        const { count, rows } = await Booking.findAndCountAll({
+            where: {
+                clientId
+            },
+            limit: pageSize,
+            offset,
+            order: [["createdAt", "DESC"]]
+        });
+
+        res.status(200).json({
+            message: "Bookings retrieved successfully",
+            count: rows.length,
+            data: rows,
+            pagination: {
+                pageNumber,
+                pageSize,
+                totalDocument: count,
+                totalPages: Math.ceil(count / pageSize)
             }
-        }
-    });
+        });
 
-    const yesterdayBookings = await Booking.count({
-        where: {
-            createdAt: {
-                [Op.between]: [yesterdayStart, yesterdayEnd]
-            }
-        }
-    });
-
-    let percentageChange = 0;
-
-    if (yesterdayBookings > 0) {
-        percentageChange =
-            ((todayBookings - yesterdayBookings) / yesterdayBookings) * 100;
+    } catch (error) {
+        console.log(error.message);
+        next(error);
     }
-
-    return {
-        todayBookings,
-        yesterdayBookings,
-        percentageChange: percentageChange.toFixed(1)
-    };
 };
+
+
+// const getBookingStats = async (req, res) => {
+//     const todayStart = dayjs().startOf("day").toDate();
+//     const todayEnd = dayjs().endOf("day").toDate();
+
+//     const yesterdayStart = dayjs()
+//         .subtract(1, "day")
+//         .startOf("day")
+//         .toDate();
+
+//     const yesterdayEnd = dayjs()
+//         .subtract(1, "day")
+//         .endOf("day")
+//         .toDate();
+
+//     const todayBookings = await Booking.count({
+//         where: {
+//             createdAt: {
+//                 [Op.between]: [todayStart, todayEnd]
+//             }
+//         }
+//     });
+
+//     const yesterdayBookings = await Booking.count({
+//         where: {
+//             createdAt: {
+//                 [Op.between]: [yesterdayStart, yesterdayEnd]
+//             }
+//         }
+//     });
+
+//     let percentageChange = 0;
+
+//     if (yesterdayBookings > 0) {
+//         percentageChange =
+//             ((todayBookings - yesterdayBookings) / yesterdayBookings) * 100;
+//     }
+
+//     return {
+//         todayBookings,
+//         yesterdayBookings,
+//         percentageChange: percentageChange.toFixed(1)
+//     };
+// };

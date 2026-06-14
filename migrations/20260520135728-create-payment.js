@@ -32,14 +32,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      references: {
+      reference: {
         type: Sequelize.STRING,
         allowNull: false
       },
       status: {
-        type: Sequelize.ENUM('processing', 'success', 'failed', 'abandoned'),
+        type: Sequelize.ENUM('pending', 'success', 'failed', 'abandoned', 'processing'),
         allowNull: false,
-        defaultValue: 'processing'
+        defaultValue: 'pending'
       }, 
       createdAt: {
         allowNull: false,

@@ -46,14 +46,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    references: {
+    reference: {
       type: DataTypes.STRING,
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('processing', 'success', 'failed', 'abandoned'),
+      type: DataTypes.ENUM('pending', 'success', 'failed', 'abandoned', 'processing'),
       allowNull: false,
-      defaultValue: 'processing'
+      defaultValue: 'pending'
     }
   }, {
     sequelize,
