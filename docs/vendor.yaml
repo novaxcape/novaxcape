@@ -11,6 +11,8 @@ paths:
       summary: Register vendor
       tags:
         - Vendor
+
+
       requestBody:
         required: true
         content:
@@ -227,3 +229,144 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+
+
+
+  # paths:
+  #   api/v1/vendor/dashboard:
+  #    get:
+  #      summary: Get vendor dashboard statistics
+  #      description: Retrieves dashboard analytics for the authenticated vendor including requests, revenue, bookings, ticket type breakdown, visitor statistics, and ratings.
+  #      tags:
+  #        - Vendor Dashboard
+  #      security:
+  #        - bearerAuth: []
+  #      responses:
+  #        200:
+  #          description: Dashboard statistics retrieved successfully
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: object
+  #                properties:
+  #                  message:
+  #                    type: string
+  #                    example: Vendor dashboard stats retrieved successfully
+  #                  data:
+  #                    type: object
+  #                    properties:
+  #                      vendorName:
+  #                        type: string
+  #                        example: Lekki Conservation Centre
+  
+  #                      requests:
+  #                        type: object
+  #                        properties:
+  #                          today:
+  #                            type: integer
+  #                            example: 12
+  #                          yesterday:
+  #                            type: integer
+  #                            example: 8
+ 
+  #                      revenue:
+  #                        type: object
+  #                        properties:
+  #                          today:
+  #                            type: number
+  #                            example: 250000
+  #                          yesterday:
+  #                            type: number
+  #                            example: 180000
+ 
+  #                      bookings:
+  #                        type: object
+  #                        properties:
+  #                          today:
+  #                            type: integer
+  #                            example: 15
+  #                          yesterday:
+  #                            type: integer
+  #                            example: 10
+  #                          total:
+  #                            type: integer
+  #                            example: 250
+ 
+  #                      ticketTypes:
+  #                        type: object
+  #                        properties:
+  #                          breakdown:
+  #                            type: array
+  #                            items:
+  #                              type: object
+  #                              properties:
+  #                                packageType:
+  #                                  type: string
+  #                                  example: Adult
+  #                                count:
+  #                                  type: integer
+  #                                  example: 120
+  #                          total:
+  #                            type: integer
+  #                            example: 250
+ 
+  #                      visitorStats:
+  #                        type: array
+  #                        items:
+  #                          type: object
+  #                          properties:
+  #                            date:
+  #                              type: string
+  #                              format: date
+  #                              example: 2026-06-09
+  #                            visits:
+  #                              type: integer
+  #                              example: 18
+ 
+  #                      ratings:
+  #                        type: object
+  #                        properties:
+  #                          average:
+  #                            type: number
+  #                            nullable: true
+  #                            example: null
+  #                          count:
+  #                            type: integer
+  #                            example: 0
+  
+  #        401:
+  #          description: Unauthorized - Invalid or missing token
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: object
+  #                properties:
+  #                  message:
+  #                    type: string
+  #                    example: Token not found  
+  #        404:
+  #          description: Vendor not found
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: object
+  #                properties:
+  #                  message:
+  #                    type: string
+  #                    example: Vendor not found
+   
+  #        500:
+  #          description: Internal server error
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: object
+  #                properties:
+  #                message:
+  #                    type: string
+  #                    example: Internal Server Error
+
+ 
+
+
