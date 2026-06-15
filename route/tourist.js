@@ -12,4 +12,6 @@ router.get('/get-all-state/:state', touristController.getAllTouristsByState)
 router.get('/get-one/:id', touristController.getOneTourist)
 router.get('/get-all-opening-hours/:openingHours', touristController.getAllTouristsByOpeningHours)
 
+router.post('/verify-client-passcode', authenticateToken, vendorAuth, touristController.verifyClientPasscode)
+
 module.exports = router
