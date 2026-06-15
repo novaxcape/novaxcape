@@ -31,13 +31,14 @@ const options = {
     },
     apis: [
       "./docs/client.yaml",
-      "./docs/package.yaml",
       "./docs/vendor.yaml",
       "./docs/tourist.yaml",
       "./docs/kyc.yaml",
+      "./docs/package.yaml",
       "./docs/paymentPlan.yaml",
       "./docs/booking.yaml",
-      "./docs/payment.yaml"
+      "./docs/payment.yaml",
+      "./docs/review.yaml"
       
     ]
 }
