@@ -1,4 +1,4 @@
-const { Tourist, Vendor } = require('../models')
+const { Tourist, Vendor, Booking } = require('../models')
 const fs = require('fs')
 const cloudinary = require('../middleware/cloudinary')
 
@@ -214,3 +214,36 @@ exports.getAllTouristsByOpeningHours = async (req, res, next) => {
         next(error)
     }
 }
+
+
+exports.verifyClientPasscode = async (req, res, next) => {
+    try {
+        const { passcode } = req.body;
+
+        if (!passcode) {
+            return res.status(400).json({
+                message: 'Passcode is required'
+            });
+        }
+
+        const booking = await Booking.findOne({
+            where: { passcode }
+        });
+
+        if (!booking) {
+            return res.status(404).json({
+                message: 'Invalid passcode'
+            });
+        }
+
+        return res.status(200).json({
+            message: 'Passcode verified successfully',
+            data: booking
+        });
+
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    }
+};
+
