@@ -24,20 +24,6 @@ exports.createPackage = async (req, res) => {
             });
         };
 
-        const existingPackage = await Package.findOne({
-            where: {
-                packageName,
-                touristId: tourist.dataValues.id
-            }
-        });
-
-        if (existingPackage) {
-            return res.status(400).json({
-                success: false,
-                message: 'Package already exists for this tourist'
-            });
-        };
-
         const newPackage = await Package.create({
             vendorId: vendor.dataValues.id,
             touristId: tourist.dataValues.id,
