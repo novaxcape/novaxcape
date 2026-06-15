@@ -152,7 +152,6 @@ exports.verifyPayment = async (req, res, next) => {
 }
 
 
-
 exports.verifyWebhook = async (req, res, next) => {
     try {
   const { event, data } = req.body;
@@ -162,8 +161,7 @@ exports.verifyWebhook = async (req, res, next) => {
     message: "Invalid webhook signature"
   });
   const payment = await Payment.findOne({where:{reference}})
-  const order = await orderModel.findOne({ customerId: payment.customerId });
-  if (!payment || !order) return res.status(404).json({
+  if (!payment ) return res.status(404).json({
     message: "NO payment record found"
   });
 
