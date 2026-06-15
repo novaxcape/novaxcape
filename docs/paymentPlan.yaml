@@ -17,6 +17,7 @@ paths:
         - name: packageId
           in: path
           required: true
+          description: Package ID for the payment plan
           schema:
             type: string
             format: uuid
@@ -33,13 +34,18 @@ paths:
                 durationInMonths:
                   type: integer
                   example: 3
+                  description: Number of months for the plan duration
                 frequency:
                   type: string
-                  enum: [weekly, monthly]
+                  enum:
+                    - weekly
+                    - monthly
                   example: monthly
+                  description: Billing frequency for installment payments
                 currency:
                   type: string
                   example: NGN
+                  description: Currency for the plan; defaults to NGN if omitted
       responses:
         "201":
           description: Payment plan created successfully
@@ -49,12 +55,71 @@ paths:
                 $ref: '#/components/schemas/PaymentPlanResponse'
         "400":
           description: Payment plan already exists or bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         "404":
-          description: Package not found
+          description: Package, tourist center, or installment-supporting center not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         "500":
-          description: Something went wrong
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/plan/get-all/{packageId}:
+    get:
+      summary: Retrieve all payment plans for a package
+      tags:
+        - PaymentPlan
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: packageId
+          in: path
+          required: true
+          description: Package ID to fetch payment plans for
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Payment plans retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlanListResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     PaymentPlan:
       type: object
@@ -69,11 +134,13 @@ components:
           type: integer
         frequency:
           type: string
-          enum: [weekly, monthly]
+          enum:
+            - weekly
+            - monthly
         totalAmount:
-          type: integer
+          type: number
         installmentAmount:
-          type: integer
+          type: number
         numberOfInstallments:
           type: integer
         installmentsPaid:
@@ -84,7 +151,11 @@ components:
           type: string
         status:
           type: string
-          enum: [active, completed, cancelled, defaulted]
+          enum:
+            - active
+            - completed
+            - cancelled
+            - defaulted
         startDate:
           type: string
           format: date-time
@@ -105,3 +176,21 @@ components:
           type: string
         data:
           $ref: '#/components/schemas/PaymentPlan'
+
+    PaymentPlanListResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        count:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentPlan'
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
