@@ -1,227 +1,339 @@
-openapi: 3.0.0
+tags:
+  - name: Vendor
+    description: Vendor Authentication and Dashboard APIs
 
-info:
-  title: Novaxcape Vendor API
-  version: 1.0.0
-  description: Documentation for vendor endpoints
-
-paths:
-  /api/v1/vendor/register:
-    post:
-      summary: Register vendor
-      tags:
-        - Vendor
-
-
-      requestBody:
-        required: true
+/api/v1/vendor/register:
+  post:
+    tags:
+      - Vendor
+    summary: Register Vendor
+    description: Register a new vendor and send OTP to email for verification.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - centerName
+              - email
+              - phoneNumber
+              - password
+            properties:
+              centerName:
+                type: string
+                example: Wonderland Resort
+              email:
+                type: string
+                format: email
+                example: vendor@example.com
+              phoneNumber:
+                type: string
+                example: "08012345678"
+              password:
+                type: string
+                example: Password@123
+    responses:
+      201:
+        description: Vendor registered successfully
         content:
           application/json:
             schema:
               type: object
-              required:
-                - centerName
-                - email
-                - phoneNumber
-                - password
               properties:
-                centerName:
+                message:
                   type: string
-                  example: "Lekki Conservation Centre"
-                email:
-                  type: string
-                  example: "vendor@gmail.com"
-                phoneNumber:
-                  type: string
-                  example: "09087654321"
-                password:
-                  type: string
-                  example: "Password123@"
-      responses:
-        "201":
-          description: Vendor registered successfully
-        "400":
-          description: Vendor already exists
-        "500":
-          description: Something went wrong
+                  example: Vendor registered successfully, Please check your email to verify OTP
+      400:
+        description: Vendor already exists
 
-  /api/v1/vendor/verify-otp:
-    post:
-      summary: Verify vendor email
-      tags:
-        - Vendor
-      requestBody:
-        required: true
+/api/v1/vendor/verify-otp:
+  post:
+    tags:
+      - Vendor
+    summary: Verify Vendor Email
+    description: Verify vendor account using OTP sent to email.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+              - otp
+            properties:
+              email:
+                type: string
+                format: email
+                example: vendor@example.com
+              otp:
+                type: string
+                example: "123456"
+    responses:
+      200:
+        description: Email verified successfully
+      400:
+        description: Invalid or expired OTP
+      404:
+        description: Vendor not found
+
+/api/v1/vendor/resend-otp:
+  post:
+    tags:
+      - Vendor
+    summary: Resend OTP
+    description: Resend verification OTP to vendor email.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+            properties:
+              email:
+                type: string
+                format: email
+                example: vendor@example.com
+    responses:
+      200:
+        description: OTP resent successfully
+      400:
+        description: Email already verified
+      404:
+        description: Vendor not found
+
+/api/v1/vendor/login:
+  post:
+    tags:
+      - Vendor
+    summary: Vendor Login
+    description: Authenticate vendor and generate JWT token.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                type: string
+                format: email
+                example: vendor@example.com
+              password:
+                type: string
+                example: Password@123
+    responses:
+      200:
+        description: Login successful
         content:
           application/json:
             schema:
               type: object
-              required:
-                - email
-                - otp
               properties:
-                email:
+                message:
                   type: string
-                  example: "vendor@gmail.com"
-                otp:
+                  example: Login successfull
+                token:
                   type: string
-                  example: "123456"
-      responses:
-        "200":
-          description: Email verified successfully
-        "400":
-          description: Invalid OTP, expired OTP, or email already verified
-        "404":
-          description: Vendor not found
-        "500":
-          description: Something went wrong
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                vendor:
+                  type: object
+      400:
+        description: Invalid credential
+      404:
+        description: Vendor not found
 
-  /api/v1/vendor/resend-otp:
-    post:
-      summary: Resend OTP
-      tags:
-        - Vendor
-      requestBody:
-        required: true
+/api/v1/vendor/forget-password:
+  post:
+    tags:
+      - Vendor
+    summary: Forgot Password
+    description: Send password reset OTP to vendor email.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+            properties:
+              email:
+                type: string
+                format: email
+                example: vendor@example.com
+    responses:
+      200:
+        description: Forgot password successful
+      404:
+        description: Vendor not found
+
+/api/v1/vendor/reset-password:
+  post:
+    tags:
+      - Vendor
+    summary: Reset Password
+    description: Reset vendor password using email.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                type: string
+                format: email
+                example: vendor@example.com
+              password:
+                type: string
+                example: NewPassword@123
+    responses:
+      200:
+        description: Password reset successful
+      404:
+        description: Invalid credential
+
+/api/v1/vendor/change-password:
+  post:
+    tags:
+      - Vendor
+    summary: Change Password
+    description: Change vendor password after authentication.
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - oldPassword
+              - newPassword
+            properties:
+              oldPassword:
+                type: string
+                example: Password@123
+              newPassword:
+                type: string
+                example: NewPassword@123
+    responses:
+      200:
+        description: Password changed successfully
+      400:
+        description: Old password is invalid
+      404:
+        description: Vendor not found
+      401:
+        description: Unauthorized
+
+/api/v1/vendor/dashboard:
+  get:
+    tags:
+      - Vendor
+    summary: Vendor Dashboard Statistics
+    description: Retrieve vendor dashboard statistics including requests, bookings, revenue, ticket types and visitor trends.
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: Dashboard statistics retrieved successfully
         content:
           application/json:
             schema:
               type: object
-              required:
-                - email
               properties:
-                email:
+                message:
                   type: string
-                  example: "vendor@gmail.com"
-      responses:
-        "200":
-          description: OTP resent successfully
-        "400":
-          description: Email already verified
-        "404":
-          description: Vendor not found
-        "500":
-          description: Something went wrong
-
-  /api/v1/vendor/login:
-    post:
-      summary: Login vendor
-      tags:
-        - Vendor
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - email
-                - password
-              properties:
-                email:
-                  type: string
-                  example: "vendor@gmail.com"
-                password:
-                  type: string
-                  example: "Password123@"
-      responses:
-        "200":
-          description: Login successful
-        "400":
-          description: Invalid credentials or email not verified
-        "404":
-          description: Invalid credentials
-        "500":
-          description: Something went wrong
-
-  /api/v1/vendor/forget-password:
-    post:
-      summary: Forgot password
-      tags:
-        - Vendor
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - email
-              properties:
-                email:
-                  type: string
-                  example: "vendor@gmail.com"
-      responses:
-        "200":
-          description: Forgot password successful
-        "404":
-          description: Vendor not found
-        "500":
-          description: Something went wrong
-
-  /api/v1/vendor/reset-password:
-    post:
-      summary: Reset password
-      tags:
-        - Vendor
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - email
-                - password
-              properties:
-                email:
-                  type: string
-                  example: "vendor@gmail.com"
-                password:
-                  type: string
-                  example: "NewPassword123@"
-      responses:
-        "200":
-          description: Password reset successful
-        "404":
-          description: Invalid credential
-        "500":
-          description: Something went wrong
-
-  /api/v1/vendor/change-password:
-    post:
-      summary: Change password
-      tags:
-        - Vendor
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - oldPassword
-                - newPassword
-              properties:
-                oldPassword:
-                  type: string
-                  example: "OldPassword123@"
-                newPassword:
-                  type: string
-                  example: "NewPassword123@"
-      responses:
-        "200":
-          description: Password changed successfully
-        "400":
-          description: Old password is invalid
-        "401":
-          description: Unauthorized
-        "404":
-          description: User not found
-        "500":
-          description: Something went wrong
+                  example: Vendor dashboard stats retrieved successfully
+                data:
+                  type: object
+                  properties:
+                    vendorName:
+                      type: string
+                      example: Wonderland Resort
+                    requests:
+                      type: object
+                      properties:
+                        today:
+                          type: integer
+                          example: 12
+                        yesterday:
+                          type: integer
+                          example: 8
+                    revenue:
+                      type: object
+                      properties:
+                        today:
+                          type: number
+                          example: 50000
+                        yesterday:
+                          type: number
+                          example: 35000
+                    bookings:
+                      type: object
+                      properties:
+                        today:
+                          type: integer
+                          example: 10
+                        yesterday:
+                          type: integer
+                          example: 7
+                        total:
+                          type: integer
+                          example: 120
+                    ticketTypes:
+                      type: object
+                      properties:
+                        breakdown:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              packageType:
+                                type: string
+                                example: Adult
+                              count:
+                                type: integer
+                                example: 25
+                        total:
+                          type: integer
+                          example: 50
+                    visitorStats:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          date:
+                            type: string
+                            example: "2026-06-15"
+                          visits:
+                            type: integer
+                            example: 12
+                    ratings:
+                      type: object
+                      properties:
+                        average:
+                          type: number
+                          nullable: true
+                          example: null
+                        count:
+                          type: integer
+                          example: 0
+      401:
+        description: Unauthorized
+      404:
+        description: Vendor not found
 
 components:
   securitySchemes:
@@ -229,144 +341,3 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
-
-
-
-  # paths:
-  #   api/v1/vendor/dashboard:
-  #    get:
-  #      summary: Get vendor dashboard statistics
-  #      description: Retrieves dashboard analytics for the authenticated vendor including requests, revenue, bookings, ticket type breakdown, visitor statistics, and ratings.
-  #      tags:
-  #        - Vendor Dashboard
-  #      security:
-  #        - bearerAuth: []
-  #      responses:
-  #        200:
-  #          description: Dashboard statistics retrieved successfully
-  #          content:
-  #            application/json:
-  #              schema:
-  #                type: object
-  #                properties:
-  #                  message:
-  #                    type: string
-  #                    example: Vendor dashboard stats retrieved successfully
-  #                  data:
-  #                    type: object
-  #                    properties:
-  #                      vendorName:
-  #                        type: string
-  #                        example: Lekki Conservation Centre
-  
-  #                      requests:
-  #                        type: object
-  #                        properties:
-  #                          today:
-  #                            type: integer
-  #                            example: 12
-  #                          yesterday:
-  #                            type: integer
-  #                            example: 8
- 
-  #                      revenue:
-  #                        type: object
-  #                        properties:
-  #                          today:
-  #                            type: number
-  #                            example: 250000
-  #                          yesterday:
-  #                            type: number
-  #                            example: 180000
- 
-  #                      bookings:
-  #                        type: object
-  #                        properties:
-  #                          today:
-  #                            type: integer
-  #                            example: 15
-  #                          yesterday:
-  #                            type: integer
-  #                            example: 10
-  #                          total:
-  #                            type: integer
-  #                            example: 250
- 
-  #                      ticketTypes:
-  #                        type: object
-  #                        properties:
-  #                          breakdown:
-  #                            type: array
-  #                            items:
-  #                              type: object
-  #                              properties:
-  #                                packageType:
-  #                                  type: string
-  #                                  example: Adult
-  #                                count:
-  #                                  type: integer
-  #                                  example: 120
-  #                          total:
-  #                            type: integer
-  #                            example: 250
- 
-  #                      visitorStats:
-  #                        type: array
-  #                        items:
-  #                          type: object
-  #                          properties:
-  #                            date:
-  #                              type: string
-  #                              format: date
-  #                              example: 2026-06-09
-  #                            visits:
-  #                              type: integer
-  #                              example: 18
- 
-  #                      ratings:
-  #                        type: object
-  #                        properties:
-  #                          average:
-  #                            type: number
-  #                            nullable: true
-  #                            example: null
-  #                          count:
-  #                            type: integer
-  #                            example: 0
-  
-  #        401:
-  #          description: Unauthorized - Invalid or missing token
-  #          content:
-  #            application/json:
-  #              schema:
-  #                type: object
-  #                properties:
-  #                  message:
-  #                    type: string
-  #                    example: Token not found  
-  #        404:
-  #          description: Vendor not found
-  #          content:
-  #            application/json:
-  #              schema:
-  #                type: object
-  #                properties:
-  #                  message:
-  #                    type: string
-  #                    example: Vendor not found
-   
-  #        500:
-  #          description: Internal server error
-  #          content:
-  #            application/json:
-  #              schema:
-  #                type: object
-  #                properties:
-  #                message:
-  #                    type: string
-  #                    example: Internal Server Error
-
- 
-
-
