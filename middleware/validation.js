@@ -4,12 +4,12 @@ const { profile } = require('./passport');
 
 exports.clientReg = (req, res, next) => {
     const schema = joi.object({
-        firstName: joi.string().trim().pattern(/^[A-Za-z\s]{3,}$/).required().messages({
+        firstName: joi.string().trim().pattern(/^[A-Za-z\s-]{3,}$/).required().messages({
             'any.required': 'Firstname is required',
             'string.empty': 'Firstname cannot be empty',
             'string.pattern.base': 'Firstname cannot contain numbers and must be at least 4 characters'
         }),
-        lastName: joi.string().trim().pattern(/^[A-Za-z\s]{3,}$/).required().messages({
+        lastName: joi.string().trim().pattern(/^[A-Za-z\s-]{3,}$/).required().messages({
             'any.required': 'Lastname is required',
             'string.empty': 'Lastname cannot be empty',
             'string.pattern.base': 'Lastname cannot contain numbers and must be at least 4 characters'
@@ -685,3 +685,64 @@ exports.createPaymentPlanValidation = (req, res, next) => {
     }
     next()
 }
+
+
+exports.createTouristValidation = (req, res, next) => {
+    const schema = joi.object({
+        centreName: joi.string().trim().pattern(/^(?=.*[A-Za-z])[A-Za-z0-9\s]{3,}$/).required().messages({
+            'any.required': 'Centre name is required',
+            'string.empty': 'Centre name cannot be empty',
+            'string.pattern.base': 'Centre name cannot contain numbers and must be at least 4 characters'
+        }),
+        location: joi.string().trim().pattern(/^[A-Za-z0-9][A-Za-z0-9\s,.-]{2,}$/).required().messages({
+            'any.required': 'Location is required',
+            'string.empty': 'Location cannot be empty',
+            'string.pattern.base': 'Minimum 3 characters, Starts with a letter or number,Allows letters, numbers, spaces, commas, periods, and hyphens'
+        }),
+        description: joi.string().trim().min(10).required().messages({
+            'string.empty': 'Description cannot be empty',
+            'string.min': 'Description must be at least 10 characters long' 
+        }),
+        city: joi.string().trim().pattern(/^[A-Za-z\s'-]{3,}$/).required().messages({
+            'any.required': 'City is required',
+            'string.empty': 'City cannot be empty',
+            'string.pattern.base': 'City must be at least 3 characters long and contain only letters, spaces, hyphens, and apostrophes'
+        }),
+        streetAddress: joi.string().trim().pattern(/^[A-Za-z0-9\s,./#-]{3,}$/).required().messages({
+            'any.required': 'Street address is required',
+            'string.empty': 'Street address cannot be empty',
+            'string.pattern.base': 'Street address must be at least 3 characters long and contain only letters, numbers, spaces, commas, periods, slashes, and hyphens'
+        }),
+        
+    })
+
+    const { error } = schema.validate(req.body, { abortEarly: false });
+    if (error) {
+        console.log(error.details[0])
+        return res.status(400).json({
+            message: error.details[0].message
+        })
+    }
+
+    next()
+}
+
+exports.validateClientPasscode = (req, res, next) => {
+    const schema = joi.object({
+        passcode: joi.string().trim().pattern(/^\d{6}$/).required().messages({
+            'any.required': 'Passcode is required',
+            'string.empty': 'Passcode cannot be empty',
+            'string.pattern.base': 'Passcode must be a 6 digit number'
+        })
+    })
+    const { error } = schema.validate(req.body, { abortEarly: false });
+    if (error) {
+        console.log(error.details[0])
+        return res.status(400).json({
+            message: error.details[0].message
+        })
+    }
+    next()
+}
+
+
