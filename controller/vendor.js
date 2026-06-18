@@ -33,6 +33,7 @@ exports.register = async (req, res, next) => {
       otp,
       otpExpire
     })
+    
     res.status(201).json({
       message: "Vendor registered successfully, Please check your email to verify OTP"
     });

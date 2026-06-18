@@ -15,11 +15,11 @@ const local_database = process.env.LOCAL_DB_NAME;
 
 module.exports = {
   development: {
-    "username": local_user,
-    "password": local_password,
-    "database": local_database,
-    "host": local_host,
-    "dialect": local_dialect
+    "username": host_user,
+    "password": host_password,
+    "database": host_database,
+    "host": host_host,
+    "dialect": host_dialect
   },
   "test": {
     "username": host_user,
