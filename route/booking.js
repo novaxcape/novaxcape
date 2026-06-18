@@ -6,8 +6,8 @@ const { authenticateToken, vendorAuth, clientAuth } = require('../middleware/aut
 
 router.post('/create/:touristId/:packageId', authenticateToken, bookingController.createBooking);
 
-router.get('/get-all/:touristId/:packageId', authenticateToken, vendorAuth, bookingController.getAllBooking)
+router.get('/get-all/:touristId', authenticateToken, vendorAuth, bookingController.getAllBooking)
 
-router.get('/get-all', authenticateToken, clientAuth, bookingController.getAllBooking)
+router.get('/get-all', authenticateToken, clientAuth, bookingController.getAll)
 
 module.exports = router;

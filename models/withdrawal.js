@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Withdrawal.belongsTo(models.Tourist, { foreignKey: 'touristId', as: 'tourist' });
+      Withdrawal.belongsTo(models.Wallet, { foreignKey: 'walletId', as: 'wallet' });
     }
   }
   Withdrawal.init({
@@ -31,6 +32,17 @@ module.exports = (sequelize, DataTypes) => {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
+      },
+
+      walletId: {
+        allowNull: true,
+        type: DataTypes.UUID,
+        references: {
+          model: 'Wallets',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       
       reference: {
