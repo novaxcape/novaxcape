@@ -106,24 +106,16 @@ exports.createBooking = async (req, res, next) => {
 
 exports.getAllBooking = async (req, res, next) => {
     try {
-        const { touristId, packageId } = req.params;
+        const { touristId } = req.params;
 
         const pageNumber = parseInt(req.query.pageNumber) || 1;
         const pageSize = parseInt(req.query.pageSize) || 10;
         const offset = (pageNumber - 1) * pageSize;
 
-        const where = {};
-
-        if (touristId) {
-            where.touristId = touristId;
-        }
-
-        if (packageId) {
-            where.packageId = packageId;
-        }
-
         const { count, rows } = await Booking.findAndCountAll({
-            where,
+            where: {
+                touristId
+            },
             include: [
                 {
                     model: Tourist,
@@ -144,7 +136,7 @@ exports.getAllBooking = async (req, res, next) => {
 
         res.status(200).json({
             message: "Bookings retrieved successfully",
-            count: rows.length,
+            count,
             data: rows,
             pagination: {
                 pageNumber,
@@ -156,7 +148,6 @@ exports.getAllBooking = async (req, res, next) => {
             }
         });
     } catch (error) {
-        console.log(error.message);
         next(error);
     }
 };

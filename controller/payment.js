@@ -1,4 +1,4 @@
-const { Client, Booking, Payment, Package, Tourist } = require('../models')
+const { Client, Booking, Payment, Package, Tourist, Wallet } = require('../models')
 const otpGenerator = require('otp-generator')
 const axios = require('axios')
 const { confirmBooking } = require('../helper/emailTemplate')
@@ -22,6 +22,7 @@ exports.initiatePayment = async (req, res, next) => {
         const booking = await Booking.findByPk(bookingId);
 
         const package = await Package.findByPk(booking.dataValues.packageId);
+        console.log("package:", package);
 
         if (!booking) {
             return res.status(404).json({
@@ -81,7 +82,13 @@ exports.verifyPayment = async (req, res, next) => {
             include: [
                 {
                     model: Booking,
-                    as: 'booking'
+                    as: 'booking',
+                    include: [
+                        {
+                            model: Package,
+                            as: 'package'
+                        }
+                    ]
                 }
             ]
         });
@@ -94,21 +101,27 @@ exports.verifyPayment = async (req, res, next) => {
 
         const client = await Client.findByPk(payment.booking.clientId);
         const tourist = await Tourist.findByPk(payment.booking.touristId);
-        console.log("payment:", payment)
-        console.log("tourist:", tourist)
+       
+
+        let wallet = await Wallet.findOne({ where: { touristId: tourist.id } });
+        if (!wallet) {
+            wallet = await Wallet.create({ touristId: tourist.id, balance: 0, totalEarnings: 0 });
+        }
 
         const { data } = await axios.get(`https://api.korapay.com/merchant/api/v1/charges/${reference}`,{
             headers: {
                 Authorization: `Bearer ${process.env.KORA_API_KEY}`
             }
         })
-        // console.log("data:", data)
   
 
         if (data?.status === true && data?.data.status === 'success') {
             payment.status = data?.data.status;
             await payment.save()
 
+         wallet.balance = Number(wallet.balance) + Number(payment.booking.package.amount)
+         wallet.totalEarnings = Number(wallet.totalEarnings) + Number(payment.booking.package.amount)
+         await wallet.save()
          res.status(200).json({
                 message: "Payment verified successfully",
                 data: data?.data

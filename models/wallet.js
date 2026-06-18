@@ -11,7 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Wallet.belongsTo(models.Tourist, { foreignKey: 'touristId', as: 'tourist' });
+      Wallet.belongsTo(models.Tourist, { foreignKey: 'touristId' });
+      Wallet.hasMany(models.Withdrawal, { foreignKey: 'walletId', as: 'withdrawals' });
     }
   }
   Wallet.init({
@@ -25,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.UUID,
       references: {
-        model: 'Vendors',
+        model: 'Tourists',
         key: 'id'
       },
       onUpdate: 'CASCADE',

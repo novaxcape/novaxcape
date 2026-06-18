@@ -127,8 +127,9 @@ exports.register = async (req, res, next) => {
             location
         })
         await Wallet.create({
-      touristId: newTourist.dataValues.id
+      touristId: newTourist.id
         })
+        // console.log("newTourist:", newTourist)
 
         res.status(201).json({
             message: "Successfully registerd Center",
