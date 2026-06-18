@@ -1,4 +1,4 @@
-const { Tourist, Vendor, Booking } = require('../models')
+const { Tourist, Vendor, Booking, Wallet } = require('../models')
 const fs = require('fs')
 const cloudinary = require('../middleware/cloudinary')
 
@@ -125,6 +125,9 @@ exports.register = async (req, res, next) => {
             privacyPolicy: privacyResponse,
             openingHours: parseJsonField(openingHours),
             location
+        })
+        await Wallet.create({
+      touristId: newTourist.dataValues.id
         })
 
         res.status(201).json({

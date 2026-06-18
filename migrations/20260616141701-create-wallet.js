@@ -5,18 +5,29 @@ module.exports = {
     await queryInterface.createTable('Wallets', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4
       },
-      firstName: {
-        type: Sequelize.STRING
+      touristId: {
+        allowNull: false,
+        type: Sequelize.UUID,
+        references: {
+          model: 'Vendors',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
-      lastName: {
-        type: Sequelize.STRING
+      balance: {
+        type: Sequelize.DECIMAL(12, 2),
+        allowNull: false,
+        defaultValue: 0
       },
-      email: {
-        type: Sequelize.STRING
+      totalEarnings: {
+        type: Sequelize.DECIMAL(12, 2),
+        allowNull: false,
+        defaultValue: 0
       },
       createdAt: {
         allowNull: false,
