@@ -42,11 +42,11 @@ exports.createBooking = async (req, res, next) => {
 
         // booking.passcode = passcode;
         
-        // const paymentPlan = await PaymentPlan.findOne({
-        //     where: {
-        //         packageId: tourPackage.id
-        //     }
-        // });
+        const paymentPlan = await PaymentPlan.findOne({
+            where: {
+                packageId: tourPackage.id
+            }
+        });
 
         // if (paymentPlan) {
         //     return res.status(404).json({
