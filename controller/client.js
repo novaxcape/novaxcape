@@ -164,29 +164,34 @@ exports.login = async (req, res, next) => {
     const correctPassword = await bcrypt.compare(password, user.dataValues.password)
 
     if (!correctPassword) {
-      user.dataValues.failedLoginAttempts = (user.dataValues.failedLoginAttempts || 0) + 1
-      if (user.dataValues.failedLoginAttempts >= 5) {
-        user.dataValues.isLocked = true
-        await user.save()
-        return res.status(429).json({
-          message: 'Account locked'
-        })
-      }
-
-      await user.save()
-
       return res.status(400).json({
-        message: 'Invalid Credentials',
-        attemptsRemaining: 5 - user.dataValues.failedLoginAttempts
+        message: "Invalid credentials"
       })
     }
+    // if (!correctPassword) {
+    //   user.dataValues.failedLoginAttempts = (user.dataValues.failedLoginAttempts || 0) + 1
+    //   if (user.dataValues.failedLoginAttempts >= 5) {
+    //     user.dataValues.isLocked = true
+    //     await user.save()
+    //     return res.status(429).json({
+    //       message: 'Account locked'
+    //     })
+    //   }
+
+    //   await user.save()
+
+    //   return res.status(400).json({
+    //     message: 'Invalid Credentials',
+    //     attemptsRemaining: 5 - user.dataValues.failedLoginAttempts
+    //   })
+    // }
     if (user.dataValues.isVerified == false) {
       return res.status(400).json({
         message: 'Please verify your email'
       })
     };
 
-    user.dataValues.failedLoginAttempts = 0
+    // user.dataValues.failedLoginAttempts = 0
     await user.save()
 
     const token = jwt.sign(
