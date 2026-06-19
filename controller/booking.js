@@ -88,7 +88,7 @@ exports.createBooking = async (req, res, next) => {
             packageId: tourPackage.id,
             visitDate: visit.toDate(),
             bookingNumber: generateOrderNumber(),
-            status,
+            // status,
             passcode
         });
 
