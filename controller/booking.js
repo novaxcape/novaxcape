@@ -41,17 +41,18 @@ exports.createBooking = async (req, res, next) => {
         const passcode = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, digits: true, lowerCaseAlphabets: false });
 
         // booking.passcode = passcode;
-        const paymentPlan = await PaymentPlan.findOne({
-            where: {
-                packageId: tourPackage.id
-            }
-        });
+        
+        // const paymentPlan = await PaymentPlan.findOne({
+        //     where: {
+        //         packageId: tourPackage.id
+        //     }
+        // });
 
-        if (!paymentPlan) {
-            return res.status(404).json({
-                message: 'Payment plan not found'
-            });
-        }
+        // if (paymentPlan) {
+        //     return res.status(404).json({
+        //         message: 'Payment plan not found'
+        //     });
+        // }
 
         const visit = dayjs(visitDate, "MM/DD/YYYY", true);
 
