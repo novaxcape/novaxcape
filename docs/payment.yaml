@@ -5,12 +5,24 @@ info:
   version: 1.0.0
   description: Documentation for payment endpoints
 
+servers:
+  - url: http://localhost:{port}
+    description: Local server
+    variables:
+      port:
+        default: "9955"
+        description: Server port (updated from your .env PORT)
+
+security:
+  - bearerAuth: []
+
 paths:
   /api/v1/payment/make-payment/{bookingId}:
     post:
       summary: Initialize a payment for a booking
       tags:
         - Payment
+      operationId: initiatePayment
       security:
         - bearerAuth: []
       parameters:
@@ -21,6 +33,9 @@ paths:
             type: string
             format: uuid
           description: Booking ID for which to create the payment charge
+      requestBody:
+        description: (no body required) The endpoint uses the authenticated user and the bookingId path parameter to initialize the payment.
+        required: false
       responses:
         "200":
           description: Payment initialized successfully
@@ -28,6 +43,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentInitResponse'
+              examples:
+                success:
+                  value:
+                    message: "payment initialized successfully"
+                    data:
+                      status: "success"
+                      reference: "NOV-XCAPE-ABC123"
+                      amount: 10000
+                      currency: "NGN"
+                      customer:
+                        email: "user@example.com"
+                        name: "John Doe"
+                      redirect_url: "https://www.google.com"
         "401":
           description: Unauthorized
           content:
@@ -52,6 +80,7 @@ paths:
       summary: Verify a payment using the reference code
       tags:
         - Payment
+      operationId: verifyPayment
       security:
         - bearerAuth: []
       parameters:
@@ -82,6 +111,42 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "500":
           description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/payment/verify-webhook:
+    post:
+      summary: Webhook endpoint for payment provider callbacks
+      tags:
+        - Payment
+      description: Receives webhook events from Korapay. This endpoint is typically called by the payment provider and does not require authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                data:
+                  type: object
+      responses:
+        "200":
+          description: Webhook processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        "400":
+          description: Invalid payload
           content:
             application/json:
               schema:
@@ -151,6 +216,17 @@ components:
               type: object
             response:
               type: object
+          example:
+            message: "payment initialized successfully"
+            data:
+              status: "success"
+              reference: "NOV-XCAPE-ABC123"
+              amount: 10000
+              currency: "NGN"
+              customer:
+                email: "user@example.com"
+                name: "John Doe"
+              redirect_url: "https://www.google.com"
 
     PaymentVerifyResponse:
       type: object
