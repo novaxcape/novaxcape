@@ -1,4 +1,4 @@
-const { Tourist, Vendor, Booking, Wallet } = require('../models')
+const { Tourist, Vendor, Booking, Wallet, PaymentPlan} = require('../models')
 const fs = require('fs')
 const cloudinary = require('../middleware/cloudinary')
 
@@ -130,6 +130,11 @@ exports.register = async (req, res, next) => {
       touristId: newTourist.id
         })
         // console.log("newTourist:", newTourist)
+
+        const paymentPlan = await PaymentPlan.create({
+            touristId: tourist.id,
+        });
+
 
         res.status(201).json({
             message: "Successfully registerd Center",
