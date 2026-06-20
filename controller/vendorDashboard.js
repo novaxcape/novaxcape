@@ -158,7 +158,7 @@ exports.getDashboardStats = async (req, res, next) => {
         raw: true
       }),
       Payment.findOne({
-        attributes: [[fn('SUM', col('Payment.amount')), 'sum']],
+        attributes: [[fn('COALESCE', fn('SUM', col('Payment.amount')), 0), 'sum']],
         where: {
           status: 'success',
           createdAt: {
@@ -169,11 +169,13 @@ exports.getDashboardStats = async (req, res, next) => {
           {
             model: Booking,
             as: 'booking',
+            required: true,
             attributes: [],
             include: [
               {
                 model: Package,
                 as: 'package',
+                required: true,
                 where: packageFilter,
                 attributes: []
               }
@@ -183,7 +185,7 @@ exports.getDashboardStats = async (req, res, next) => {
         raw: true
       }).then(r => parseInt(r.sum, 10) || 0),
       Payment.findOne({
-        attributes: [[fn('SUM', col('Payment.amount')), 'sum']],
+        attributes: [[fn('COALESCE', fn('SUM', col('Payment.amount')), 0), 'sum']],
         where: {
           status: 'success',
           createdAt: {
@@ -194,11 +196,13 @@ exports.getDashboardStats = async (req, res, next) => {
           {
             model: Booking,
             as: 'booking',
+            required: true,
             attributes: [],
             include: [
               {
                 model: Package,
                 as: 'package',
+                required: true,
                 where: packageFilter,
                 attributes: []
               }
