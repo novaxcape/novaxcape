@@ -1,0 +1,100 @@
+openapi: 3.0.0
+
+info:
+  title: Novaxcape Wallet API
+  version: 1.0.0
+  description: Documentation for wallet endpoints
+
+tags:
+  - name: Wallet
+    description: Wallet API for vendor-managed tourist center balances
+
+paths:
+  /api/v1/wallet:
+    get:
+      summary: Get vendor wallet details
+      description: Retrieve the authenticated vendor's wallet associated with their tourist center.
+      tags:
+        - Wallet
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Wallet successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Wallet successfully retrieved
+                  data:
+                    $ref: '#/components/schemas/Wallet'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Vendor access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Vendor, tourist, or wallet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Wallet:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 4f4e08c2-2d7f-45b3-9f3b-528f827f7f9a
+        touristId:
+          type: string
+          format: uuid
+          example: 3e5d9f8d-71f2-4c08-8a0e-2fa1d4c1a7f9
+        balance:
+          type: number
+          format: float
+          example: 12500.00
+        totalEarnings:
+          type: number
+          format: float
+          example: 45200.00
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-06-20T12:34:56.789Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2026-06-20T14:12:34.123Z
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Vendor not found
