@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      PaymentPlan.belongsTo(models.Package, { foreignKey: 'packageId', as: 'package' });
+      PaymentPlan.belongsTo(models.Package, { foreignKey: 'touristId', as: 'tourist' });
     }
   }
   PaymentPlan.init({
@@ -21,11 +21,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
     },
-    packageId: {
-      allowNull: false,
+    touristId: {
       type: DataTypes.UUID,
+      allowNull: false,
       references: {
-        model: 'packages',
+        model: 'Tourists',
         key: 'id'
       },
       onUpdate: 'CASCADE',
@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 1
     },
     frequency: {
-      type: DataTypes.ENUM('weekly', 'monthly'),
+      type: DataTypes.ENUM('weekly', 'monthly','fullPayment'),
       allowNull: false,
       defaultValue: 'monthly'
     },
@@ -47,21 +47,19 @@ module.exports = (sequelize, DataTypes) => {
     },
     installmentAmount: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     numberOfInstallments: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     installmentsPaid: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0
+      allowNull: true,
     },
     amountPaid: {
       type: DataTypes.DECIMAL(12, 2),
-      allowNull: false,
-      defaultValue: 0
+      allowNull: true,
     },
     currency: {
       type: DataTypes.STRING,
@@ -71,7 +69,7 @@ module.exports = (sequelize, DataTypes) => {
     status: {
       type: DataTypes.ENUM('active', 'completed', 'cancelled', 'defaulted'),
       allowNull: false,
-      defaultValue: 'active'
+      defaultValue: 'completed'
     },
     startDate: {
       type: DataTypes.DATE,

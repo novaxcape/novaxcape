@@ -69,11 +69,11 @@ exports.createPaymentPlan = async (req, res, next) => {
 
 exports.getAllPaymentPlan = async (req, res, next) => {
     try {
-        const { packageId } = req.params;
+        const { touristId } = req.params;
 
         const paymentPlans = await PaymentPlan.findAll({
             where: {
-                packageId
+                touristId
             }
         });
 

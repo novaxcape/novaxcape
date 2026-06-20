@@ -9,16 +9,16 @@ module.exports = {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4
       },
-      packageId: {
-        allowNull: false,
-        type: Sequelize.UUID,
-        references: {
-          model: 'Packages',
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+     touristId: {
+      type: Sequelize.UUID,
+      allowNull: false,
+      references: {
+        model: 'Tourists',
+        key: 'id'
       },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
       // Number of months the payment is spread across (e.g. 1, 2, 3)
       durationInMonths: {
         type: Sequelize.INTEGER,

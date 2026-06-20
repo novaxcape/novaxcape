@@ -19,6 +19,7 @@ const bookingRoutes = require('./route/booking')
 const paymentPlanRoutes = require('./route/paymentPlan')
 const paymentRoutes = require('./route/paymet')
 const reviewRoutes = require('./route/review')
+const walletRoutes = require('./route/wallet')
 
 
 // const rateLimit = require('express-rate-limit')
@@ -64,6 +65,7 @@ app.use('/api/v1/booking', bookingRoutes)
 app.use('/api/v1/plan', paymentPlanRoutes)
 app.use('/api/v1/payment', paymentRoutes)
 app.use('/api/v1/review', reviewRoutes)
+app.use('/api/v1/wallet', walletRoutes)
 
 
 
