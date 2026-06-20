@@ -157,7 +157,8 @@ exports.getDashboardStats = async (req, res, next) => {
         order: [['visitDate', 'ASC']],
         raw: true
       }),
-      Payment.sum('amount', {
+      Payment.findOne({
+        attributes: [[fn('SUM', col('Payment.amount')), 'sum']],
         where: {
           status: 'success',
           createdAt: {
@@ -178,9 +179,11 @@ exports.getDashboardStats = async (req, res, next) => {
               }
             ]
           }
-        ]
-      }),
-      Payment.sum('amount', {
+        ],
+        raw: true
+      }).then(r => parseInt(r.sum, 10) || 0),
+      Payment.findOne({
+        attributes: [[fn('SUM', col('Payment.amount')), 'sum']],
         where: {
           status: 'success',
           createdAt: {
@@ -201,8 +204,9 @@ exports.getDashboardStats = async (req, res, next) => {
               }
             ]
           }
-        ]
-      })
+        ],
+        raw: true
+      }).then(r => parseInt(r.sum, 10) || 0)
     ])
 
     const ticketTypes = buildTicketTypeStats(ticketRows)
