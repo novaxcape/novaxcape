@@ -256,3 +256,34 @@ exports.verifyClientPasscode = async (req, res, next) => {
     }
 };
 
+
+exports.getallTourists = async (req, res, next) => {
+    try {
+        const vendorId = req.user.id;
+
+        const vendor = await Vendor.findByPk(vendorId);
+
+        if (!vendor) {
+            return res.status(404).json({
+                message: "Vendor not found"
+            });
+        }
+
+        const tourists = await Tourist.findAll({
+            where: {
+                vendorId: vendor.id
+            },
+            order: [["createdAt", "DESC"]]
+        });
+
+        res.status(200).json({
+            message: "Tourist centers retrieved successfully",
+            count: tourists.length,
+            data: tourists
+        });
+
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    }
+};

@@ -9,6 +9,7 @@ tags:
   - name: Wallet
     description: Wallet API for vendor-managed tourist center balances
 
+
 paths:
   /api/v1/wallet:
     get:
