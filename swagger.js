@@ -38,7 +38,8 @@ const options = {
       "./docs/paymentPlan.yaml",
       "./docs/booking.yaml",
       "./docs/payment.yaml",
-      "./docs/review.yaml"
+      "./docs/review.yaml",
+      "./docs/wallet.yaml",
       
     ]
 }
