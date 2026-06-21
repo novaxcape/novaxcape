@@ -131,9 +131,9 @@ exports.register = async (req, res, next) => {
         })
         // console.log("newTourist:", newTourist)
 
-        const paymentPlan = await PaymentPlan.create({
-            touristId: tourist.id,
-        });
+        // const paymentPlan = await PaymentPlan.create({
+        //     touristId: tourist.id,
+        // });
 
 
         res.status(201).json({
