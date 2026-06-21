@@ -157,7 +157,8 @@ exports.getDashboardStats = async (req, res, next) => {
         order: [['visitDate', 'ASC']],
         raw: true
       }),
-      Payment.sum('amount', {
+      Payment.findOne({
+        attributes: [[fn('COALESCE', fn('SUM', col('Payment.amount')), 0), 'sum']],
         where: {
           status: 'success',
           createdAt: {
@@ -168,19 +169,23 @@ exports.getDashboardStats = async (req, res, next) => {
           {
             model: Booking,
             as: 'booking',
+            required: true,
             attributes: [],
             include: [
               {
                 model: Package,
                 as: 'package',
+                required: true,
                 where: packageFilter,
                 attributes: []
               }
             ]
           }
-        ]
-      }),
-      Payment.sum('amount', {
+        ],
+        raw: true
+      }).then(r => parseInt(r.sum, 10) || 0),
+      Payment.findOne({
+        attributes: [[fn('COALESCE', fn('SUM', col('Payment.amount')), 0), 'sum']],
         where: {
           status: 'success',
           createdAt: {
@@ -191,18 +196,21 @@ exports.getDashboardStats = async (req, res, next) => {
           {
             model: Booking,
             as: 'booking',
+            required: true,
             attributes: [],
             include: [
               {
                 model: Package,
                 as: 'package',
+                required: true,
                 where: packageFilter,
                 attributes: []
               }
             ]
           }
-        ]
-      })
+        ],
+        raw: true
+      }).then(r => parseInt(r.sum, 10) || 0)
     ])
 
     const ticketTypes = buildTicketTypeStats(ticketRows)
