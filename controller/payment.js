@@ -43,8 +43,8 @@ exports.initiatePayment = async (req, res, next) => {
                 email: client.dataValues.email,
                 name: `${client.dataValues.firstName} ${client.dataValues.lastName}`
             },
-            redirect_url: 'https://www.google.com',
-            notification_url: 'https://novaxcape.onrender.com/verify-webhook'
+            redirect_url: 'https://www.google.com'
+            // notification_url: 'https://novaxcape.onrender.com/verify-webhook'
         }
         console.log("payment:", paymentData)
 
