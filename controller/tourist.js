@@ -287,3 +287,18 @@ exports.getallTourists = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getAll = async (req, res, next) => {
+    try {
+        const tourist = await Tourist.findAll({
+            order: [["createdAt", "DESC"]]
+        })
+        res.status(200).json({
+            message: "Tourist centers retrieved successfully",
+            count: tourist.length
+        })
+    } catch (error) {
+        console.log(error.message);
+        next(error)
+    }
+}
