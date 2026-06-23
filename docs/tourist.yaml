@@ -325,6 +325,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/v1/tourist/get-all-tourists:
+    get:
+      summary: Get all tourist centers
+      description: Returns all tourist centers in the system sorted by creation date in descending order.
+      tags:
+        - Tourist
+      responses:
+        "200":
+          description: Tourist centers retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TouristCountResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -467,6 +487,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Tourist'
+
+    TouristCountResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        count:
+          type: integer
 
     ErrorResponse:
       type: object
