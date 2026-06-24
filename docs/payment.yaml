@@ -92,11 +92,48 @@ paths:
           description: Payment reference returned by the payment initialization endpoint
       responses:
         "200":
-          description: Payment verified successfully or failed payment details
+          description: Payment verified successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentVerifyResponse'
+              examples:
+                success:
+                  value:
+                    message: "Payment verified successfully"
+                    data:
+                      status: "success"
+                      reference: "NOV-XCAPE-ABC123"
+                      amount: 10000
+                      currency: "NGN"
+                      customer:
+                        email: "user@example.com"
+                        name: "John Doe"
+                      transaction:
+                        id: "txn_123"
+                        status: "success"
+                    otp: "123456"
+        "400":
+          description: Payment verification failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentVerifyResponse'
+              examples:
+                failure:
+                  value:
+                    message: "Payment verification failed"
+                    data:
+                      status: "failed"
+                      reference: "NOV-XCAPE-ABC123"
+                      amount: 10000
+                      currency: "NGN"
+                      customer:
+                        email: "user@example.com"
+                        name: "John Doe"
+                      error:
+                        code: "payment_failed"
+                        message: "Charge was not successful"
         "401":
           description: Unauthorized
           content:
@@ -255,6 +292,11 @@ components:
               type: object
             error:
               type: object
+              nullable: true
+        otp:
+          type: string
+          description: One-time passcode returned when payment is successfully verified
+          nullable: true
 
     ErrorResponse:
       type: object
