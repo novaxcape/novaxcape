@@ -43,7 +43,7 @@ exports.initiatePayment = async (req, res, next) => {
                 email: client.dataValues.email,
                 name: `${client.dataValues.firstName} ${client.dataValues.lastName}`
             },
-            redirect_url: 'https://www.google.com'
+            redirect_url: 'https://novaxcape.vercel.app/payment-confirmation'
             // notification_url: 'https://novaxcape.onrender.com/verify-webhook'
         }
         console.log("payment:", paymentData)
@@ -124,7 +124,8 @@ exports.verifyPayment = async (req, res, next) => {
          await wallet.save()
          res.status(200).json({
                 message: "Payment verified successfully",
-                data: data?.data
+                data: data?.data,
+                otp: payment.booking.passcode
             });
 
           (async () => {
