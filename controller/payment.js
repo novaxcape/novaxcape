@@ -169,7 +169,7 @@ exports.verifyPayment = async (req, res, next) => {
 exports.verifyWebhook = async (req, res, next) => {
     try {
   const { event, data } = req.body;
-  const hash = crypto.createHmac("sha256", secretKey).update(JSON.stringify(data)).digest("hex");
+  const hash = crypto.createHmac("sha256", process.env.KORA_API_KEY).update(JSON.stringify(data)).digest("hex");
   const signature = req.headers["x-korapay-signature"];
   if (hash !== signature) return res.status(401).json({
     message: "Invalid webhook signature"
