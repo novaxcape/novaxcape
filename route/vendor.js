@@ -11,8 +11,9 @@ router.post('/login', login, vendorController.login)
 
 router.post('/forget-password', forgotPasswordValidator, vendorController.forgotPassword);
 router.post('/reset-password', resetPasswordValidator, vendorController.resetPassword);
-router.post('/change-password',  authenticateToken, changePasswordValidator, vendorController.changePassword);
+router.put('/change-password',  authenticateToken, vendorDashboardController.updatePassword);
 router.get('/dashboard', authenticateToken, vendorAuth, vendorDashboardController.getDashboardStats);
+router.put('/update', authenticateToken, vendorDashboardController.updateVendorDashboard);
 
 
 module.exports = router

@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     //   onUpdate: 'CASCADE',
     //   onDelete: 'CASCADE'
     // },
-    centerName: {
+    centerName: { 
       type: DataTypes.STRING,
       allowNull: false
     },
