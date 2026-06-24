@@ -44,7 +44,7 @@ exports.initiatePayment = async (req, res, next) => {
                 name: `${client.dataValues.firstName} ${client.dataValues.lastName}`
             },
             redirect_url: 'https://novaxcape.vercel.app/payment-confirmation',
-            notification_url: 'https://novaxcape.onrender.com/api/v1/payment/verify-webhook'
+            // notification_url: 'https://novaxcape.onrender.com/api/v1/payment/verify-webhook'
         }
         console.log("payment:", paymentData)
 
