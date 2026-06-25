@@ -113,6 +113,9 @@ paths:
                         id: "txn_123"
                         status: "success"
                     otp: "123456"
+                    visitDate: "2026-07-15"
+                    bookingId: "BK-2026-001"
+                    location: "Novaxcape Adventure Park"
         "400":
           description: Payment verification failed
           content:
@@ -296,6 +299,19 @@ components:
         otp:
           type: string
           description: One-time passcode returned when payment is successfully verified
+          nullable: true
+        visitDate:
+          type: string
+          format: date
+          description: Visit date for the booking
+          nullable: true
+        bookingId:
+          type: string
+          description: Booking number/ID
+          nullable: true
+        location:
+          type: string
+          description: Location/centre name for the booking
           nullable: true
 
     ErrorResponse:
