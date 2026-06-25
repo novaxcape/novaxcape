@@ -46,7 +46,6 @@ exports.initiatePayment = async (req, res, next) => {
             redirect_url: 'https://novaxcape.vercel.app/payment-confirmation',
             // notification_url: 'https://novaxcape.onrender.com/api/v1/payment/verify-webhook'
         }
-        console.log("payment:", paymentData)
 
         const {data} = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentData, {
             headers: {
@@ -98,7 +97,7 @@ exports.verifyPayment = async (req, res, next) => {
                 message: 'Payment not found'
             });
         }
-
+        console.log('payment:', payment)
         const client = await Client.findByPk(payment.booking.clientId);
         const tourist = await Tourist.findByPk(payment.booking.touristId);
        
@@ -125,7 +124,10 @@ exports.verifyPayment = async (req, res, next) => {
          res.status(200).json({
                 message: "Payment verified successfully",
                 data: data?.data,
-                otp: payment.booking.passcode
+                otp: payment.booking.passcode,
+                visitDate: payment.booking.visitDate,
+                bookingId: payment.booking.bookingNumber,
+                location: tourist.centreName
             });
 
           (async () => {
@@ -141,6 +143,7 @@ exports.verifyPayment = async (req, res, next) => {
                     }),
                     subject: 'BOOKING CONFIRMATION'
                 });
+                console.log("email:", sendSingleEmail)
               } catch (error) {
                   console.log('Email send error:', error);
               }
