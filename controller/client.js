@@ -45,6 +45,7 @@ exports.register = async (req, res, next) => {
       otp,
       otpExpire
     });
+    console.log("otp:", otp)
 
     res.status(201).json({
       message: 'Client registered successfully. Please check your email for OTP verification.'
