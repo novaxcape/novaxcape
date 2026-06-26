@@ -127,7 +127,8 @@ exports.verifyPayment = async (req, res, next) => {
                 otp: payment.booking.passcode,
                 visitDate: payment.booking.visitDate,
                 bookingId: payment.booking.bookingNumber,
-                location: tourist.centreName
+                location: tourist.centreName,
+                amount: payment.booking.package.amount
             });
 
           (async () => {
@@ -139,7 +140,8 @@ exports.verifyPayment = async (req, res, next) => {
                         location: tourist.centreName,
                         visitDate: payment.booking.visitDate,
                         bookingId: payment.booking.bookingNumber,
-                        passcode: payment.booking.passcode
+                        passcode: payment.booking.passcode,
+                        amount: payment.booking.package.amount
                     }),
                     subject: 'BOOKING CONFIRMATION'
                 });

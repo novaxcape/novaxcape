@@ -8,6 +8,7 @@ router.post('/register', vendorSignUpValidator, vendorController.register);
 router.post('/verify-otp', verifyOtp, vendorController.verifyEmail)
 router.post('/resend-otp', resendOtp, vendorController.resendOTP)
 router.post('/login', login, vendorController.login)
+router.post('/logout', authenticateToken, vendorController.logout)
 
 router.post('/forget-password', forgotPasswordValidator, vendorController.forgotPassword);
 router.post('/reset-password', resetPasswordValidator, vendorController.resetPassword);

@@ -21,124 +21,40 @@ module.exports = {
         onDelete: 'CASCADE'
       },
 
-      reference: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
-      },
-
-      destinationType: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        defaultValue: "bank_account",
-      },
-
-      amount: {
-        type: Sequelize.DECIMAL(10,2),
-        allowNull: false,
-      },
-
-      currency: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-
-      bankCode: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-
-      accountNumber: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-
-      customerEmail: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-
-      customerName: {
-        type: Sequelize.STRING,
+      walletId: {
         allowNull: true,
+        type: Sequelize.UUID,
+        references: {
+          model: 'Wallets',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
-
-      bankCountry: {
+    amount: {
+        type: Sequelize.INTEGER
+        },
+    reference: {
         type: Sequelize.STRING,
-        allowNull: true,
-      },
+        unique: true
+        },
+    bankName: {
+        type: Sequelize.STRING
+        },
+        bankCode: {
+            type: Sequelize.STRING
+        },
+    providerReference: {
+        type: Sequelize.STRING
+       },
 
-      bankName: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
-
-      beneficiaryType: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
-      firstName: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
-      lastName: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
-      accountType: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
-      accountNumberType: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
-      paymentMethod: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
-      routingNumber: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
-      intermediaryRoutingNumber: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
-      addressInformation: {
-        type: Sequelize.TEXT,
-        allowNull: true,
-      },
-
-      supportingDocuments: {
-        type: Sequelize.TEXT,
-        allowNull: true,
-      },
-
-      narration: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
-      purposeOfPayment: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
-      metadata: {
-        type: Sequelize.TEXT,
-        allowNull: true,
-      },
-
+    accountNumber: {
+        type: Sequelize.STRING
+        },
+    status: {
+        type: Sequelize.ENUM("processing", "successful", "failed"),
+        defaultValue: "processing"
+        },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
