@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
-        dafaultValue: DataTypes.UUIDV4
+        defaultValue: DataTypes.UUIDV4
       },
 
       touristId: {

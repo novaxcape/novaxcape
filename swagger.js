@@ -39,7 +39,7 @@ const options = {
       "./docs/payment.yaml",
       "./docs/review.yaml",
       "./docs/wallet.yaml",
-      
+      "./docs/withdrawal.yaml",
     ]
 }
 
