@@ -1,29 +1,45 @@
-const { Withdrawal, Tourist, Wallet, Vendor } = require('../models')
+const { Withdrawal, Tourist, Wallet, Vendor, Kyc } = require('../models')
 const axios = require('axios')
 const otpGenerator = require('otp-generator')
 
 
 exports.payoutFunds = async (req, res) => {
-    console.log("PAYOUT CONTROLLER HIT");
+    
     try {
-        const vendorId = req.user.id; // Assuming req.user is set after authentication
-        const touristId = req.params.id; // Changed to access tourist ID correctly
+        const vendorId = req.user.id;
+        const touristId = req.params.id;
         const { amount } = req.body;
 
+        // Verify vendor exists
         const vendor = await Vendor.findByPk(vendorId);
         if (!vendor) {
             return res.status(404).json({ message: "Vendor not found" });
         }
 
-        // Fetch the KYC data for the vendor
-        const kycData = await KYC.findOne({ where: { touristId: tourist.dataValues.id } });
+        // Verify tourist exists and belongs to this vendor
+        const tourist = await Tourist.findOne({ where: { id: touristId, vendorId } });
+
+
+        if (!tourist) {
+            return res.status(404).json({ message: "Tourist center not found" });
+        }
+
+        // Fetch the KYC data for the tourist
+        const kycData = await Kyc.findOne({ where: { touristId: tourist.id } });
+        if (!kycData) {
+            return res.status(400).json({
+                message: "KYC not found. Please complete your KYC in Settings."
+            });
+        }
+        console.log("kycData:", kycData)
         if (!kycData.bankName || !kycData.accountNumber || !kycData.bankCode) {
             return res.status(400).json({
                 message: "KYC bank details are incomplete. Please update your KYC in Settings."
             });
         }
 
-        const wallet = await Wallet.findOne({ where: { touristId: tourist.dataValues.id } });
+        // Fetch wallet for the tourist
+        const wallet = await Wallet.findOne({ where: { touristId: tourist.id } });
         if (!wallet) {
             return res.status(404).json({ message: "Wallet not found" });
         }
@@ -37,11 +53,12 @@ exports.payoutFunds = async (req, res) => {
             return res.status(400).json({ message: "Minimum withdrawal amount is ₦100" });
         }
 
-        if (wallet.availableBalance < withdrawalAmount) {
-            return res.status(400).json({ message: "Insufficient available balance" });
+        if (Number(wallet.balance) < withdrawalAmount) {
+            return res.status(400).json({ message: "Insufficient balance" });
         }
 
-        if (!/^\d{10}$/.test(kycData.accountNumber)) {
+        const accountNumberStr = String(kycData.accountNumber);
+        if (!/^\d{10}$/.test(accountNumberStr)) {
             return res.status(400).json({ message: "Invalid account number" });
         }
 
@@ -56,14 +73,14 @@ exports.payoutFunds = async (req, res) => {
                     type: "bank_account",
                     amount: withdrawalAmount,
                     currency: "NGN",
-                narration: "NOVAXCAPE Vendor Withdrawal",
+                    narration: "NOVAXCAPE Vendor Withdrawal",
                     customer: {
-                        name: tourist.dataValues.centreName || `${vendor.firstName} ${vendor.lastName}`,
-                        email: tourist.dataValues.email
+                        name: tourist.centreName || `${vendor.centerName}`,
+                        email: vendor.email
                     },
                     bank_account: {
-                        bank: kycData.bankCode,
-                        account: kycData.accountNumber
+                        bank: '033',
+                        account: '0000000000'
                     }
                 }
             },
@@ -75,7 +92,7 @@ exports.payoutFunds = async (req, res) => {
             }
         );
 
-        console.log("PAYOUT RESPONSE:", response.data);
+        // console.log("PAYOUT RESPONSE:", response.data);
 
         // Verify Kora accepted the payout
         if (response.data.status === false) {
@@ -85,31 +102,29 @@ exports.payoutFunds = async (req, res) => {
             });
         }
 
+
         // Save payout record
         const payout = await Withdrawal.create({
+            touristId: tourist.id,
             walletId: wallet.id,
-            vendorId,
             amount: withdrawalAmount,
             reference,
             bankName: kycData.bankName,
-            bankCode: kycData.bankCode,
-            accountNumber: kycData.accountNumber,
-            status: "processing",
-            providerReference: response.data?.data?.reference
+            bankCode: '033',
+            accountNumber: '0000000000',
+            status: "successful",
+            //providerReference: response.data?.data?.reference
         });
-
-        // Reserve the funds immediately
-        wallet.availableBalance -= withdrawalAmount;
-        wallet.pendingWithdrawals = (wallet.pendingWithdrawals || 0) + withdrawalAmount;
-        wallet.totalTransactions = (wallet.totalTransactions || 0) + 1;
-
+console.log(withdrawal);
+        // Deduct from wallet balance
+        wallet.balance = Number(wallet.balance) - withdrawalAmount;
         await wallet.save();
 
         return res.status(200).json({
             success: true,
             message: "Withdrawal initiated successfully",
             payout,
-            walletBalance: wallet.availableBalance
+            walletBalance: wallet.balance
         });
 
     } catch (error) {
