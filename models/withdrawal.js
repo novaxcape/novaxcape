@@ -1,6 +1,7 @@
 'use strict';
 const {
-  Model
+  Model,
+  STRING
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Withdrawal extends Model {
@@ -44,124 +45,30 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
       },
-      
-      reference: {
+    amount: {
+        type: DataTypes.INTEGER
+        },
+    reference: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
+        unique: true
+        },
+    bankName: {
+        type: DataTypes.STRING
+        },
+        bankCode: {
+            type: DataTypes.STRING
+        },
+    providerReference: {
+        type: DataTypes.STRING
+       },
 
-      destinationType: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: "bank_account",
-      },
-
-      amount: {
-        type: DataTypes.DECIMAL(10,2),
-        allowNull: false,
-      },
-
-      currency: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-
-      bankCode: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-
-      accountNumber: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-
-      customerEmail: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-
-      customerName: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      bankCountry: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      bankName: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-
-      beneficiaryType: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      firstName: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      lastName: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      accountType: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      accountNumberType: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      paymentMethod: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      routingNumber: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      intermediaryRoutingNumber: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      addressInformation: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-
-      supportingDocuments: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-
-      narration: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      purposeOfPayment: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      metadata: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
+    accountNumber: {
+        type: DataTypes.STRING
+        },
+    status: {
+        type: DataTypes.ENUM("processing", "successful", "failed"),
+        defaultValue: "processing"
+        }
 
   }, {
     sequelize,

@@ -11,6 +11,7 @@ router.post('/verify-email', clientValidate.verifyOtp, clientController.verifyEm
 router.post('/resend-otp', clientValidate.resendOtp, clientController.resendOTP);
 router.post('/login', clientValidate.login, clientController.login);
 router.put('/update-profile', authenticateToken, upload.single('profilePicture'), clientValidate.updateProfile, clientController.updateProfile);
+router.post('/logout', authenticateToken, clientController.logout);
 
 router.post('/forget-password', clientValidate.forgotPasswordValidator, clientController.forgotPassword);
 router.post('/reset-password', clientValidate.resetPasswordValidator, clientController.resetPassword);
