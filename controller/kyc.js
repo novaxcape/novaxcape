@@ -8,6 +8,12 @@ exports.createKyc = async (req, res, next) => {
 
         const {touristId} = req.params
 
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                message: 'Unauthorized - Invalid token'
+            });
+        }
+
         const tourist = await Tourist.findOne({where: {vendorId: req.user.id, id: touristId}})
         if (!tourist) {
             return res.status(404).json({

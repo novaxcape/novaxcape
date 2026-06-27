@@ -204,7 +204,7 @@ tags:
         description: Invalid credential
 
 /api/v1/vendor/change-password:
-  post:
+  put:
     tags:
       - Vendor
     summary: Change Password
@@ -218,24 +218,99 @@ tags:
           schema:
             type: object
             required:
-              - oldPassword
+              - currentPassword
               - newPassword
+              - confirmNewPassword
             properties:
-              oldPassword:
+              currentPassword:
                 type: string
                 example: Password@123
               newPassword:
                 type: string
                 example: NewPassword@123
+              confirmNewPassword:
+                type: string
+                example: NewPassword@123
     responses:
       200:
         description: Password changed successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Password updated successfully
       400:
-        description: Old password is invalid
+        description: Invalid credential or password does not match
       404:
         description: Vendor not found
       401:
         description: Unauthorized
+
+/api/v1/vendor/update:
+  put:
+    tags:
+      - Vendor
+    summary: Update Vendor Dashboard
+    description: Update vendor center details (name, phone, address).
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              centerName:
+                type: string
+                example: Wonderland Resort
+              centerPhoneNumber:
+                type: string
+                example: "08012345678"
+              centerAddress:
+                type: string
+                example: 123 Beach Road, Lagos
+    responses:
+      200:
+        description: Vendor dashboard updated successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Vendor dashboard updated successfully
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    centerName:
+                      type: string
+                      example: Wonderland Resort
+                    centerAddress:
+                      type: string
+                      example: 123 Beach Road, Lagos
+                    phoneNumber:
+                      type: string
+                      example: "08012345678"
+                    role:
+                      type: string
+                      example: vendor
+                    isVerified:
+                      type: boolean
+                      example: true
+      401:
+        description: Unauthorized
+      404:
+        description: Vendor not found
+      500:
+        description: Server error
 
 /api/v1/vendor/dashboard:
   get:
@@ -335,9 +410,108 @@ tags:
       404:
         description: Vendor not found
 
+/api/v1/vendor/create/{centreId}:
+  post:
+    tags:
+      - Vendor
+    summary: Create Favorite Centre
+    description: Add a centre to vendor's favorites list.
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: centreId
+        in: path
+        required: true
+        description: ID of the centre to add to favorites
+        schema:
+          type: integer
+          example: 1
+    responses:
+      200:
+        description: Centre successfully added to favorite
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Centre successfully added to favourite
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    clientId:
+                      type: integer
+                      example: 1
+                    centreId:
+                      type: integer
+                      example: 1
+                    centreName:
+                      type: string
+                      example: Wonderland Resort
+                    createdAt:
+                      type: string
+                      format: date-time
+                      example: "2026-06-27T10:30:00.000Z"
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      example: "2026-06-27T10:30:00.000Z"
+      401:
+        description: Unauthorized
+      404:
+        description: Centre not found
+      500:
+        description: Server error
+
+/api/v1/vendor/get:
+  get:
+    tags:
+      - Vendor
+    summary: Get All Favorites
+    description: Retrieve all favorite centres for the authenticated vendor.
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: Centre successfully retrieved from favourite
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Centre successfully retrieved from favourite
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      centreId:
+                        type: integer
+                        example: 1
+                      centreName:
+                        type: string
+                        example: Wonderland Resort
+      401:
+        description: Unauthorized
+      500:
+        description: Server error
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+
+
+      

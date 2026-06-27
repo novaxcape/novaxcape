@@ -44,6 +44,10 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: false
       },
+      isCentre: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
       otp: {
       type: Sequelize.STRING,
       allowNull: true

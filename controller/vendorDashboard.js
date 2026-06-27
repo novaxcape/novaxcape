@@ -1,8 +1,9 @@
-const { Vendor, Booking, Payment, Package } = require('../models')
+const { Vendor, Booking, Payment, Package, Tourist, favourite } = require('../models')
 const { Op, fn, col } = require('sequelize')
 const dayjs = require('dayjs')
 const { confirmBooking } = require('../helper/emailTemplate')
 const bcrypt = require('bcrypt')
+const tourist = require('../models/tourist')
 
 const buildTicketTypeStats = (rows) => {
   const breakdown = []
@@ -28,6 +29,12 @@ const buildTicketTypeStats = (rows) => {
 
 exports.getDashboardStats = async (req, res, next) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        message: 'Unauthorized - Invalid token'
+      })
+    }
+
     const vendorId = req.user.id
     const vendor = await Vendor.findByPk(vendorId, {
       attributes: ['centerName']
@@ -262,7 +269,14 @@ exports.getDashboardStats = async (req, res, next) => {
 
 exports.updateVendorDashboard = async (req, res) => {
     try {
-        const id  = req.user?.id;
+        if (!req.user || !req.user.id) {
+          return res.status(401).json({
+            success: false,
+            message: 'Unauthorized - Invalid token'
+          });
+        }
+
+        const id  = req.user.id;
 
         const {
             centerName,
@@ -315,7 +329,14 @@ exports.updateVendorDashboard = async (req, res) => {
 
 exports.updatePassword = async (req,res) =>{
   try {
-    const id  = req.user?.id;
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized - Invalid token'
+      });
+    }
+
+    const id  = req.user.id;
 
         const {
             currentPassword,
@@ -367,6 +388,112 @@ exports.updatePassword = async (req,res) =>{
   } catch (error) {
     res.status(500).json({
       success: false,
+      message: error.message
+    })
+  }
+}
+
+
+
+exports.checkVendorStatus = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized - Invalid token"
+      });
+    }
+
+    const centreCount = await Tourist.count({
+      where: { vendorId: req.user.id }
+    });
+
+    const hasCentre = centreCount > 0;
+
+    if (!hasCentre) {
+      return res.status(400).json({
+        message: 'Please create a centre',
+        success: false,
+        hasCentre: false
+      })
+    } else {
+      return res.status(200).json({
+        message: 'proceed to dashboard',
+        success: true,
+        hasCentre: true
+      })
+    }
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.createFavourite = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        message: 'Unauthorized - Invalid token'
+      })
+    }
+
+    const clientId = req.user.id;
+
+    const{centreId} = req.params;
+
+    const selectCentreId = centreId;
+    const centre = await Tourist.findOne({
+      where: { id: selectCentreId},
+      attributes: ['centreName']
+    })
+    if (!centre) {
+      return res.status(404).json({
+        message: 'Centre not found'
+      })
+    }
+    const data = await favourite.create({
+      clientId: clientId,
+      centreId: selectCentreId,
+      centreName: centre.centreName
+    })
+
+    res.status(200).json({
+      message: 'Centre successfully added to favourite',
+      data
+    })
+
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message
+    })
+  }
+};
+
+exports.getFavourite = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        message: 'Unauthorized - Invalid token'
+      })
+    }
+
+    const clientId = req.user.id;
+    
+    const data = await favourite.findAll({
+      where: {clientId},
+      attributes: ["id","centreId",'centreName']
+    })
+
+    res.status(200).json({
+      message: 'Centre successfully retrieved from favourite',
+      data
+    })
+
+  } catch (error) {
+    return res.status(500).json({
       message: error.message
     })
   }

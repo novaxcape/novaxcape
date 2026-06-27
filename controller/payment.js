@@ -9,6 +9,12 @@ const crypto = require('crypto')
 
 exports.initiatePayment = async (req, res, next) => {
     try {
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                message: 'Unauthorized - Invalid token'
+            });
+        }
+
         const clientId = req.user.id;
         const { bookingId } = req.params
         const client = await Client.findByPk(clientId)

@@ -57,6 +57,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
+    isCentre: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     otp: {
       type: DataTypes.STRING,
       allowNull: true

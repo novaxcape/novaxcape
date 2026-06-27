@@ -14,6 +14,8 @@ router.post('/reset-password', resetPasswordValidator, vendorController.resetPas
 router.put('/change-password',  authenticateToken, vendorDashboardController.updatePassword);
 router.get('/dashboard', authenticateToken, vendorAuth, vendorDashboardController.getDashboardStats);
 router.put('/update', authenticateToken, vendorDashboardController.updateVendorDashboard);
-
+router.get("/status", authenticateToken, vendorDashboardController.checkVendorStatus);
+router.post("/create/:centreId",authenticateToken, vendorDashboardController.createFavourite )
+router.get("/get", authenticateToken, vendorDashboardController.getFavourite)
 
 module.exports = router

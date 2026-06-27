@@ -215,6 +215,12 @@ exports.login = async (req, res, next) => {
 
 exports.updateProfile = async (req, res, next) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        message: 'Unauthorized - Invalid token'
+      });
+    }
+
     const files = req.file;
     const filePath = files?.path;
     const { userName } = req.body;
@@ -322,6 +328,12 @@ exports.resetPassword = async (req, res, next) => {
 
 exports.changePassword = async (req, res, next) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        message: 'Unauthorized - Invalid token'
+      });
+    }
+
     const { oldPassword, newPassword } = req.body;
     const clientData = await Client.findByPk(req.user.id);
 
@@ -354,6 +366,12 @@ exports.changePassword = async (req, res, next) => {
 
 exports.loginWithGoogle = async (req, res, next) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        message: 'Unauthorized - Invalid token'
+      });
+    }
+
     const token = await jwt.sign({
       id: req.user.id,
       role: req.user.role

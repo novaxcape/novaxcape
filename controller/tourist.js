@@ -127,6 +127,9 @@ exports.register = async (req, res, next) => {
             location
         })
 
+        vendor.isCentre = true
+        await vendor.save()
+
         res.status(201).json({
             message: "Successfully registerd Center",
             data: newTourist

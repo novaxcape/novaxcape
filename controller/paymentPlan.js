@@ -2,6 +2,12 @@ const { PaymentPlan, Package, Tourist, Vendor } = require('../models');
 
 exports.createPaymentPlan = async (req, res, next) => {
     try {
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                message: 'Unauthorized - Invalid token'
+            });
+        }
+
         const { durationInMonths, frequency, currency } = req.body;
 
         const { packageId } = req.params;
