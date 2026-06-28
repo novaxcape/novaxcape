@@ -10,87 +10,76 @@ exports.createPaymentPlan = async (req, res, next) => {
 
         const { durationInMonths, frequency, currency } = req.body;
 
-        const { packageId } = req.params;
-        const package = await Package.findByPk(packageId);
+        const tourist = await Tourist.findByPk(req.user.id);
 
-        if (!package) {
+        if (!tourist) {
             return res.status(404).json({
-                message: 'Package not found'
-            })
+                message: "Tourist not found"
+            });
         }
 
-        const vendor = await Vendor.findByPk(req.user.id)
-
-        const tourist = await Tourist.findByPk(package.touristId)
-        console.log("tourist:", tourist)
- 
-        if(!tourist) {
-            return res.status(404).json({
-                message: 'Tourist not found'
-            })
-        }
-        if (tourist.dataValues.installmentPayment !== true) {
-            return res.status(404).json({
-                message: 'Installment plan does not exist for this center'
-            })
+        if (!tourist.installmentPayment) {
+            return res.status(400).json({
+                message: "Installment payment is not enabled for this center."
+            });
         }
 
-        const existingPlan = await PaymentPlan.findOne({ where: { packageId: package.dataValues.id } });
+        const existingPlan = await PaymentPlan.findOne({
+            where: {
+                touristId: tourist.id
+            }
+        });
+
         if (existingPlan) {
             return res.status(400).json({
-                message: "payment plan already exists for this package"
-            })
+                message: "Payment plan already exists."
+            });
         }
-
-        const totalAmount = Number(package.amount);
 
         let numberOfInstallments;
 
-        if (frequency === 'weekly') {
+        if (frequency === "weekly") {
             numberOfInstallments = durationInMonths * 4;
         } else {
             numberOfInstallments = durationInMonths;
         }
-        // console.log("durationInMonths:", durationInMonths)
-        const installmentAmount = (totalAmount / numberOfInstallments).toFixed(2);
 
-        const startDate = new Date()
-        const nextPaymentDate = new Date(startDate)
+        const startDate = new Date();
+        const nextPaymentDate = new Date(startDate);
 
-        if (frequency === 'weekly') {
-            nextPaymentDate.setDate(nextPaymentDate.getMonth() + 1)
+        if (frequency === "weekly") {
+            nextPaymentDate.setDate(nextPaymentDate.getDate() + 7);
+        } else {
+            nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
         }
 
-        const newPlan = await PaymentPlan.create({
-            packageId,
+        const paymentPlan = await PaymentPlan.create({
+            touristId: tourist.id,
             durationInMonths,
             frequency,
-            totalAmount,
-            installmentAmount,
             numberOfInstallments,
             startDate,
             nextPaymentDate
-        })
+        });
 
         res.status(201).json({
-            message: "Payment plan created successfully",
-            data: newPlan
-        })
+            message: "Payment plan created successfully.",
+            data: paymentPlan
+        });
 
     } catch (error) {
-        console.log(error.message);
-        next(error)
+        next(error);
     }
-}
+};
 
 
 exports.getAllPaymentPlan = async (req, res, next) => {
     try {
-        const { packageId } = req.params;
+        const { touristId } = req.params;
 
         const paymentPlans = await PaymentPlan.findAll({
             where: {
-                packageId
+                touristId
             }
         });
 

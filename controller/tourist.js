@@ -1,4 +1,4 @@
-const { Tourist, Vendor, Booking } = require('../models')
+const { Tourist, Vendor, Booking, Wallet, PaymentPlan} = require('../models')
 const fs = require('fs')
 const cloudinary = require('../middleware/cloudinary')
 
@@ -126,6 +126,15 @@ exports.register = async (req, res, next) => {
             openingHours: parseJsonField(openingHours),
             location
         })
+        await Wallet.create({
+      touristId: newTourist.id
+        })
+        // console.log("newTourist:", newTourist)
+
+        // const paymentPlan = await PaymentPlan.create({
+        //     touristId: tourist.id,
+        // });
+
 
         vendor.isCentre = true
         await vendor.save()
@@ -250,3 +259,49 @@ exports.verifyClientPasscode = async (req, res, next) => {
     }
 };
 
+
+exports.getallTourists = async (req, res, next) => {
+    try {
+        const vendorId = req.user.id;
+
+        const vendor = await Vendor.findByPk(vendorId);
+
+        if (!vendor) {
+            return res.status(404).json({
+                message: "Vendor not found"
+            });
+        }
+
+        const tourists = await Tourist.findAll({
+            where: {
+                vendorId: vendor.id
+            },
+            order: [["createdAt", "DESC"]]
+        });
+
+        res.status(200).json({
+            message: "Tourist centers retrieved successfully",
+            count: tourists.length,
+            data: tourists
+        });
+
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    }
+};
+
+exports.getAll = async (req, res, next) => {
+    try {
+        const tourist = await Tourist.findAll({
+            order: [["createdAt", "DESC"]]
+        })
+        res.status(200).json({
+            message: "Tourist centers retrieved successfully",
+            count: tourist.length
+        })
+    } catch (error) {
+        console.log(error.message);
+        next(error)
+    }
+}

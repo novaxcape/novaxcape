@@ -59,15 +59,35 @@ exports.createPackage = async (req, res) => {
 
 exports.getAllPackages = async (req, res, next) => {
     try {
-        const packages = await Package.findAll();
+        const { touristId } = req.params;
+
+        const tourist = await Tourist.findByPk(touristId);
+
+        if (!tourist) {
+            return res.status(404).json({
+                success: false,
+                message: "Tourist not found"
+            });
+        }
+
+        const packages = await Package.findAll({
+            where: {
+                touristId
+            },
+            order: [["createdAt", "DESC"]]
+        });
+
         return res.status(200).json({
-            message: 'Packages retrieved successfully',
+            success: true,
+            message: "Packages retrieved successfully",
+            count: packages.length,
             data: packages
         });
+
     } catch (error) {
-        console.log('error:', error)
-        next(error)
-    };
+        console.log(error);
+        next(error);
+    }
 };
 
 

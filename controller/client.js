@@ -45,6 +45,7 @@ exports.register = async (req, res, next) => {
       otp,
       otpExpire
     });
+    console.log("otp:", otp)
 
     res.status(201).json({
       message: 'Client registered successfully. Please check your email for OTP verification.'
@@ -164,29 +165,34 @@ exports.login = async (req, res, next) => {
     const correctPassword = await bcrypt.compare(password, user.dataValues.password)
 
     if (!correctPassword) {
-      user.dataValues.failedLoginAttempts = (user.dataValues.failedLoginAttempts || 0) + 1
-      if (user.dataValues.failedLoginAttempts >= 5) {
-        user.dataValues.isLocked = true
-        await user.save()
-        return res.status(429).json({
-          message: 'Account locked'
-        })
-      }
-
-      await user.save()
-
       return res.status(400).json({
-        message: 'Invalid Credentials',
-        attemptsRemaining: 5 - user.dataValues.failedLoginAttempts
+        message: "Invalid credentials"
       })
     }
+    // if (!correctPassword) {
+    //   user.dataValues.failedLoginAttempts = (user.dataValues.failedLoginAttempts || 0) + 1
+    //   if (user.dataValues.failedLoginAttempts >= 5) {
+    //     user.dataValues.isLocked = true
+    //     await user.save()
+    //     return res.status(429).json({
+    //       message: 'Account locked'
+    //     })
+    //   }
+
+    //   await user.save()
+
+    //   return res.status(400).json({
+    //     message: 'Invalid Credentials',
+    //     attemptsRemaining: 5 - user.dataValues.failedLoginAttempts
+    //   })
+    // }
     if (user.dataValues.isVerified == false) {
       return res.status(400).json({
         message: 'Please verify your email'
       })
     };
 
-    user.dataValues.failedLoginAttempts = 0
+    // user.dataValues.failedLoginAttempts = 0
     await user.save()
 
     const token = jwt.sign(
@@ -423,3 +429,16 @@ exports.getAllClients = async (req, res, next) => {
     next(error)
   }
 }
+
+exports.logout = async (req, res, next) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+
+        res.status(200).json({
+            message: "Logged out successfully"
+        });
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    }
+};

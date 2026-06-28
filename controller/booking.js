@@ -47,17 +47,18 @@ exports.createBooking = async (req, res, next) => {
         const passcode = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, digits: true, lowerCaseAlphabets: false });
 
         // booking.passcode = passcode;
-        const paymentPlan = await PaymentPlan.findOne({
-            where: {
-                packageId: tourPackage.id
-            }
-        });
+        
+        // const paymentPlan = await PaymentPlan.findOne({
+        //     where: {
+        //         packageId: tourPackage.id
+        //     }
+        // });
 
-        if (!paymentPlan) {
-            return res.status(404).json({
-                message: 'Payment plan not found'
-            });
-        }
+        // if (paymentPlan) {
+        //     return res.status(404).json({
+        //         message: 'Payment plan not found'
+        //     });
+        // }
 
         const visit = dayjs(visitDate, "MM/DD/YYYY", true);
 
@@ -68,24 +69,24 @@ exports.createBooking = async (req, res, next) => {
         }
 
         // End of installment duration + 3 days grace period
-        const eligibleBookingDate = dayjs(paymentPlan.startDate)
-            .add(paymentPlan.durationInMonths, 'month')
-            .add(3, 'day');
+        // const eligibleBookingDate = dayjs(paymentPlan.startDate)
+        //     .add(paymentPlan.durationInMonths, 'month')
+        //     .add(3, 'day');
 
-        let status = 'installment';
+        // let status = 'installment';
 
-        if (
-            visit.isSame(eligibleBookingDate, 'day') ||
-            visit.isAfter(eligibleBookingDate, 'day')
-        ) {
-            status = 'inProgress';
-        }
+        // if (
+        //     visit.isSame(eligibleBookingDate, 'day') ||
+        //     visit.isAfter(eligibleBookingDate, 'day')
+        // ) {
+        //     status = 'inProgress';
+        // }
 
-        if (status === 'installment') {
-            return res.status(400).json({
-                message: `You can only book from ${eligibleBookingDate.format('MM/DD/YYYY')} onwards after completing your installment plan.`
-            });
-        }
+        // if (status === 'installment') {
+        //     return res.status(400).json({
+        //         message: `You can only book from ${eligibleBookingDate.format('MM/DD/YYYY')} onwards after completing your installment plan.`
+        //     });
+        // }
 
         const booking = await Booking.create({
             clientId: client.id,
@@ -93,7 +94,7 @@ exports.createBooking = async (req, res, next) => {
             packageId: tourPackage.id,
             visitDate: visit.toDate(),
             bookingNumber: generateOrderNumber(),
-            status,
+            // status,
             passcode
         });
 
@@ -112,24 +113,16 @@ exports.createBooking = async (req, res, next) => {
 
 exports.getAllBooking = async (req, res, next) => {
     try {
-        const { touristId, packageId } = req.params;
+        const { touristId } = req.params;
 
         const pageNumber = parseInt(req.query.pageNumber) || 1;
         const pageSize = parseInt(req.query.pageSize) || 10;
         const offset = (pageNumber - 1) * pageSize;
 
-        const where = {};
-
-        if (touristId) {
-            where.touristId = touristId;
-        }
-
-        if (packageId) {
-            where.packageId = packageId;
-        }
-
         const { count, rows } = await Booking.findAndCountAll({
-            where,
+            where: {
+                touristId
+            },
             include: [
                 {
                     model: Tourist,
@@ -150,7 +143,7 @@ exports.getAllBooking = async (req, res, next) => {
 
         res.status(200).json({
             message: "Bookings retrieved successfully",
-            count: rows.length,
+            count,
             data: rows,
             pagination: {
                 pageNumber,
@@ -162,7 +155,6 @@ exports.getAllBooking = async (req, res, next) => {
             }
         });
     } catch (error) {
-        console.log(error.message);
         next(error);
     }
 };

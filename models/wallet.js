@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Package extends Model {
+  class Wallet extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,29 +11,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Package.belongsTo(models.Tourist, { foreignKey: 'touristId' });
+      Wallet.belongsTo(models.Tourist, { foreignKey: 'touristId' });
+      Wallet.hasMany(models.Withdrawal, { foreignKey: 'walletId', as: 'withdrawals' });
     }
   }
-  Package.init({
+  Wallet.init({
     id: {
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
     },
-    vendorId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: 'Vendors',
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
-    },
     touristId: {
-      type: DataTypes.UUID,
       allowNull: false,
+      type: DataTypes.UUID,
       references: {
         model: 'Tourists',
         key: 'id'
@@ -41,26 +32,19 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
-    packageName: {
-      type: DataTypes.STRING,
+    balance: {
+      type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
+      defaultValue: 0
     },
-    packageType: {
-      type: DataTypes.STRING,
+    totalEarnings: {
+      type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
-    },
-    amount: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    numberOfPeople: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+      defaultValue: 0
+    }
   }, {
     sequelize,
-    modelName: 'Package',
-    tableName: 'Packages',
+    modelName: 'Wallet',
   });
-  return Package;
+  return Wallet;
 };

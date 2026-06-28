@@ -265,7 +265,7 @@ exports.resetPasswordSuccessfulTemplate = (name)=> {
 }
 
 
-exports.confirmBooking = ({ location, visitDate, bookingId, passcode }) => {
+exports.confirmBooking = ({ location, visitDate, bookingId, passcode, amount }) => {
    return `
 <!DOCTYPE html>
 <html lang="en">
@@ -369,9 +369,14 @@ exports.confirmBooking = ({ location, visitDate, bookingId, passcode }) => {
                             <strong>${visitDate}</strong>
                         </p>
 
-                        <p style="margin:0;">
+                        <p style="margin:0 0 18px;">
                             <span style="color:#888888;font-size:13px;">Booking ID</span><br>
                             <strong>${bookingId}</strong>
+                        </p>
+
+                        <p style="margin:0;">
+                            <span style="color:#888888;font-size:13px;">Amount Paid</span><br>
+                            <strong>$${amount}</strong>
                         </p>
 
                     </td>
@@ -427,8 +432,5 @@ exports.confirmBooking = ({ location, visitDate, bookingId, passcode }) => {
 
 </body>
 </html>
-
-
-
 `
 }

@@ -5,12 +5,24 @@ info:
   version: 1.0.0
   description: Documentation for payment endpoints
 
+servers:
+  - url: http://localhost:{port}
+    description: Local server
+    variables:
+      port:
+        default: "9955"
+        description: Server port (updated from your .env PORT)
+
+security:
+  - bearerAuth: []
+
 paths:
   /api/v1/payment/make-payment/{bookingId}:
     post:
       summary: Initialize a payment for a booking
       tags:
         - Payment
+      operationId: initiatePayment
       security:
         - bearerAuth: []
       parameters:
@@ -21,6 +33,9 @@ paths:
             type: string
             format: uuid
           description: Booking ID for which to create the payment charge
+      requestBody:
+        description: (no body required) The endpoint uses the authenticated user and the bookingId path parameter to initialize the payment.
+        required: false
       responses:
         "200":
           description: Payment initialized successfully
@@ -28,6 +43,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentInitResponse'
+              examples:
+                success:
+                  value:
+                    message: "payment initialized successfully"
+                    data:
+                      status: "success"
+                      reference: "NOV-XCAPE-ABC123"
+                      amount: 10000
+                      currency: "NGN"
+                      customer:
+                        email: "user@example.com"
+                        name: "John Doe"
+                      redirect_url: "https://www.google.com"
         "401":
           description: Unauthorized
           content:
@@ -52,6 +80,7 @@ paths:
       summary: Verify a payment using the reference code
       tags:
         - Payment
+      operationId: verifyPayment
       security:
         - bearerAuth: []
       parameters:
@@ -63,11 +92,51 @@ paths:
           description: Payment reference returned by the payment initialization endpoint
       responses:
         "200":
-          description: Payment verified successfully or failed payment details
+          description: Payment verified successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentVerifyResponse'
+              examples:
+                success:
+                  value:
+                    message: "Payment verified successfully"
+                    data:
+                      status: "success"
+                      reference: "NOV-XCAPE-ABC123"
+                      amount: 10000
+                      currency: "NGN"
+                      customer:
+                        email: "user@example.com"
+                        name: "John Doe"
+                      transaction:
+                        id: "txn_123"
+                        status: "success"
+                    otp: "123456"
+                    visitDate: "2026-07-15"
+                    bookingId: "BK-2026-001"
+                    location: "Novaxcape Adventure Park"
+        "400":
+          description: Payment verification failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentVerifyResponse'
+              examples:
+                failure:
+                  value:
+                    message: "Payment verification failed"
+                    data:
+                      status: "failed"
+                      reference: "NOV-XCAPE-ABC123"
+                      amount: 10000
+                      currency: "NGN"
+                      customer:
+                        email: "user@example.com"
+                        name: "John Doe"
+                      error:
+                        code: "payment_failed"
+                        message: "Charge was not successful"
         "401":
           description: Unauthorized
           content:
@@ -82,6 +151,42 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "500":
           description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/payment/verify-webhook:
+    post:
+      summary: Webhook endpoint for payment provider callbacks
+      tags:
+        - Payment
+      description: Receives webhook events from Korapay. This endpoint is typically called by the payment provider and does not require authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                data:
+                  type: object
+      responses:
+        "200":
+          description: Webhook processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        "400":
+          description: Invalid payload
           content:
             application/json:
               schema:
@@ -151,6 +256,17 @@ components:
               type: object
             response:
               type: object
+          example:
+            message: "payment initialized successfully"
+            data:
+              status: "success"
+              reference: "NOV-XCAPE-ABC123"
+              amount: 10000
+              currency: "NGN"
+              customer:
+                email: "user@example.com"
+                name: "John Doe"
+              redirect_url: "https://www.google.com"
 
     PaymentVerifyResponse:
       type: object
@@ -179,6 +295,24 @@ components:
               type: object
             error:
               type: object
+              nullable: true
+        otp:
+          type: string
+          description: One-time passcode returned when payment is successfully verified
+          nullable: true
+        visitDate:
+          type: string
+          format: date
+          description: Visit date for the booking
+          nullable: true
+        bookingId:
+          type: string
+          description: Booking number/ID
+          nullable: true
+        location:
+          type: string
+          description: Location/centre name for the booking
+          nullable: true
 
     ErrorResponse:
       type: object

@@ -33,6 +33,7 @@ exports.register = async (req, res, next) => {
       otp,
       otpExpire
     })
+    
     res.status(201).json({
       message: "Vendor registered successfully, Please check your email to verify OTP"
     });
@@ -276,3 +277,17 @@ exports.resetPassword = async (req, res, next) => {
 //     next(error);
 //   }
 // }
+
+exports.logout = async (req, res, next) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1]; 
+        
+        res.status(200).json({
+            message: "Logged out successfully"
+        });
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    }
+};
+

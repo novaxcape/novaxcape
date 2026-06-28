@@ -1,207 +1,241 @@
+openapi: 3.0.0
+
+info:
+  title: Novaxcape Vendor API
+  version: 1.0.0
+  description: Documentation for vendor authentication and dashboard endpoints
+
 tags:
   - name: Vendor
     description: Vendor Authentication and Dashboard APIs
 
-/api/v1/vendor/register:
-  post:
-    tags:
-      - Vendor
-    summary: Register Vendor
-    description: Register a new vendor and send OTP to email for verification.
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - centerName
-              - email
-              - phoneNumber
-              - password
-            properties:
-              centerName:
-                type: string
-                example: Wonderland Resort
-              email:
-                type: string
-                format: email
-                example: vendor@example.com
-              phoneNumber:
-                type: string
-                example: "08012345678"
-              password:
-                type: string
-                example: Password@123
-    responses:
-      201:
-        description: Vendor registered successfully
+paths:
+  /api/v1/vendor/register:
+    post:
+      tags:
+        - Vendor
+      summary: Register Vendor
+      description: Register a new vendor and send OTP to email for verification.
+      requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - centerName
+                - email
+                - phoneNumber
+                - password
               properties:
-                message:
+                centerName:
                   type: string
-                  example: Vendor registered successfully, Please check your email to verify OTP
-      400:
-        description: Vendor already exists
+                  example: Wonderland Resort
+                email:
+                  type: string
+                  format: email
+                  example: vendor@example.com
+                phoneNumber:
+                  type: string
+                  example: "08012345678"
+                password:
+                  type: string
+                  example: Password@123
+      responses:
+        "201":
+          description: Vendor registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Vendor registered successfully, Please check your email to verify OTP
+        "400":
+          description: Vendor already exists
 
-/api/v1/vendor/verify-otp:
-  post:
-    tags:
-      - Vendor
-    summary: Verify Vendor Email
-    description: Verify vendor account using OTP sent to email.
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - email
-              - otp
-            properties:
-              email:
-                type: string
-                format: email
-                example: vendor@example.com
-              otp:
-                type: string
-                example: "123456"
-    responses:
-      200:
-        description: Email verified successfully
-      400:
-        description: Invalid or expired OTP
-      404:
-        description: Vendor not found
-
-/api/v1/vendor/resend-otp:
-  post:
-    tags:
-      - Vendor
-    summary: Resend OTP
-    description: Resend verification OTP to vendor email.
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - email
-            properties:
-              email:
-                type: string
-                format: email
-                example: vendor@example.com
-    responses:
-      200:
-        description: OTP resent successfully
-      400:
-        description: Email already verified
-      404:
-        description: Vendor not found
-
-/api/v1/vendor/login:
-  post:
-    tags:
-      - Vendor
-    summary: Vendor Login
-    description: Authenticate vendor and generate JWT token.
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - email
-              - password
-            properties:
-              email:
-                type: string
-                format: email
-                example: vendor@example.com
-              password:
-                type: string
-                example: Password@123
-    responses:
-      200:
-        description: Login successful
+  /api/v1/vendor/verify-otp:
+    post:
+      tags:
+        - Vendor
+      summary: Verify Vendor Email
+      description: Verify vendor account using OTP sent to email.
+      requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - email
+                - otp
               properties:
-                message:
+                email:
                   type: string
-                  example: Login successfull
-                token:
+                  format: email
+                  example: vendor@example.com
+                otp:
                   type: string
-                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                vendor:
-                  type: object
-      400:
-        description: Invalid credential
-      404:
-        description: Vendor not found
+                  example: "123456"
+      responses:
+        "200":
+          description: Email verified successfully
+        "400":
+          description: Invalid or expired OTP
+        "404":
+          description: Vendor not found
 
-/api/v1/vendor/forget-password:
-  post:
-    tags:
-      - Vendor
-    summary: Forgot Password
-    description: Send password reset OTP to vendor email.
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - email
-            properties:
-              email:
-                type: string
-                format: email
-                example: vendor@example.com
-    responses:
-      200:
-        description: Forgot password successful
-      404:
-        description: Vendor not found
+  /api/v1/vendor/resend-otp:
+    post:
+      tags:
+        - Vendor
+      summary: Resend OTP
+      description: Resend verification OTP to vendor email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: vendor@example.com
+      responses:
+        "200":
+          description: OTP resent successfully
+        "400":
+          description: Email already verified
+        "404":
+          description: Vendor not found
 
-/api/v1/vendor/reset-password:
-  post:
-    tags:
-      - Vendor
-    summary: Reset Password
-    description: Reset vendor password using email.
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - email
-              - password
-            properties:
-              email:
-                type: string
-                format: email
-                example: vendor@example.com
-              password:
-                type: string
-                example: NewPassword@123
-    responses:
-      200:
-        description: Password reset successful
-      404:
-        description: Invalid credential
+  /api/v1/vendor/login:
+    post:
+      tags:
+        - Vendor
+      summary: Vendor Login
+      description: Authenticate vendor and generate JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: vendor@example.com
+                password:
+                  type: string
+                  example: Password@123
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successful
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  vendor:
+                    type: object
+        "400":
+          description: Invalid credential
+        "404":
+          description: Vendor not found
+
+  /api/v1/vendor/logout:
+    post:
+      tags:
+        - Vendor
+      summary: Logout Vendor
+      description: Logout vendor and invalidate JWT token.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+      responses:
+        "200":
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out successfully
+        "401":
+          description: Unauthorized - Token is missing or invalid
+        "500":
+          description: Something went wrong
+
+  /api/v1/vendor/forget-password:
+    post:
+      tags:
+        - Vendor
+      summary: Forgot Password
+      description: Send password reset OTP to vendor email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: vendor@example.com
+      responses:
+        "200":
+          description: Forgot password successful
+        "404":
+          description: Vendor not found
+
+  /api/v1/vendor/reset-password:
+    post:
+      tags:
+        - Vendor
+      summary: Reset Password
+      description: Reset vendor password using email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: vendor@example.com
+                password:
+                  type: string
+                  example: NewPassword@123
+      responses:
+        "200":
+          description: Password reset successful
+        "404":
+          description: Invalid credential
 
 /api/v1/vendor/change-password:
   put:

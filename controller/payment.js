@@ -1,4 +1,4 @@
-const { Client, Booking, Payment, Package, Tourist } = require('../models')
+const { Client, Booking, Payment, Package, Tourist, Wallet } = require('../models')
 const otpGenerator = require('otp-generator')
 const axios = require('axios')
 const { confirmBooking } = require('../helper/emailTemplate')
@@ -28,6 +28,7 @@ exports.initiatePayment = async (req, res, next) => {
         const booking = await Booking.findByPk(bookingId);
 
         const package = await Package.findByPk(booking.dataValues.packageId);
+        console.log("package:", package);
 
         if (!booking) {
             return res.status(404).json({
@@ -48,10 +49,9 @@ exports.initiatePayment = async (req, res, next) => {
                 email: client.dataValues.email,
                 name: `${client.dataValues.firstName} ${client.dataValues.lastName}`
             },
-            redirect_url: 'https://www.google.com',
-            notification_url: 'https://novaxcape.onrender.com/verify-webhook'
+            redirect_url: 'https://novaxcape.vercel.app/payment-confirmation',
+            // notification_url: 'https://novaxcape.onrender.com/api/v1/payment/verify-webhook'
         }
-        console.log("payment:", paymentData)
 
         const {data} = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentData, {
             headers: {
@@ -87,7 +87,13 @@ exports.verifyPayment = async (req, res, next) => {
             include: [
                 {
                     model: Booking,
-                    as: 'booking'
+                    as: 'booking',
+                    include: [
+                        {
+                            model: Package,
+                            as: 'package'
+                        }
+                    ]
                 }
             ]
         });
@@ -97,27 +103,38 @@ exports.verifyPayment = async (req, res, next) => {
                 message: 'Payment not found'
             });
         }
-
+        console.log('payment:', payment)
         const client = await Client.findByPk(payment.booking.clientId);
         const tourist = await Tourist.findByPk(payment.booking.touristId);
-        console.log("payment:", payment)
-        console.log("tourist:", tourist)
+       
+
+        let wallet = await Wallet.findOne({ where: { touristId: tourist.id } });
+        if (!wallet) {
+            wallet = await Wallet.create({ touristId: tourist.id, balance: 0, totalEarnings: 0 });
+        }
 
         const { data } = await axios.get(`https://api.korapay.com/merchant/api/v1/charges/${reference}`,{
             headers: {
                 Authorization: `Bearer ${process.env.KORA_API_KEY}`
             }
         })
-        // console.log("data:", data)
   
 
         if (data?.status === true && data?.data.status === 'success') {
             payment.status = data?.data.status;
             await payment.save()
 
+         wallet.balance = Number(wallet.balance) + Number(payment.booking.package.amount)
+         wallet.totalEarnings = Number(wallet.totalEarnings) + Number(payment.booking.package.amount)
+         await wallet.save()
          res.status(200).json({
                 message: "Payment verified successfully",
-                data: data?.data
+                data: data?.data,
+                otp: payment.booking.passcode,
+                visitDate: payment.booking.visitDate,
+                bookingId: payment.booking.bookingNumber,
+                location: tourist.centreName,
+                amount: payment.booking.package.amount
             });
 
           (async () => {
@@ -129,10 +146,12 @@ exports.verifyPayment = async (req, res, next) => {
                         location: tourist.centreName,
                         visitDate: payment.booking.visitDate,
                         bookingId: payment.booking.bookingNumber,
-                        passcode: payment.booking.passcode
+                        passcode: payment.booking.passcode,
+                        amount: payment.booking.package.amount
                     }),
                     subject: 'BOOKING CONFIRMATION'
                 });
+                console.log("email:", sendSingleEmail)
               } catch (error) {
                   console.log('Email send error:', error);
               }
@@ -161,7 +180,7 @@ exports.verifyPayment = async (req, res, next) => {
 exports.verifyWebhook = async (req, res, next) => {
     try {
   const { event, data } = req.body;
-  const hash = crypto.createHmac("sha256", secretKey).update(JSON.stringify(data)).digest("hex");
+  const hash = crypto.createHmac("sha256", process.env.KORA_API_KEY).update(JSON.stringify(data)).digest("hex");
   const signature = req.headers["x-korapay-signature"];
   if (hash !== signature) return res.status(401).json({
     message: "Invalid webhook signature"
