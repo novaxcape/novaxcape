@@ -13,6 +13,12 @@ const generateOrderNumber = () => {
 
 exports.createBooking = async (req, res, next) => {
     try {
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                message: 'Unauthorized - Invalid token'
+            });
+        }
+
         const clientId = req.user.id;
         const { touristId, packageId } = req.params;
         const { visitDate } = req.body;
@@ -156,6 +162,12 @@ exports.getAllBooking = async (req, res, next) => {
 
 exports.getAll = async (req, res, next) => {
     try {
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                message: 'Unauthorized - Invalid token'
+            });
+        }
+
         const clientId = req.user.id;
 
         const pageNumber = parseInt(req.query.pageNumber) || 1;

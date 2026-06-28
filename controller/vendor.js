@@ -246,37 +246,37 @@ exports.resetPassword = async (req, res, next) => {
 }
 
 
-exports.changePassword = async (req, res, next) => {
-  try {
-    const { oldPassword, newPassword } = req.body;
-    const vendor = await Vendor.findByPk(req.user.id);
+// exports.changePassword = async (req, res, next) => {
+//   try {
+//     const { oldPassword, newPassword } = req.body;
+//     const vendor = await Vendor.findByPk(req.user.id);
 
-    if (!vendor) {
-      return res.status(404).json({
-        message: "Vendor not found"
-      })
-    }
+//     if (!vendor) {
+//       return res.status(404).json({
+//         message: "Vendor not found"
+//       })
+//     }
 
-    const checkPassword = await bcrypt.compare(oldPassword, vendor.dataValues.password);
+//     const checkPassword = await bcrypt.compare(oldPassword, vendor.dataValues.password);
 
-    if (!checkPassword) {
-      return res.status(400).json({
-        message: "Old password is invalid"
-      })
-    }
+//     if (!checkPassword) {
+//       return res.status(400).json({
+//         message: "Old password is invalid"
+//       })
+//     }
 
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
+//     const salt = await bcrypt.genSalt(10)
+//     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    await vendor.update({ password: hashedPassword });
+//     await vendor.update({ password: hashedPassword });
 
-    res.status(200).json({
-      message: "Password changed successfully"
-    })
-  } catch (error) {
-    next(error);
-  }
-}
+//     res.status(200).json({
+//       message: "Password changed successfully"
+//     })
+//   } catch (error) {
+//     next(error);
+//   }
+// }
 
 exports.logout = async (req, res, next) => {
     try {

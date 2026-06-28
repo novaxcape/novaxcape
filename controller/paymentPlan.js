@@ -2,7 +2,13 @@ const { PaymentPlan, Package, Tourist, Vendor } = require('../models');
 
 exports.createPaymentPlan = async (req, res, next) => {
     try {
-        const { durationInMonths, frequency } = req.body;
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                message: 'Unauthorized - Invalid token'
+            });
+        }
+
+        const { durationInMonths, frequency, currency } = req.body;
 
         const tourist = await Tourist.findByPk(req.user.id);
 

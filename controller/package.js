@@ -3,6 +3,13 @@ const { Package, Vendor, Tourist } = require('../models');
 
 exports.createPackage = async (req, res) => {
     try {
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                success: false,
+                message: 'Unauthorized - Invalid token'
+            });
+        }
+
         const vendorId = req.user.id;
         const touristId = req.params.touristId;
         const { packageName, packageType, amount, numberOfPeople } = req.body;
@@ -107,6 +114,13 @@ exports.getPackageById = async (req, res, next) => {
 
 exports.updatePackage = async (req, res, next) => {
     try {
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                success: false,
+                message: 'Unauthorized - Invalid token'
+            });
+        }
+
         const vendorId = req.user.id;
         const { packageId } = req.params;
         const { packageName, packageType, amount, numberOfPeople } = req.body;

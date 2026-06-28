@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     //   onUpdate: 'CASCADE',
     //   onDelete: 'CASCADE'
     // },
-    centerName: {
+    centerName: { 
       type: DataTypes.STRING,
       allowNull: false
     },
@@ -54,6 +54,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 'Vendor'
     },
     isVerified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    isCentre: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },

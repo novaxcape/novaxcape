@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       Tourist.belongsTo(models.Vendor, { foreignKey: 'vendorId', as: 'vendor' });
       Tourist.hasMany(models.Withdrawal, { foreignKey: 'touristId', as: 'withdrawals' });
       Tourist.hasMany(models.PaymentPlan, { foreignKey: 'touristId', as: 'paymentPlans' });
+      Tourist.belongsTo(models.favourite, { foreignKey: 'centreId', as: 'favorite'})
     }
   }
 

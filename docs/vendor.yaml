@@ -237,137 +237,307 @@ paths:
         "404":
           description: Invalid credential
 
-  /api/v1/vendor/change-password:
-    post:
-      tags:
-        - Vendor
-      summary: Change Password
-      description: Change vendor password after authentication.
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
+/api/v1/vendor/change-password:
+  put:
+    tags:
+      - Vendor
+    summary: Change Password
+    description: Change vendor password after authentication.
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - currentPassword
+              - newPassword
+              - confirmNewPassword
+            properties:
+              currentPassword:
+                type: string
+                example: Password@123
+              newPassword:
+                type: string
+                example: NewPassword@123
+              confirmNewPassword:
+                type: string
+                example: NewPassword@123
+    responses:
+      200:
+        description: Password changed successfully
         content:
           application/json:
             schema:
               type: object
-              required:
-                - oldPassword
-                - newPassword
               properties:
-                oldPassword:
+                message:
                   type: string
-                  example: Password@123
-                newPassword:
-                  type: string
-                  example: NewPassword@123
-      responses:
-        "200":
-          description: Password changed successfully
-        "400":
-          description: Old password is invalid
-        "404":
-          description: Vendor not found
-        "401":
-          description: Unauthorized
+                  example: Password updated successfully
+      400:
+        description: Invalid credential or password does not match
+      404:
+        description: Vendor not found
+      401:
+        description: Unauthorized
 
-  /api/v1/vendor/dashboard:
-    get:
-      tags:
-        - Vendor
-      summary: Vendor Dashboard Statistics
-      description: Retrieve vendor dashboard statistics including requests, bookings, revenue, ticket types and visitor trends.
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: Dashboard statistics retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Vendor dashboard stats retrieved successfully
-                  data:
-                    type: object
-                    properties:
-                      vendorName:
-                        type: string
-                        example: Wonderland Resort
-                      requests:
+/api/v1/vendor/update:
+  put:
+    tags:
+      - Vendor
+    summary: Update Vendor Dashboard
+    description: Update vendor center details (name, phone, address).
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              centerName:
+                type: string
+                example: Wonderland Resort
+              centerPhoneNumber:
+                type: string
+                example: "08012345678"
+              centerAddress:
+                type: string
+                example: 123 Beach Road, Lagos
+    responses:
+      200:
+        description: Vendor dashboard updated successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Vendor dashboard updated successfully
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    centerName:
+                      type: string
+                      example: Wonderland Resort
+                    centerAddress:
+                      type: string
+                      example: 123 Beach Road, Lagos
+                    phoneNumber:
+                      type: string
+                      example: "08012345678"
+                    role:
+                      type: string
+                      example: vendor
+                    isVerified:
+                      type: boolean
+                      example: true
+      401:
+        description: Unauthorized
+      404:
+        description: Vendor not found
+      500:
+        description: Server error
+
+/api/v1/vendor/dashboard:
+  get:
+    tags:
+      - Vendor
+    summary: Vendor Dashboard Statistics
+    description: Retrieve vendor dashboard statistics including requests, bookings, revenue, ticket types and visitor trends.
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: Dashboard statistics retrieved successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Vendor dashboard stats retrieved successfully
+                data:
+                  type: object
+                  properties:
+                    vendorName:
+                      type: string
+                      example: Wonderland Resort
+                    requests:
+                      type: object
+                      properties:
+                        today:
+                          type: integer
+                          example: 12
+                        yesterday:
+                          type: integer
+                          example: 8
+                    revenue:
+                      type: object
+                      properties:
+                        today:
+                          type: number
+                          example: 50000
+                        yesterday:
+                          type: number
+                          example: 35000
+                    bookings:
+                      type: object
+                      properties:
+                        today:
+                          type: integer
+                          example: 10
+                        yesterday:
+                          type: integer
+                          example: 7
+                        total:
+                          type: integer
+                          example: 120
+                    ticketTypes:
+                      type: object
+                      properties:
+                        breakdown:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              packageType:
+                                type: string
+                                example: Adult
+                              count:
+                                type: integer
+                                example: 25
+                        total:
+                          type: integer
+                          example: 50
+                    visitorStats:
+                      type: array
+                      items:
                         type: object
                         properties:
-                          today:
+                          date:
+                            type: string
+                            example: "2026-06-15"
+                          visits:
                             type: integer
                             example: 12
-                          yesterday:
-                            type: integer
-                            example: 8
-                      revenue:
-                        type: object
-                        properties:
-                          today:
-                            type: number
-                            example: 50000
-                          yesterday:
-                            type: number
-                            example: 35000
-                      bookings:
-                        type: object
-                        properties:
-                          today:
-                            type: integer
-                            example: 10
-                          yesterday:
-                            type: integer
-                            example: 7
-                          total:
-                            type: integer
-                            example: 120
-                      ticketTypes:
-                        type: object
-                        properties:
-                          breakdown:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                packageType:
-                                  type: string
-                                  example: Adult
-                                count:
-                                  type: integer
-                                  example: 25
-                          total:
-                            type: integer
-                            example: 50
-                      visitorStats:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            date:
-                              type: string
-                              example: "2026-06-15"
-                            visits:
-                              type: integer
-                              example: 12
-                      ratings:
-                        type: object
-                        properties:
-                          average:
-                            type: number
-                            nullable: true
-                            example: null
-                          count:
-                            type: integer
-                            example: 0
-        "401":
-          description: Unauthorized
-        "404":
-          description: Vendor not found
+                    ratings:
+                      type: object
+                      properties:
+                        average:
+                          type: number
+                          nullable: true
+                          example: null
+                        count:
+                          type: integer
+                          example: 0
+      401:
+        description: Unauthorized
+      404:
+        description: Vendor not found
+
+/api/v1/vendor/create/{centreId}:
+  post:
+    tags:
+      - Vendor
+    summary: Create Favorite Centre
+    description: Add a centre to vendor's favorites list.
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: centreId
+        in: path
+        required: true
+        description: ID of the centre to add to favorites
+        schema:
+          type: integer
+          example: 1
+    responses:
+      200:
+        description: Centre successfully added to favorite
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Centre successfully added to favourite
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    clientId:
+                      type: integer
+                      example: 1
+                    centreId:
+                      type: integer
+                      example: 1
+                    centreName:
+                      type: string
+                      example: Wonderland Resort
+                    createdAt:
+                      type: string
+                      format: date-time
+                      example: "2026-06-27T10:30:00.000Z"
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      example: "2026-06-27T10:30:00.000Z"
+      401:
+        description: Unauthorized
+      404:
+        description: Centre not found
+      500:
+        description: Server error
+
+/api/v1/vendor/get:
+  get:
+    tags:
+      - Vendor
+    summary: Get All Favorites
+    description: Retrieve all favorite centres for the authenticated vendor.
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: Centre successfully retrieved from favourite
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Centre successfully retrieved from favourite
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      centreId:
+                        type: integer
+                        example: 1
+                      centreName:
+                        type: string
+                        example: Wonderland Resort
+      401:
+        description: Unauthorized
+      500:
+        description: Server error
 
 components:
   securitySchemes:
@@ -375,3 +545,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+
+
+      
