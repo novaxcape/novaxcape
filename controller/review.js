@@ -3,6 +3,9 @@ const { Review } = require('../models')
 
 exports.createReview = async (req, res, next) => {
     try {
+        const clientId = req.user.id
+        const touristId = req.params.id
+        
         const { ratings, fullName, email, addYourReview } = req.body
         
         const review = await Review.create({
