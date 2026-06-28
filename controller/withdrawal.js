@@ -135,3 +135,37 @@ console.log(withdrawal);
         });
     }
 };
+
+
+exports.getTouristWithdrawals = async (req, res) => {
+    try {
+        const vendorId = req.user.id;
+        const touristId = req.params.id;
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const offset = (page - 1) * limit;
+
+        const { count, rows: withdrawals } = await Withdrawal.findAndCountAll({
+            where: {
+                touristId,
+                status: "successful"
+            },
+            order: [["createdAt", "DESC"]],
+            limit,
+            offset
+        });
+
+        return res.status(200).json({
+            success: true,
+            totalWithdrawals: count,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,
+            withdrawals
+        });
+
+    } catch (error) {
+        console.error("Error fetching withdrawals:", error.message);
+        next(error);
+    }
+};
