@@ -56,10 +56,20 @@ exports.createBooking = async (req, res, next) => {
         // Validate visit date against centre's opening hours
         const openingHours = tourist.openingHours;
         const dayOfWeek = visit.format('dddd'); // e.g., "Monday"
-        
+
         let isOpenOnDay = false;
-        
-        if (Array.isArray(openingHours)) {
+
+        if (typeof openingHours === 'string') {
+            // Stored as pipe-delimited string: "Monday: 10 AM - 4 PM | Tuesday: Closed | Wednesday: 10 AM - 4 PM"
+            // Split by "|" and check each day entry
+            const entries = openingHours.split('|').map(e => e.trim());
+            isOpenOnDay = entries.some(entry => {
+                // Check if entry starts with the day name (case-insensitive) and does NOT contain "Closed"
+                const dayName = entry.split(':')[0]?.trim();
+                const isClosed = entry.toLowerCase().includes('closed');
+                return dayName && dayName.toLowerCase() === dayOfWeek.toLowerCase() && !isClosed;
+            });
+        } else if (Array.isArray(openingHours)) {
             // Array of day names ["Monday", "Tuesday", ...]
             // or array of objects [{day: "Monday", open: "08:00", close: "18:00"}, ...]
             isOpenOnDay = openingHours.some(entry => {
@@ -74,7 +84,7 @@ exports.createBooking = async (req, res, next) => {
             });
         } else if (openingHours && typeof openingHours === 'object') {
             // Object keyed by day names: { "Monday": { open: "08:00", close: "18:00" }, ... }
-            isOpenOnDay = Object.keys(openingHours).some(key => 
+            isOpenOnDay = Object.keys(openingHours).some(key =>
                 key.toLowerCase() === dayOfWeek.toLowerCase()
             );
         }
