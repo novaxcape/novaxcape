@@ -25,13 +25,13 @@ exports.payoutFunds = async (req, res) => {
         }
 
         // Fetch the KYC data for the tourist
-        const kycData = await Kyc.findOne({ where: { touristId: tourist.id } });
-        if (!kycData) {
-            return res.status(400).json({
-                message: "KYC not found. Please complete your KYC in Settings."
-            });
-        }
-        console.log("kycData:", kycData)
+        // const kycData = await Kyc.findOne({ where: { touristId: tourist.id } });
+        // if (!kycData) {
+        //     return res.status(400).json({
+        //         message: "KYC not found. Please complete your KYC in Settings."
+        //     });
+        // }
+        // console.log("kycData:", kycData)
         // if (!kycData.bankName || !kycData.accountNumber || !kycData.bankCode) {
         //     return res.status(400).json({
         //         message: "KYC bank details are incomplete. Please update your KYC in Settings."

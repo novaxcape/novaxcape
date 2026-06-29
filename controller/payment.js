@@ -41,8 +41,11 @@ exports.initiatePayment = async (req, res, next) => {
         });
         const reference = `NOV-XCAPE-${ref}`
 
+        const serviceFee = 500;
+        const totalAmount = Number(package.dataValues.amount) + serviceFee;
+
         const paymentData = {
-            amount: package.dataValues.amount,
+            amount: totalAmount,
             currency: 'NGN',
             reference,
             customer: {
@@ -60,7 +63,7 @@ exports.initiatePayment = async (req, res, next) => {
         })
 
         const payment = await Payment.create({
-            amount: paymentData.amount + 500,
+            amount: totalAmount,
             reference,
             clientId,
             bookingId: booking.dataValues.id
