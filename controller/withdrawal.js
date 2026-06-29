@@ -10,13 +10,11 @@ exports.payoutFunds = async (req, res) => {
         const touristId = req.params.id;
         const { amount } = req.body;
 
-        // Verify vendor exists
         const vendor = await Vendor.findByPk(vendorId);
         if (!vendor) {
             return res.status(404).json({ message: "Vendor not found" });
         }
 
-        // Verify tourist exists and belongs to this vendor
         const tourist = await Tourist.findOne({ where: { id: touristId, vendorId } });
 
 
@@ -24,21 +22,6 @@ exports.payoutFunds = async (req, res) => {
             return res.status(404).json({ message: "Tourist center not found" });
         }
 
-        // Fetch the KYC data for the tourist
-        // const kycData = await Kyc.findOne({ where: { touristId: tourist.id } });
-        // if (!kycData) {
-        //     return res.status(400).json({
-        //         message: "KYC not found. Please complete your KYC in Settings."
-        //     });
-        // }
-        // console.log("kycData:", kycData)
-        // if (!kycData.bankName || !kycData.accountNumber || !kycData.bankCode) {
-        //     return res.status(400).json({
-        //         message: "KYC bank details are incomplete. Please update your KYC in Settings."
-        //     });
-        // }
-
-        // Fetch wallet for the tourist
         const wallet = await Wallet.findOne({ where: { touristId: tourist.id } });
         if (!wallet) {
             return res.status(404).json({ message: "Wallet not found" });
@@ -56,11 +39,6 @@ exports.payoutFunds = async (req, res) => {
         if (Number(wallet.balance) < withdrawalAmount) {
             return res.status(400).json({ message: "Insufficient balance" });
         }
-
-        // const accountNumberStr = String(kycData.accountNumber);
-        // if (!/^\d{10}$/.test(accountNumberStr)) {
-        //     return res.status(400).json({ message: "Invalid account number" });
-        // }
 
         const ref = otpGenerator.generate(12, { specialChars: false, upperCaseAlphabets: false, lowerCaseAlphabets: false });
         const reference = `NOV-PAYOUT-${ref}`;
@@ -92,9 +70,6 @@ exports.payoutFunds = async (req, res) => {
             }
         );
 
-        // console.log("PAYOUT RESPONSE:", response.data);
-
-        // Verify Kora accepted the payout
         if (response.data.status === false) {
             return res.status(400).json({
                 success: false,
@@ -109,7 +84,7 @@ exports.payoutFunds = async (req, res) => {
             walletId: wallet.id,
             amount: withdrawalAmount,
             reference,
-            bankName: kycData.bankName,
+            bankName: 'Access Bank',
             bankCode: '033',
             accountNumber: '0000000000',
             status: "successful"
@@ -128,10 +103,7 @@ console.log(withdrawal);
 
     } catch (error) {
         console.log("Payout Error:", error.response?.data || error.message);
-        return res.status(500).json({
-            success: false,
-            message: error.response?.data?.message || error.message
-        });
+       next(error);
     }
 };
 
