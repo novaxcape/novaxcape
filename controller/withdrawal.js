@@ -57,10 +57,10 @@ exports.payoutFunds = async (req, res) => {
             return res.status(400).json({ message: "Insufficient balance" });
         }
 
-        const accountNumberStr = String(kycData.accountNumber);
-        if (!/^\d{10}$/.test(accountNumberStr)) {
-            return res.status(400).json({ message: "Invalid account number" });
-        }
+        // const accountNumberStr = String(kycData.accountNumber);
+        // if (!/^\d{10}$/.test(accountNumberStr)) {
+        //     return res.status(400).json({ message: "Invalid account number" });
+        // }
 
         const ref = otpGenerator.generate(12, { specialChars: false, upperCaseAlphabets: false, lowerCaseAlphabets: false });
         const reference = `NOV-PAYOUT-${ref}`;
@@ -112,8 +112,7 @@ exports.payoutFunds = async (req, res) => {
             bankName: kycData.bankName,
             bankCode: '033',
             accountNumber: '0000000000',
-            status: "successful",
-            //providerReference: response.data?.data?.reference
+            status: "successful"
         });
 console.log(withdrawal);
         // Deduct from wallet balance
