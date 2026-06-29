@@ -28,6 +28,11 @@ paths:
             schema:
               type: object
               required:
+                - centreName
+                - centreEmail
+                - centrePhoneNumber
+                - city
+                - streetAddress
                 - lankmark
                 - CAC
                 - yearEstablished
@@ -42,6 +47,22 @@ paths:
                 - accountNumber
                 - accountName
               properties:
+                centreName:
+                  type: string
+                  example: Lekki Conservation Centre
+                centreEmail:
+                  type: string
+                  format: email
+                  example: info@lekki-centre.com
+                centrePhoneNumber:
+                  type: string
+                  example: "+234809876543"
+                city:
+                  type: string
+                  example: Lagos
+                streetAddress:
+                  type: string
+                  example: KM 19 Lekki-Epe Expressway
                 lankmark:
                   type: string
                   example: Near Lekki Phase 1 gate
@@ -52,8 +73,8 @@ paths:
                   type: integer
                   example: 2018
                 phoneNumber:
-                  type: integer
-                  example: 9087654321
+                  type: string
+                  example: "+234809087654321"
                 centreType:
                   type: string
                   example: Conservation center
@@ -71,14 +92,14 @@ paths:
                   format: email
                   example: director@example.com
                 directorPhoneNumber:
-                  type: integer
-                  example: 9081234567
+                  type: string
+                  example: "+234809081234567"
                 bankName:
                   type: string
                   example: Access Bank
                 accountNumber:
-                  type: integer
-                  example: 1234567890
+                  type: string
+                  example: "1234567890"
                 accountName:
                   type: string
                   example: Lekki Conservation Centre Ltd
