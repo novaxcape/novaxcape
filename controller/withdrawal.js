@@ -89,9 +89,10 @@ exports.payoutFunds = async (req, res, next) => {
             accountNumber: '0000000000',
             status: "successful"
         });
-console.log(withdrawal);
+console.log(payout);
         // Deduct from wallet balance
         wallet.balance = Number(wallet.balance) - withdrawalAmount;
+        wallet.withdrawal = Number(wallet.withdrawal) + withdrawalAmount;
         await wallet.save();
 
         return res.status(200).json({
@@ -108,7 +109,7 @@ console.log(withdrawal);
 };
 
 
-exports.getTouristWithdrawals = async (req, res) => {
+exports.getTouristWithdrawals = async (req, res, next) => {
     try {
         const vendorId = req.user.id;
         const touristId = req.params.id;
