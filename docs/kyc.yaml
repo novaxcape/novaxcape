@@ -28,11 +28,8 @@ paths:
             schema:
               type: object
               required:
-                - centreName
                 - centreEmail
                 - centrePhoneNumber
-                - city
-                - streetAddress
                 - lankmark
                 - CAC
                 - yearEstablished
@@ -47,22 +44,15 @@ paths:
                 - accountNumber
                 - accountName
               properties:
-                centreName:
-                  type: string
-                  example: Lekki Conservation Centre
                 centreEmail:
                   type: string
                   format: email
                   example: info@lekki-centre.com
+                  description: Centre email (required from body)
                 centrePhoneNumber:
                   type: string
                   example: "+234809876543"
-                city:
-                  type: string
-                  example: Lagos
-                streetAddress:
-                  type: string
-                  example: KM 19 Lekki-Epe Expressway
+                  description: Centre phone number (required from body)
                 lankmark:
                   type: string
                   example: Near Lekki Phase 1 gate
@@ -106,16 +96,94 @@ paths:
                 bankCode:
                   type: string
                   example: "044"
+                  description: Optional bank code
       responses:
         "200":
           description: KYC created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Kyc successfully created
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      touristId:
+                        type: string
+                        format: uuid
+                      centreName:
+                        type: string
+                      centreEmail:
+                        type: string
+                      city:
+                        type: string
+                      centrePhoneNumber:
+                        type: string
+                      streetAddress:
+                        type: string
+                      lankmark:
+                        type: string
+                      CAC:
+                        type: string
+                      yearEstablished:
+                        type: integer
+                      phoneNumber:
+                        type: string
+                      centreType:
+                        type: string
+                      postal:
+                        type: string
+                      state:
+                        type: string
+                      directorFullName:
+                        type: string
+                      directorEmail:
+                        type: string
+                      directorPhoneNumber:
+                        type: string
+                      bankName:
+                        type: string
+                      accountNumber:
+                        type: string
+                      accountName:
+                        type: string
+                      bankCode:
+                        type: string
+                      createdAt:
+                        type: string
+                        format: date-time
+                      updatedAt:
+                        type: string
+                        format: date-time
         "400":
           description: Required field missing or KYC already exists for this tourist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Kyc already exists for this tourist
         "401":
-          description: Unauthorized
+          description: Unauthorized - Invalid token
         "403":
           description: Vendor access required
         "404":
           description: Tourist not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Tourist not found
         "500":
           description: Something went wrong
