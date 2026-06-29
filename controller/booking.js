@@ -44,21 +44,6 @@ exports.createBooking = async (req, res, next) => {
                 message: 'Package not found'
             });
         }
-        const passcode = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, digits: true, lowerCaseAlphabets: false });
-
-        // booking.passcode = passcode;
-        
-        // const paymentPlan = await PaymentPlan.findOne({
-        //     where: {
-        //         packageId: tourPackage.id
-        //     }
-        // });
-
-        // if (paymentPlan) {
-        //     return res.status(404).json({
-        //         message: 'Payment plan not found'
-        //     });
-        // }
 
         const visit = dayjs(visitDate, "MM/DD/YYYY", true);
 
@@ -68,25 +53,39 @@ exports.createBooking = async (req, res, next) => {
             });
         }
 
-        // End of installment duration + 3 days grace period
-        // const eligibleBookingDate = dayjs(paymentPlan.startDate)
-        //     .add(paymentPlan.durationInMonths, 'month')
-        //     .add(3, 'day');
+        // Validate visit date against centre's opening hours
+        const openingHours = tourist.openingHours;
+        const dayOfWeek = visit.format('dddd'); // e.g., "Monday"
+        
+        let isOpenOnDay = false;
+        
+        if (Array.isArray(openingHours)) {
+            // Array of day names ["Monday", "Tuesday", ...]
+            // or array of objects [{day: "Monday", open: "08:00", close: "18:00"}, ...]
+            isOpenOnDay = openingHours.some(entry => {
+                if (typeof entry === 'string') {
+                    return entry.toLowerCase() === dayOfWeek.toLowerCase();
+                }
+                if (entry && typeof entry === 'object') {
+                    const dayValue = entry.day || entry.dayOfWeek || entry.name;
+                    return dayValue && String(dayValue).toLowerCase() === dayOfWeek.toLowerCase();
+                }
+                return false;
+            });
+        } else if (openingHours && typeof openingHours === 'object') {
+            // Object keyed by day names: { "Monday": { open: "08:00", close: "18:00" }, ... }
+            isOpenOnDay = Object.keys(openingHours).some(key => 
+                key.toLowerCase() === dayOfWeek.toLowerCase()
+            );
+        }
 
-        // let status = 'installment';
+        if (!isOpenOnDay) {
+            return res.status(400).json({
+                message: `This centre is not open on ${dayOfWeek}s. Please select a day within the centre's operating hours.`
+            });
+        }
 
-        // if (
-        //     visit.isSame(eligibleBookingDate, 'day') ||
-        //     visit.isAfter(eligibleBookingDate, 'day')
-        // ) {
-        //     status = 'inProgress';
-        // }
-
-        // if (status === 'installment') {
-        //     return res.status(400).json({
-        //         message: `You can only book from ${eligibleBookingDate.format('MM/DD/YYYY')} onwards after completing your installment plan.`
-        //     });
-        // }
+        const passcode = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, digits: true, lowerCaseAlphabets: false });
 
         const booking = await Booking.create({
             clientId: client.id,
@@ -98,6 +97,7 @@ exports.createBooking = async (req, res, next) => {
             passcode
         });
 
+        await booking.save()
         return res.status(201).json({
             message: 'Booking created successfully',
             booking

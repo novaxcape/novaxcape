@@ -60,7 +60,7 @@ exports.initiatePayment = async (req, res, next) => {
         })
 
         const payment = await Payment.create({
-            amount: paymentData.amount,
+            amount: paymentData.amount + 500,
             reference,
             clientId,
             bookingId: booking.dataValues.id
