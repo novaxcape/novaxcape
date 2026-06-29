@@ -3,7 +3,7 @@ const axios = require('axios')
 const otpGenerator = require('otp-generator')
 
 
-exports.payoutFunds = async (req, res) => {
+exports.payoutFunds = async (req, res, next) => {
     
     try {
         const vendorId = req.user.id;
