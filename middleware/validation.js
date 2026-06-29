@@ -304,10 +304,15 @@ exports.vendorSignUpValidator = (req, res, next) => {
 
  exports.createKycValidation = (req, res, next) => {
           const schema = joi.object({
-              touristId: joi.string().guid({ version: ['uuidv4'] }).required().messages({
-                  'any.required': 'Tourist ID is required',
-                  'string.empty': 'Tourist ID cannot be empty',
-                  'string.guid': 'Tourist ID must be a valid UUID'
+              centreEmail: joi.string().email().required().messages({
+                  'any.required': 'Centre email is required',
+                  'string.empty': 'Centre email cannot be empty',
+                  'string.email': 'Centre email must be a valid email'
+              }),
+              centrePhoneNumber: joi.string().pattern(/^[0-9]{10,15}$/).required().messages({
+                  'any.required': 'Centre phone number is required',
+                  'string.empty': 'Centre phone number cannot be empty',
+                  'string.pattern.base': 'Centre phone number must contain only digits and be between 10 and 15 digits long'
               }),
               lankmark: joi.string().trim().required().messages({
                   'any.required': 'Landmark is required',
@@ -382,7 +387,6 @@ exports.vendorSignUpValidator = (req, res, next) => {
       
           next();
       };
-  
 
 exports.vendorLoginValidator = (req, res, next) => {
     const schema = joi.object({
@@ -744,5 +748,3 @@ exports.validateClientPasscode = (req, res, next) => {
     }
     next()
 }
-
-
