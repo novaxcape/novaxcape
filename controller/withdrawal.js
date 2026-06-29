@@ -32,11 +32,11 @@ exports.payoutFunds = async (req, res) => {
             });
         }
         console.log("kycData:", kycData)
-        if (!kycData.bankName || !kycData.accountNumber || !kycData.bankCode) {
-            return res.status(400).json({
-                message: "KYC bank details are incomplete. Please update your KYC in Settings."
-            });
-        }
+        // if (!kycData.bankName || !kycData.accountNumber || !kycData.bankCode) {
+        //     return res.status(400).json({
+        //         message: "KYC bank details are incomplete. Please update your KYC in Settings."
+        //     });
+        // }
 
         // Fetch wallet for the tourist
         const wallet = await Wallet.findOne({ where: { touristId: tourist.id } });
