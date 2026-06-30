@@ -3,7 +3,7 @@ openapi: 3.0.0
 info:
   title: Novaxcape Payment API
   version: 1.0.0
-  description: Documentation for payment endpoints
+  description: Documentation for booking payment initialization, verification, installment tracking, and webhook handling.
 
 servers:
   - url: http://localhost:{port}
@@ -11,7 +11,7 @@ servers:
     variables:
       port:
         default: "9955"
-        description: Server port (updated from your .env PORT)
+        description: Server port
 
 security:
   - bearerAuth: []
@@ -33,9 +33,6 @@ paths:
             type: string
             format: uuid
           description: Booking ID for which to create the payment charge
-      requestBody:
-        description: (no body required) The endpoint uses the authenticated user and the bookingId path parameter to initialize the payment.
-        required: false
       responses:
         "200":
           description: Payment initialized successfully
@@ -43,19 +40,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentInitResponse'
-              examples:
-                success:
-                  value:
-                    message: "payment initialized successfully"
-                    data:
-                      status: "success"
-                      reference: "NOV-XCAPE-ABC123"
-                      amount: 10000
-                      currency: "NGN"
-                      customer:
-                        email: "user@example.com"
-                        name: "John Doe"
-                      redirect_url: "https://www.google.com"
+        "400":
+          description: All installments have already been paid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         "401":
           description: Unauthorized
           content:
@@ -97,46 +87,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentVerifyResponse'
-              examples:
-                success:
-                  value:
-                    message: "Payment verified successfully"
-                    data:
-                      status: "success"
-                      reference: "NOV-XCAPE-ABC123"
-                      amount: 10000
-                      currency: "NGN"
-                      customer:
-                        email: "user@example.com"
-                        name: "John Doe"
-                      transaction:
-                        id: "txn_123"
-                        status: "success"
-                    otp: "123456"
-                    visitDate: "2026-07-15"
-                    bookingId: "BK-2026-001"
-                    location: "Novaxcape Adventure Park"
         "400":
           description: Payment verification failed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaymentVerifyResponse'
-              examples:
-                failure:
-                  value:
-                    message: "Payment verification failed"
-                    data:
-                      status: "failed"
-                      reference: "NOV-XCAPE-ABC123"
-                      amount: 10000
-                      currency: "NGN"
-                      customer:
-                        email: "user@example.com"
-                        name: "John Doe"
-                      error:
-                        code: "payment_failed"
-                        message: "Charge was not successful"
+                $ref: '#/components/schemas/ErrorResponse'
         "401":
           description: Unauthorized
           content:
@@ -145,6 +101,65 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "404":
           description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/payment/installment-status/{bookingId}:
+    get:
+      summary: Retrieve installment payment status for a booking
+      description: Returns the current installment progress for a booking, including how many payments have been completed and how much is due per installment.
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: bookingId
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Booking ID
+      responses:
+        "200":
+          description: Installment status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallmentStatusResponse'
+              example:
+                message: "Installment status retrieved"
+                data:
+                  bookingId: "5f3b1d2c-7d4e-4c9f-8d2a-1b1c2d3e4f5a"
+                  bookingNumber: "NOV-123456"
+                  paymentMethod: "installment"
+                  totalInstallments: 2
+                  installmentsPaid: 1
+                  totalAmount: 45000
+                  amountPerInstallment: 22500
+                  status: "installment"
+                  payments:
+                    - id: "pmt_001"
+                      reference: "NOV-XCAPE-123456"
+                      status: "success"
+                      installmentNumber: 1
+                      installmentOf: 2
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Booking not found
           content:
             application/json:
               schema:
@@ -183,10 +198,24 @@ paths:
                 properties:
                   success:
                     type: boolean
+                  status:
+                    type: string
                   message:
                     type: string
         "400":
-          description: Invalid payload
+          description: Invalid payload or missing reference
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Invalid webhook signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: No payment record found
           content:
             application/json:
               schema:
@@ -218,6 +247,10 @@ components:
           type: string
         status:
           type: string
+        installmentNumber:
+          type: integer
+        installmentOf:
+          type: integer
         createdAt:
           type: string
           format: date-time
@@ -250,23 +283,10 @@ components:
                   type: string
             redirect_url:
               type: string
-            notification_url:
-              type: string
             transaction:
               type: object
             response:
               type: object
-          example:
-            message: "payment initialized successfully"
-            data:
-              status: "success"
-              reference: "NOV-XCAPE-ABC123"
-              amount: 10000
-              currency: "NGN"
-              customer:
-                email: "user@example.com"
-                name: "John Doe"
-              redirect_url: "https://www.google.com"
 
     PaymentVerifyResponse:
       type: object
@@ -302,7 +322,7 @@ components:
           nullable: true
         visitDate:
           type: string
-          format: date
+          format: date-time
           description: Visit date for the booking
           nullable: true
         bookingId:
@@ -313,6 +333,51 @@ components:
           type: string
           description: Location/centre name for the booking
           nullable: true
+        amount:
+          type: number
+          nullable: true
+        installmentNumber:
+          type: integer
+          nullable: true
+        installmentsPaid:
+          type: integer
+          nullable: true
+        totalInstallments:
+          type: integer
+          nullable: true
+        fullyPaid:
+          type: boolean
+          nullable: true
+
+    InstallmentStatusResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            bookingId:
+              type: string
+              format: uuid
+            bookingNumber:
+              type: string
+            paymentMethod:
+              type: string
+            totalInstallments:
+              type: integer
+            installmentsPaid:
+              type: integer
+            totalAmount:
+              type: number
+            amountPerInstallment:
+              type: number
+            status:
+              type: string
+            payments:
+              type: array
+              items:
+                $ref: '#/components/schemas/Payment'
 
     ErrorResponse:
       type: object

@@ -3,7 +3,18 @@ openapi: 3.0.0
 info:
   title: Novaxcape Booking API
   version: 1.0.0
-  description: Booking endpoints for Novaxcape, including booking creation and retrieval.
+  description: Booking endpoints for creating and retrieving bookings for tourist packages.
+
+servers:
+  - url: http://localhost:{port}
+    description: Local server
+    variables:
+      port:
+        default: "9955"
+        description: Server port
+
+security:
+  - bearerAuth: []
 
 paths:
   /api/v1/booking/create/{touristId}/{packageId}:
@@ -41,6 +52,19 @@ paths:
                   type: string
                   description: Date of visit in MM/DD/YYYY format
                   example: "06/15/2026"
+                paymentMethod:
+                  type: string
+                  enum:
+                    - full
+                    - installment
+                  default: full
+                  description: Payment method for the booking
+                totalInstallments:
+                  type: integer
+                  minimum: 2
+                  maximum: 2
+                  default: 2
+                  description: Number of installments. The current implementation supports 2 installments.
       responses:
         "201":
           description: Booking created successfully
@@ -49,7 +73,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BookingResponse'
         "400":
-          description: Bad request; invalid visit date or installment not completed
+          description: Invalid visit date, centre is closed on the selected day, or the payment method is invalid
           content:
             application/json:
               schema:
@@ -61,7 +85,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         "404":
-          description: Client, Tourist, Package or Payment plan not found
+          description: Client, tourist, or package not found
           content:
             application/json:
               schema:
@@ -198,12 +222,26 @@ components:
           example: "NOV-123456"
         visitDate:
           type: string
-          format: date
-          example: "2026-06-15"
+          format: date-time
+          example: "2026-06-15T00:00:00.000Z"
+        paymentMethod:
+          type: string
+          enum:
+            - full
+            - installment
+        totalInstallments:
+          type: integer
+          example: 2
+        installmentsPaid:
+          type: integer
+          example: 0
+        totalAmount:
+          type: number
+          example: 45000
         status:
           type: string
           enum:
-            - camcelled
+            - cancelled
             - inProgress
             - installment
             - delivered

@@ -21,7 +21,7 @@ exports.createBooking = async (req, res, next) => {
 
         const clientId = req.user.id;
         const { touristId, packageId } = req.params;
-        const { visitDate } = req.body;
+        const { visitDate, paymentMethod, totalInstallments } = req.body;
 
         const client = await Client.findByPk(clientId);
         const tourPackage = await Package.findByPk(packageId);
@@ -95,6 +95,16 @@ exports.createBooking = async (req, res, next) => {
             });
         }
 
+        // Validate payment method
+        const validPaymentMethods = ['full', 'installment'];
+        const method = validPaymentMethods.includes(paymentMethod) ? paymentMethod : 'full';
+        
+        // For installment, default to 2 installments if not specified or invalid
+        let installments = 1;
+        if (method === 'installment') {
+            installments = totalInstallments && totalInstallments === 2 ? 2 : 2;
+        }
+
         const passcode = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, digits: true, lowerCaseAlphabets: false });
 
         const booking = await Booking.create({
@@ -103,11 +113,13 @@ exports.createBooking = async (req, res, next) => {
             packageId: tourPackage.id,
             visitDate: visit.toDate(),
             bookingNumber: generateOrderNumber(),
-            // status,
-            passcode
+            passcode,
+            paymentMethod: method,
+            totalInstallments: installments,
+            totalAmount: tourPackage.amount,
+            status: method === 'installment' ? 'installment' : 'inProgress'
         });
 
-        await booking.save()
         return res.status(201).json({
             message: 'Booking created successfully',
             booking
