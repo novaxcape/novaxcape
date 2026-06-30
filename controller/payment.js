@@ -1,10 +1,9 @@
-const { Client, Booking, Payment, Package, Tourist, Wallet } = require('../models')
-const otpGenerator = require('otp-generator')
-const axios = require('axios')
-const { confirmBooking } = require('../helper/emailTemplate')
-const { sendSingleEmail } = require('../utils/brevo')
-const crypto = require('crypto')
-
+const { Client, Booking, Payment, Package, Tourist, Wallet } = require('../models');
+const otpGenerator = require('otp-generator');
+const axios = require('axios');
+const { confirmBooking } = require('../helper/emailTemplate');
+const { sendSingleEmail } = require('../utils/brevo');
+const crypto = require('crypto');
 
 
 exports.initiatePayment = async (req, res, next) => {
@@ -16,69 +15,118 @@ exports.initiatePayment = async (req, res, next) => {
         }
 
         const clientId = req.user.id;
-        const { bookingId } = req.params
-        const client = await Client.findByPk(clientId)
+        const { bookingId } = req.params;
 
-        if(!Client) {
+        const client = await Client.findByPk(clientId);
+
+        if (!client) {
             return res.status(404).json({
                 message: "Client not found"
-            })
+            });
         }
 
-        const booking = await Booking.findByPk(bookingId);
-
-        const package = await Package.findByPk(booking.dataValues.packageId);
-        console.log("package:", package);
+        const booking = await Booking.findByPk(bookingId, {
+            include: [
+                {
+                    model: Package,
+                    as: 'package'
+                }
+            ]
+        });
 
         if (!booking) {
             return res.status(404).json({
                 message: "Booking not found"
-            })
+            });
         }
 
-        const ref = otpGenerator.generate(12, {upperCaseAlphabets: false,
-            specialChars: false, lowerCaseAlphabets: false
-        });
-        const reference = `NOV-XCAPE-${ref}`
+        let amountToPay;
+        let nextInstallmentNumber = 1;
 
-        const serviceFee = 500;
-        const totalAmount = Number(package.dataValues.amount) + serviceFee;
+        if (booking.paymentMethod === 'installment') {
+            // Automatically determine next unpaid installment
+            nextInstallmentNumber = booking.installmentsPaid + 1;
+
+            if (nextInstallmentNumber > booking.totalInstallments) {
+                return res.status(400).json({
+                    message: 'All installments for this booking have already been paid'
+                });
+            }
+
+            // Calculate installment amount: totalAmount / totalInstallments
+            const perInstallment = Math.ceil(Number(booking.totalAmount) / booking.totalInstallments);
+            // Service fee split across installments: 500 per installment
+            const serviceFee = 500;
+            amountToPay = perInstallment + serviceFee;
+
+        } else {
+            // Full payment: package amount + service fee
+            amountToPay = Number(booking.totalAmount || booking.package.amount) + 1000;
+        }
+
+        const ref = otpGenerator.generate(12, {
+            upperCaseAlphabets: false,
+            specialChars: false,
+            lowerCaseAlphabets: false
+        });
+        const reference = `NOV-XCAPE-${ref}`;
 
         const paymentData = {
-            amount: totalAmount,
+            amount: amountToPay,
             currency: 'NGN',
             reference,
             customer: {
-                email: client.dataValues.email,
-                name: `${client.dataValues.firstName} ${client.dataValues.lastName}`
+                email: client.email,
+                name: `${client.firstName} ${client.lastName}`
             },
             redirect_url: 'https://novaxcape.vercel.app/payment-confirmation',
-            // notification_url: 'https://novaxcape.onrender.com/api/v1/payment/verify-webhook'
-        }
+        };
 
-        const {data} = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentData, {
+        const { data } = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentData, {
             headers: {
                 Authorization: `Bearer ${process.env.KORA_API_KEY}`
             }
-        })
+        });
 
         const payment = await Payment.create({
-            amount: totalAmount,
+            amount: amountToPay,
             reference,
             clientId,
-            bookingId: booking.dataValues.id
-        })
+            bookingId: booking.id,
+            installmentNumber: booking.paymentMethod === 'installment' ? nextInstallmentNumber : 1,
+            installmentOf: booking.paymentMethod === 'installment' ? booking.totalInstallments : 1
+        });
 
         res.status(200).json({
-            message: "payment initialized successfully",
+            message: "Payment initialized successfully",
             data
-        })
-        
+        });
+
     } catch (error) {
-        console.log(error)
-        next(error)
+        console.log(error);
+        next(error);
     }
-}
+};
+
+
+const sendBookingConfirmationEmail = async (booking, client, tourist) => {
+    try {
+        await sendSingleEmail({
+            email: client.email.toLowerCase(),
+            name: `${client.firstName} ${client.lastName}`,
+            html: confirmBooking({
+                location: tourist.centreName,
+                visitDate: booking.visitDate,
+                bookingId: booking.bookingNumber,
+                passcode: booking.passcode,
+                amount: booking.totalAmount
+            }),
+            subject: 'BOOKING CONFIRMATION - NOVAXCAPE'
+        });
+    } catch (error) {
+        console.log('Email send error:', error);
+    }
+};
 
 
 exports.verifyPayment = async (req, res, next) => {
@@ -106,113 +154,209 @@ exports.verifyPayment = async (req, res, next) => {
                 message: 'Payment not found'
             });
         }
-        console.log('payment:', payment)
-        const client = await Client.findByPk(payment.booking.clientId);
-        const tourist = await Tourist.findByPk(payment.booking.touristId);
-       
 
-        let wallet = await Wallet.findOne({ where: { touristId: tourist.id } });
-        if (!wallet) {
-            wallet = await Wallet.create({ touristId: tourist.id, balance: 0, totalEarnings: 0 });
-        }
-
-        const { data } = await axios.get(`https://api.korapay.com/merchant/api/v1/charges/${reference}`,{
+        const { data } = await axios.get(`https://api.korapay.com/merchant/api/v1/charges/${reference}`, {
             headers: {
                 Authorization: `Bearer ${process.env.KORA_API_KEY}`
             }
-        })
-  
+        });
 
         if (data?.status === true && data?.data.status === 'success') {
-            payment.status = data?.data.status;
-            await payment.save()
+            payment.status = 'success';
+            await payment.save();
 
-         wallet.balance = Number(wallet.balance) + Number(payment.booking.package.amount)
-         wallet.totalEarnings = Number(wallet.totalEarnings) + Number(payment.booking.package.amount)
-         await wallet.save()
-         res.status(200).json({
+            const booking = payment.booking;
+            const client = await Client.findByPk(booking.clientId);
+            const tourist = await Tourist.findByPk(booking.touristId);
+
+            // Credit tourist wallet (proportionate for installments)
+            let wallet = await Wallet.findOne({ where: { touristId: tourist.id } });
+            if (!wallet) {
+                wallet = await Wallet.create({ touristId: tourist.id, balance: 0, totalEarnings: 0 });
+            }
+
+            const packageAmount = booking.package ? Number(booking.package.amount) : Number(booking.totalAmount);
+            // For installments, credit proportionate amount per installment settled
+            const creditAmount = booking.paymentMethod === 'installment'
+                ? Math.ceil(packageAmount / booking.totalInstallments)
+                : packageAmount;
+
+            wallet.balance = Number(wallet.balance) + creditAmount;
+            wallet.totalEarnings = Number(wallet.totalEarnings) + creditAmount;
+            await wallet.save();
+
+            if (booking.paymentMethod === 'installment') {
+                // Increment installments paid on the booking
+                booking.installmentsPaid = (booking.installmentsPaid || 0) + 1;
+
+                // Check if fully paid
+                if (booking.installmentsPaid >= booking.totalInstallments) {
+                    booking.status = 'delivered';
+                    await booking.save();
+
+                    // Send digital ticket email only on final installment
+                    await sendBookingConfirmationEmail(booking, client, tourist);
+
+                    return res.status(200).json({
+                        message: "Payment verified successfully - Booking fully paid",
+                        data: data?.data,
+                        otp: booking.passcode,
+                        visitDate: booking.visitDate,
+                        bookingId: booking.bookingNumber,
+                        location: tourist.centreName,
+                        amount: booking.totalAmount,
+                        installmentNumber: payment.installmentNumber,
+                        installmentsPaid: booking.installmentsPaid,
+                        totalInstallments: booking.totalInstallments,
+                        fullyPaid: true
+                    });
+                }
+
+                // Installment paid but NOT yet fully paid
+                await booking.save();
+
+                return res.status(200).json({
+                    message: `Installment ${payment.installmentNumber} of ${booking.totalInstallments} paid successfully`,
+                    data: data?.data,
+                    installmentNumber: payment.installmentNumber,
+                    installmentsPaid: booking.installmentsPaid,
+                    totalInstallments: booking.totalInstallments,
+                    fullyPaid: false,
+                    nextInstallment: booking.installmentsPaid + 1
+                });
+            }
+
+            // Full payment flow (existing behavior)
+            booking.status = 'delivered';
+            await booking.save();
+
+            await sendBookingConfirmationEmail(booking, client, tourist);
+
+            return res.status(200).json({
                 message: "Payment verified successfully",
                 data: data?.data,
-                otp: payment.booking.passcode,
-                visitDate: payment.booking.visitDate,
-                bookingId: payment.booking.bookingNumber,
+                otp: booking.passcode,
+                visitDate: booking.visitDate,
+                bookingId: booking.bookingNumber,
                 location: tourist.centreName,
-                amount: payment.booking.package.amount
+                amount: booking.totalAmount || booking.package.amount
             });
 
-          (async () => {
-              try {
-                await sendSingleEmail({
-                    email: client.email.toLowerCase(),
-                    name: `${client.firstName} ${client.lastName}`,
-                    html: confirmBooking({
-                        location: tourist.centreName,
-                        visitDate: payment.booking.visitDate,
-                        bookingId: payment.booking.bookingNumber,
-                        passcode: payment.booking.passcode,
-                        amount: payment.booking.package.amount
-                    }),
-                    subject: 'BOOKING CONFIRMATION'
-                });
-                console.log("email:", sendSingleEmail)
-              } catch (error) {
-                  console.log('Email send error:', error);
-              }
-          })()
-            
         } else {
-            payment.dataValues.status = data?.data.status
-            await payment.save()
+            payment.status = data?.data.status || 'failed';
+            await payment.save();
 
             return res.status(400).json({
                 message: "Payment verification failed",
                 data: payment
-            })
+            });
         }
-
-      
 
     } catch (error) {
         console.log(error.message);
-        next(error)
-        
+        next(error);
     }
-}
+};
+
+
+exports.getInstallmentStatus = async (req, res, next) => {
+    try {
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                message: 'Unauthorized - Invalid token'
+            });
+        }
+
+        const { bookingId } = req.params;
+
+        const booking = await Booking.findByPk(bookingId, {
+            include: [
+                {
+                    model: Payment,
+                    as: 'payments',
+                    where: { status: 'success' },
+                    required: false
+                }
+            ]
+        });
+
+        if (!booking) {
+            return res.status(404).json({
+                message: 'Booking not found'
+            });
+        }
+
+        res.status(200).json({
+            message: 'Installment status retrieved',
+            data: {
+                bookingId: booking.id,
+                bookingNumber: booking.bookingNumber,
+                paymentMethod: booking.paymentMethod,
+                totalInstallments: booking.totalInstallments,
+                installmentsPaid: booking.installmentsPaid,
+                totalAmount: booking.totalAmount,
+                amountPerInstallment: booking.paymentMethod === 'installment'
+                    ? Math.ceil(Number(booking.totalAmount) / booking.totalInstallments)
+                    : Number(booking.totalAmount),
+                status: booking.status,
+                payments: booking.payments
+            }
+        });
+
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    }
+};
 
 
 exports.verifyWebhook = async (req, res, next) => {
     try {
-  const { event, data } = req.body;
-  const hash = crypto.createHmac("sha256", process.env.KORA_API_KEY).update(JSON.stringify(data)).digest("hex");
-  const signature = req.headers["x-korapay-signature"];
-  if (hash !== signature) return res.status(401).json({
-    message: "Invalid webhook signature"
-  });
-  const payment = await Payment.findOne({where:{reference}})
-  if (!payment ) return res.status(404).json({
-    message: "NO payment record found"
-  });
+        const { event, data } = req.body;
+        const hash = crypto.createHmac("sha256", process.env.KORA_API_KEY)
+            .update(JSON.stringify(data))
+            .digest("hex");
+        const signature = req.headers["x-korapay-signature"];
 
-  if (event === 'charge.success') {
-    payment.dataValues.status = success
-    await payment.save()
-} else if (event === 'charge.pending') {
-    payment.dataValues.status = pending
-    await payment.save()
-} else if (event === 'charge.failed') {
-    payment.dataValues.status = failed
-    await payment.save()
-};
+        if (hash !== signature) {
+            return res.status(401).json({
+                message: "Invalid webhook signature"
+            });
+        }
 
-  await payment.save();
-  res.status(200).json({
-    success: true,
-    status: "successful",
-    message: 'Payment verified successfully'
-  })
-} catch (error) {
-    console.log(error.message)
-    next(error)
-}
+        const reference = data?.reference;
+        if (!reference) {
+            return res.status(400).json({
+                message: "No reference in webhook data"
+            });
+        }
 
+        const payment = await Payment.findOne({ where: { reference } });
+
+        if (!payment) {
+            return res.status(404).json({
+                message: "No payment record found"
+            });
+        }
+
+        if (event === 'charge.success') {
+            payment.status = 'success';
+        } else if (event === 'charge.pending') {
+            payment.status = 'pending';
+        } else if (event === 'charge.failed') {
+            payment.status = 'failed';
+        }
+
+        await payment.save();
+
+        res.status(200).json({
+            success: true,
+            status: "successful",
+            message: 'Payment verified successfully'
+        });
+
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    }
 };

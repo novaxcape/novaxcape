@@ -70,6 +70,25 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false
       },
+      paymentMethod: {
+        type: DataTypes.ENUM('full', 'installment'),
+        allowNull: false,
+        defaultValue: 'full'
+      },
+      totalInstallments: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1
+      },
+      installmentsPaid: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
+      totalAmount: {
+        type: DataTypes.DECIMAL(12, 2),
+        allowNull: true
+      },
   }, {
     sequelize,
     modelName: 'Booking',

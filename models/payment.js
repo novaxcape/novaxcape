@@ -54,6 +54,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM('pending', 'success', 'failed', 'abandoned', 'processing'),
       allowNull: false,
       defaultValue: 'pending'
+    },
+    installmentNumber: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
+    },
+    installmentOf: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
     }
   }, {
     sequelize,
