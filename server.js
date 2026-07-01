@@ -129,7 +129,8 @@ const databaseConnection = async () => {
             console.log(`Server is listening on port: ${PORT}`)
         })
     } catch (error) {
-        console.log('unable to connect to database:', error.message)
+        console.error('unable to connect to database:', error)
+        process.exit(1)
     }
 }
 
