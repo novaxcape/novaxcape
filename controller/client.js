@@ -201,6 +201,13 @@ exports.login = async (req, res, next) => {
       { expiresIn: '1d' }
     );
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
     const data = {
       id: user.dataValues.id,
       email: user.dataValues.email,
@@ -210,7 +217,6 @@ exports.login = async (req, res, next) => {
     }
     res.status(200).json({
       message: 'Login successfull',
-      token,
       data
     })
   } catch (error) {
@@ -383,10 +389,14 @@ exports.loginWithGoogle = async (req, res, next) => {
       role: req.user.role
     }, process.env.SECERT_KEY, { expiresIn: '1d' });
 
-    const frontendUrl = new URL(process.env.FRONTEND_URL);
-    frontendUrl.hash = new URLSearchParams({ token }).toString();
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000
+    });
 
-    return res.redirect(302, frontendUrl.toString());
+    return res.redirect(302, process.env.FRONTEND_URL);
   } catch (error) {
     next(error);
   }
@@ -423,14 +433,18 @@ exports.getAllClients = async (req, res, next) => {
 }
 
 exports.logout = async (req, res, next) => {
-    try {
-        const token = req.headers.authorization.split(' ')[1];
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+    });
 
-        res.status(200).json({
-            message: "Logged out successfully"
-        });
-    } catch (error) {
-        console.log(error.message);
-        next(error);
-    }
+    return res.status(200).json({
+      message: "Logout successful"
+    });
+
+  } catch (error) {
+    next(error)
+  }
 };

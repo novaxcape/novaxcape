@@ -6,6 +6,7 @@ const express_session = require('express-session')
 const swaggerUi = require('swagger-ui-express');
 const swagger= require('./swagger')
 const {passport} =require ('./middleware/passport')
+const cookieParser = require('cookie-parser')
 const cors = require('cors')
 
 
@@ -38,7 +39,11 @@ const { updateBookingMiddleware } = require('./middleware/bookingAuth')
 
 const app = express()
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true
+}))
+app.use(cookieParser())
 
 app.use(updateBookingMiddleware)
 app.use('/apisDocs', swaggerUi.serve, swaggerUi.setup(swagger))
