@@ -383,18 +383,10 @@ exports.loginWithGoogle = async (req, res, next) => {
       role: req.user.role
     }, process.env.SECERT_KEY, { expiresIn: '1d' });
 
-    res.status(200).json({
-      message: 'Login successful',
-      data: {
-        id: req.user.id,
-        firstName: req.user.firstName,
-        lastName: req.user.lastName,
-        email: req.user.email,
-        role: req.user.role,
-        profilePicture: req.user.profilePicture
-      },
-      token
-    })
+    const frontendUrl = new URL(process.env.FRONTEND_URL);
+    frontendUrl.hash = new URLSearchParams({ token }).toString();
+
+    return res.redirect(302, frontendUrl.toString());
   } catch (error) {
     next(error);
   }

@@ -13,13 +13,18 @@ passport.use(
 
     async (accessToken, refreshToken, profile, cb) => {
       try {
+        const email = profile.emails?.[0]?.value || profile._json?.email;
+        const firstName = profile.name?.givenName || profile.displayName || 'Google';
+        const lastName = profile.name?.familyName || 'User';
 
-        console.log('profile', profile);
+        if (!email) {
+          return cb(new Error('Google did not return an email address'), null);
+        }
 
         // Check if client already exists
         let client = await Client.findOne({
           where: {
-            email: profile._json.email
+            email
           }
         });
 
@@ -27,9 +32,9 @@ passport.use(
         if (!client) {
 
           client = await Client.create({
-            firstName: profile.name.givenName,
-            lastName: profile.name.familyName,
-            email: profile._json.email,
+            firstName,
+            lastName,
+            email,
             password: ' ',
             profilePicture: profile._json.picture,
             isVerified: profile._json.email_verified
