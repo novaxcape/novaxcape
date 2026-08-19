@@ -60,18 +60,15 @@ exports.createBooking = async (req, res, next) => {
         let isOpenOnDay = false;
 
         if (typeof openingHours === 'string') {
-            // Stored as pipe-delimited string: "Monday: 10 AM - 4 PM | Tuesday: Closed | Wednesday: 10 AM - 4 PM"
-            // Split by "|" and check each day entry
+            
             const entries = openingHours.split('|').map(e => e.trim());
             isOpenOnDay = entries.some(entry => {
-                // Check if entry starts with the day name (case-insensitive) and does NOT contain "Closed"
                 const dayName = entry.split(':')[0]?.trim();
                 const isClosed = entry.toLowerCase().includes('closed');
                 return dayName && dayName.toLowerCase() === dayOfWeek.toLowerCase() && !isClosed;
             });
         } else if (Array.isArray(openingHours)) {
-            // Array of day names ["Monday", "Tuesday", ...]
-            // or array of objects [{day: "Monday", open: "08:00", close: "18:00"}, ...]
+
             isOpenOnDay = openingHours.some(entry => {
                 if (typeof entry === 'string') {
                     return entry.toLowerCase() === dayOfWeek.toLowerCase();
