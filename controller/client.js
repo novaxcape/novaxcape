@@ -7,6 +7,7 @@ const { sendOTPEmail, resetPasswordTemplate, resetPasswordSuccessfulTemplate } =
 const { sendSingleEmail } = require('../utils/brevo');
 const cloudinary = require('../middleware/cloudinary');
 const fs = require('fs');
+const redis = require('../utils/redis');
 
 const generateOTP = () => ({
   otp: otpGenerator.generate(6, {
@@ -421,7 +422,17 @@ exports.getOneClient = async (req, res, next) => {
 
 exports.getAllClients = async (req, res, next) => {
   try {
-    const allClients = await client.findAll().sort({ createdAt: -1 })
+    const checkCache = await redis.get('users')
+        if(checkCache){
+            return res.status(200).json({
+                message: "Users retrieved successfully",
+                data: checkCache
+            })
+        }
+
+    const allClients = await Client.findAll().sort({ createdAt: -1 })
+    await redis.set('users', JSON.stringify(allClients), 'EX', 60)
+
     res.status(200).json({
       message: "Clients found",
       data: allClients,

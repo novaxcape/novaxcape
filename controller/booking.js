@@ -4,7 +4,7 @@ const customParseFormat = require('dayjs/plugin/customParseFormat');
 
 dayjs.extend(customParseFormat);
 const otpGenerator = require('otp-generator');
-
+const redis = require('../utils/redis');
 const generateOrderNumber = () => {
   const randomNumber = Math.floor(100000 + Math.random() * 900000);
   return `NOV-${randomNumber}`;
@@ -138,6 +138,17 @@ exports.getAllBooking = async (req, res, next) => {
         const pageSize = parseInt(req.query.pageSize) || 10;
         const offset = (pageNumber - 1) * pageSize;
 
+        const cacheKey = `bookings:${touristId}:${pageNumber}:${pageSize}`;
+
+        const checkCache = await redis.get(cacheKey);
+
+        if (checkCache) {
+            return res.status(200).json({
+                message: "Bookings retrieved successfully",
+                data: JSON.parse(checkCache)
+            });
+        }
+
         const { count, rows } = await Booking.findAndCountAll({
             where: {
                 touristId
@@ -160,7 +171,14 @@ exports.getAllBooking = async (req, res, next) => {
             order: [["createdAt", "DESC"]]
         });
 
-        res.status(200).json({
+        await redis.set(
+            cacheKey,
+            JSON.stringify(rows),
+            "EX",
+            60
+        );
+
+        return res.status(200).json({
             message: "Bookings retrieved successfully",
             count,
             data: rows,
@@ -173,6 +191,7 @@ exports.getAllBooking = async (req, res, next) => {
                 hasPreviousPage: pageNumber > 1
             }
         });
+
     } catch (error) {
         next(error);
     }
