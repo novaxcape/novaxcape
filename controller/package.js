@@ -1,4 +1,5 @@
 const { Package, Vendor, Tourist } = require('../models');
+const redis = require('../utils/redis');
 
 
 exports.createPackage = async (req, res) => {
@@ -61,6 +62,21 @@ exports.getAllPackages = async (req, res, next) => {
     try {
         const { touristId } = req.params;
 
+        const cacheKey = `packages:${touristId}`;
+
+        const checkCache = await redis.get(cacheKey);
+
+        if (checkCache) {
+            const packages = JSON.parse(checkCache);
+
+            return res.status(200).json({
+                success: true,
+                message: "Packages retrieved successfully",
+                count: packages.length,
+                data: packages
+            });
+        }
+
         const tourist = await Tourist.findByPk(touristId);
 
         if (!tourist) {
@@ -77,6 +93,13 @@ exports.getAllPackages = async (req, res, next) => {
             order: [["createdAt", "DESC"]]
         });
 
+        await redis.set(
+            cacheKey,
+            JSON.stringify(packages),
+            "EX",
+            60
+        );
+
         return res.status(200).json({
             success: true,
             message: "Packages retrieved successfully",
@@ -89,7 +112,6 @@ exports.getAllPackages = async (req, res, next) => {
         next(error);
     }
 };
-
 
 exports.getPackageById = async (req, res, next) => {
     try {
