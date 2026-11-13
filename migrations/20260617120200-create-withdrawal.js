@@ -7,7 +7,7 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
-        dafaultValue: Sequelize.UUIDV4
+        defaultValue: Sequelize.UUIDV4
       },
 
       touristId: {

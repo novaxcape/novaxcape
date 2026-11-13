@@ -12,6 +12,7 @@ router.post('/register/:vendorId', authenticateToken, vendorAuth, validate.creat
 router.get('/get-all-state/:state', touristController.getAllTouristsByState)
 router.get('/get-one/:id', touristController.getOneTourist)
 router.get('/get-all-opening-hours/:openingHours', touristController.getAllTouristsByOpeningHours)
+router.get('/get-all-centre-type/:centreType', touristController.getAllTouristByCentreType)
 
 router.post('/verify-client-passcode', authenticateToken, vendorAuth, validate.validateClientPasscode, touristController.verifyClientPasscode)
 router.get('/getall', authenticateToken, vendorAuth, touristController.getallTourists)
