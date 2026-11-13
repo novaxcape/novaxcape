@@ -13,7 +13,7 @@ const generateOTP = () => ({
   otp: otpGenerator.generate(6, {
     upperCaseAlphabets: false,
     specialChars: false,
-    digits: true,
+    digits: true, 
     lowerCaseAlphabets: false
   }),
   otpExpire: new Date(Date.now() + 1000 * 60 * 5)

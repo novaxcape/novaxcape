@@ -10,4 +10,5 @@ const sequelize = new Sequelize({
   logging: console.log // Enable logging to see SQL queries
 });
 
-module.exports = sequelize
+
+module.exports = sequelize;

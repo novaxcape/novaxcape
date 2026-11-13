@@ -1,11 +1,24 @@
-const { Review } = require('../models')
+const { Review, Client, Tourist } = require('../models')
 
 
 exports.createReview = async (req, res, next) => {
     try {
         const clientId = req.user.id
         const touristId = req.params.id
-        
+        const existingClient = await Client.findByPk(clientId)
+        if (!existingClient) {
+            return res.status(404).json({
+                message: "Client not found"
+            })
+        }
+
+        const tourist = await Tourist.findByPk(touristId)
+        if (!tourist) {
+            return res.status(404).json({
+                message: "Tourist not found"
+            })
+        }
+
         const { ratings, fullName, email, addYourReview } = req.body
         
         const review = await Review.create({

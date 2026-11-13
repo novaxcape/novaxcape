@@ -1,4 +1,4 @@
-const { Tourist, Vendor, Booking, Wallet, PaymentPlan} = require('../models')
+const { Tourist, Vendor, Booking, Wallet, PaymentPlan, Kyc } = require('../models')
 const fs = require('fs')
 const cloudinary = require('../middleware/cloudinary')
 
@@ -298,6 +298,44 @@ exports.getAll = async (req, res, next) => {
             count: tourist.length
         })
     } catch (error) {
+        console.log(error.message);
+        next(error)
+    }
+}
+
+exports.getAllTouristByCentreType = async (req, res, next) => {
+    try {
+        const centreType = req.params.centreType?.trim()
+
+        if (!centreType) {
+            return res.status(400).json({
+                message: 'Centre type is required'
+            })
+        }
+
+        const tourists = await Tourist.findAll({
+            include: [{
+                model: Kyc,
+                as: 'kyc',
+                attributes: ['centreType'],
+                where: { centreType },
+                required: true
+            }],
+            order: [['createdAt', 'DESC']]
+        })
+
+        if (!tourists.length) {
+            return res.status(404).json({
+                message: `No tourist centers found for centre type: ${centreType}`
+            })
+        }
+
+        return res.status(200).json({
+            message: 'Tourist centers retrieved successfully',
+            count: tourists.length,
+            data: tourists
+        })
+    } catch (error){
         console.log(error.message);
         next(error)
     }

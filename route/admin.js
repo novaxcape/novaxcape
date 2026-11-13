@@ -5,4 +5,4 @@ router.post('/register', adminController.registerAdmin);
 router.post('/login', adminController.loginAdmin);
 router.post('/forgot-password', adminController.forgotPassword);
 
-module.exports = router
+module.exports = router;
