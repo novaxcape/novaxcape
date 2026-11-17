@@ -5,6 +5,7 @@ const host_password = process.env.HOST_DB_PASSWORD
 const host_host = process.env.HOST_DB_HOST
 const host_dialect = process.env.HOST_DB_DIALECT
 const host_database = process.env.HOST_DB_NAME;
+const port = process.env.HOST_DB_PORT
 
 const local_user = process.env.LOCAL_DB_USERNAME
 const local_password = process.env.LOCAL_DB_PASSWORD
@@ -19,20 +20,23 @@ module.exports = {
     "password": host_password,
     "database": host_database,
     "host": host_host,
-    "dialect": host_dialect
+    "dialect": "mysql",
+    "port": port
   },
   "test": {
     "username": host_user,
     "password": host_password,
     "database": host_database,
     "host": host_host,
-    "dialect": host_dialect
+    "dialect": "mysql",
+    "port": port
   },
   "production": {
     "username": host_user,
     "password": host_password,
     "database": host_database,
     "host": host_host,
-    "dialect": host_dialect
+    "dialect": "mysql",
+    "port": port
   }
 }
